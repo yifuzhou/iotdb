@@ -26,11 +26,10 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.apache.iotdb.db.conf.IoTDBConfig;
 import org.apache.iotdb.db.conf.IoTDBDescriptor;
 import org.apache.iotdb.db.qp.physical.crud.DeletePlan;
-import org.apache.iotdb.db.qp.physical.crud.InsertPlan;
+import org.apache.iotdb.db.qp.physical.crud.InsertRowPlan;
 import org.apache.iotdb.db.qp.physical.crud.InsertTabletPlan;
 import org.apache.iotdb.db.utils.EnvironmentUtils;
 import org.apache.iotdb.db.writelog.io.ILogReader;
@@ -38,6 +37,7 @@ import org.apache.iotdb.db.writelog.node.ExclusiveWriteLogNode;
 import org.apache.iotdb.db.writelog.node.WriteLogNode;
 import org.apache.iotdb.tsfile.file.metadata.enums.TSDataType;
 import org.apache.iotdb.tsfile.read.common.Path;
+import org.apache.iotdb.tsfile.utils.Binary;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -69,11 +69,11 @@ public class WriteLogNodeTest {
 
     WriteLogNode logNode = new ExclusiveWriteLogNode(identifier);
 
-    InsertPlan bwInsertPlan = new InsertPlan(identifier, 100,
+    InsertRowPlan bwInsertPlan = new InsertRowPlan(identifier, 100,
         new String[]{"s1", "s2", "s3", "s4"},
         new TSDataType[]{TSDataType.DOUBLE, TSDataType.INT64, TSDataType.TEXT, TSDataType.BOOLEAN},
         new String[]{"1.0", "15", "str", "false"});
-    DeletePlan deletePlan = new DeletePlan(50, new Path(identifier + ".s1"));
+    DeletePlan deletePlan = new DeletePlan(Long.MIN_VALUE, 50, new Path(identifier + ".s1"));
 
     long[] times = new long[]{110L, 111L, 112L, 113L};
     List<Integer> dataTypes = new ArrayList<>();
@@ -84,13 +84,13 @@ public class WriteLogNodeTest {
     Object[] columns = new Object[4];
     columns[0] = new double[4];
     columns[1] = new long[4];
-    columns[2] = new String[4];
+    columns[2] = new Binary[4];
     columns[3] = new boolean[4];
 
     for (int r = 0; r < 4; r++) {
       ((double[]) columns[0])[r] = 1.0;
       ((long[]) columns[1])[r] = 1;
-      ((String[]) columns[2])[r] = "hh" + r;
+      ((Binary[]) columns[2])[r] = new Binary("hh" + r);
       ((boolean[]) columns[3])[r] = false;
     }
 
@@ -99,8 +99,10 @@ public class WriteLogNodeTest {
     tabletPlan.setTimes(times);
     tabletPlan.setColumns(columns);
     tabletPlan.setRowCount(times.length);
+    tabletPlan.setStart(0);
+    tabletPlan.setEnd(4);
 
-    tabletPlan.markMeasurementInsertionFailed(2);
+    tabletPlan.markFailedMeasurementInsertion(1);
 
     logNode.write(bwInsertPlan);
     logNode.write(deletePlan);
@@ -109,7 +111,7 @@ public class WriteLogNodeTest {
     logNode.close();
 
     File walFile = new File(
-        config.getWalFolder() + File.separator + identifier + File.separator + "wal1");
+        config.getWalDir() + File.separator + identifier + File.separator + "wal1");
     assertTrue(walFile.exists());
 
     ILogReader reader = logNode.getLogReader();
@@ -130,11 +132,11 @@ public class WriteLogNodeTest {
 
     WriteLogNode logNode = new ExclusiveWriteLogNode(identifier);
 
-    InsertPlan bwInsertPlan = new InsertPlan(identifier, 100,
+    InsertRowPlan bwInsertPlan = new InsertRowPlan(identifier, 100,
         new String[]{"s1", "s2", "s3", "s4"},
         new TSDataType[]{TSDataType.DOUBLE, TSDataType.INT64, TSDataType.TEXT, TSDataType.BOOLEAN},
         new String[]{"1.0", "15", "str", "false"});
-    DeletePlan deletePlan = new DeletePlan(50, new Path(identifier + ".s1"));
+    DeletePlan deletePlan = new DeletePlan(Long.MIN_VALUE, 50, new Path(identifier + ".s1"));
 
     logNode.write(bwInsertPlan);
     logNode.notifyStartFlush();
@@ -167,16 +169,16 @@ public class WriteLogNodeTest {
 
     WriteLogNode logNode = new ExclusiveWriteLogNode("root.logTestDevice");
 
-    InsertPlan bwInsertPlan = new InsertPlan("root.logTestDevice", 100,
+    InsertRowPlan bwInsertPlan = new InsertRowPlan("root.logTestDevice", 100,
         new String[]{"s1", "s2", "s3", "s4"},
         new TSDataType[]{TSDataType.DOUBLE, TSDataType.INT64, TSDataType.TEXT, TSDataType.BOOLEAN},
         new String[]{"1.0", "15", "str", "false"});
-    DeletePlan deletePlan = new DeletePlan(50, new Path("root.logTestDevice.s1"));
+    DeletePlan deletePlan = new DeletePlan(Long.MIN_VALUE, 50, new Path("root.logTestDevice.s1"));
 
     logNode.write(bwInsertPlan);
 
     File walFile = new File(
-        config.getWalFolder() + File.separator + "root.logTestDevice" + File.separator + "wal1");
+        config.getWalDir() + File.separator + "root.logTestDevice" + File.separator + "wal1");
     assertTrue(!walFile.exists());
 
     logNode.write(deletePlan);
@@ -193,11 +195,11 @@ public class WriteLogNodeTest {
 
     WriteLogNode logNode = new ExclusiveWriteLogNode("root.logTestDevice");
 
-    InsertPlan bwInsertPlan = new InsertPlan("logTestDevice", 100,
+    InsertRowPlan bwInsertPlan = new InsertRowPlan("logTestDevice", 100,
         new String[]{"s1", "s2", "s3", "s4"},
         new TSDataType[]{TSDataType.DOUBLE, TSDataType.INT64, TSDataType.TEXT, TSDataType.BOOLEAN},
         new String[]{"1.0", "15", "str", "false"});
-    DeletePlan deletePlan = new DeletePlan(50, new Path("root.logTestDevice.s1"));
+    DeletePlan deletePlan = new DeletePlan(Long.MIN_VALUE, 50, new Path("root.logTestDevice.s1"));
 
     logNode.write(bwInsertPlan);
     logNode.write(deletePlan);
@@ -205,7 +207,7 @@ public class WriteLogNodeTest {
     logNode.forceSync();
 
     File walFile = new File(
-        config.getWalFolder() + File.separator + "root.logTestDevice" + File.separator + "wal1");
+        config.getWalDir() + File.separator + "root.logTestDevice" + File.separator + "wal1");
     assertTrue(walFile.exists());
 
     assertTrue(new File(logNode.getLogDirectory()).exists());
@@ -218,7 +220,7 @@ public class WriteLogNodeTest {
     // this test uses a dummy insert log node to insert an over-sized log and assert exception caught
     WriteLogNode logNode = new ExclusiveWriteLogNode("root.logTestDevice.oversize");
 
-    InsertPlan bwInsertPlan = new InsertPlan("root.logTestDevice.oversize", 100,
+    InsertRowPlan bwInsertPlan = new InsertRowPlan("root.logTestDevice.oversize", 100,
         new String[]{"s1", "s2", "s3", "s4"},
         new TSDataType[]{TSDataType.DOUBLE, TSDataType.INT64, TSDataType.TEXT, TSDataType.BOOLEAN},
         new String[]{"1.0", "15", new String(new char[65 * 1024 * 1024]), "false"});

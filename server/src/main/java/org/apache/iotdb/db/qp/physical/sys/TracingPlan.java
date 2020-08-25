@@ -16,23 +16,29 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.iotdb.db.exception.query;
+package org.apache.iotdb.db.qp.physical.sys;
 
-import org.apache.iotdb.rpc.TSStatusCode;
+import java.util.ArrayList;
+import java.util.List;
+import org.apache.iotdb.db.qp.logical.Operator.OperatorType;
+import org.apache.iotdb.db.qp.physical.PhysicalPlan;
+import org.apache.iotdb.tsfile.read.common.Path;
 
-public class PathException extends QueryProcessException {
+public class TracingPlan extends PhysicalPlan {
 
-  private static final long serialVersionUID = 2141197032898163234L;
+  private boolean isTracingOn;
 
-  public PathException() {
-    super("Timeseries is null", TSStatusCode.PATH_ERROR.getStatusCode());
+  public TracingPlan(boolean isTracingOn) {
+    super(false, OperatorType.TRACING);
+    this.isTracingOn = isTracingOn;
   }
 
-  public PathException(String message) {
-    super(message, TSStatusCode.PATH_ERROR.getStatusCode());
+  @Override
+  public List<Path> getPaths() {
+    return new ArrayList<>();
   }
 
-  public PathException(String message, int errorCode) {
-    super(message, errorCode);
+  public boolean isTracingOn() {
+    return isTracingOn;
   }
 }

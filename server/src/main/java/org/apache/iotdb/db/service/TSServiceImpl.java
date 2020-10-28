@@ -562,6 +562,7 @@ public class TSServiceImpl implements TSIService.Iface, ServerContext {
    */
   private TSExecuteStatementResp internalExecuteQueryStatement(String statement,
       long statementId, PhysicalPlan plan, int fetchSize, String username) {
+    queryCount.incrementAndGet();
     long startTime = System.currentTimeMillis();
     long queryId = -1;
     try {

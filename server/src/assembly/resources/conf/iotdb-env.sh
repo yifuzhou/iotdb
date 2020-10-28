@@ -166,9 +166,9 @@ calculate_heap_sizes
 #HEAP_NEWSIZE="`expr $system_memory_in_mb \* $min_percentage / 100`M"
 
 # Maximum heap size
-MAX_HEAP_SIZE="10G"
+MAX_HEAP_SIZE="32G"
 # Minimum heap size
-HEAP_NEWSIZE="2G"
+HEAP_NEWSIZE="32G"
 
 #true or false
 #DO NOT FORGET TO MODIFY THE PASSWORD FOR SECURITY (${IOTDB_CONF}/jmx.password and ${IOTDB_CONF}/jmx.access)

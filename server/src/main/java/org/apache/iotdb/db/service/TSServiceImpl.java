@@ -529,7 +529,7 @@ public class TSServiceImpl implements TSIService.Iface, ServerContext {
         physicalPlan =
             processor.parseSQLToPhysicalPlan(statement, sessionIdZoneIdMap.get(req.getSessionId()));
       } catch (QueryProcessException | SQLParserException e) {
-        logger.info(ERROR_PARSING_SQL, e.getMessage());
+        logger.info(ERROR_PARSING_SQL, e.getMessage() + " sql: " + statement);
         return RpcUtils.getTSExecuteStatementResp(TSStatusCode.SQL_PARSE_ERROR, e.getMessage());
       }
 

@@ -21,7 +21,6 @@ package org.apache.iotdb.db.conf;
 import static org.apache.iotdb.tsfile.common.constant.TsFileConstant.PATH_SEPARATOR;
 
 import java.io.File;
-import java.time.ZoneId;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.iotdb.db.conf.directories.DirectoryManager;
@@ -135,7 +134,7 @@ public class IoTDBConfig {
    */
   private long allocateMemoryForReadWithoutCache = Runtime.getRuntime().maxMemory() * 9 / 100;
 
-  private volatile int maxQueryDeduplicatedPathNum = 1000;
+  private volatile int maxQueryDeduplicatedPathNum = 2000;
 
   /**
    * Is dynamic parameter adapter enable.
@@ -298,12 +297,12 @@ public class IoTDBConfig {
   /**
    * whether to cache meta data(ChunkMetaData and TsFileMetaData) or not.
    */
-  private boolean metaDataCacheEnable = true;
+  private boolean metaDataCacheEnable = false;
 
   /**
    * Memory allocated for timeSeriesMetaData cache in read process
    */
-  private long allocateMemoryForTimeSeriesMetaDataCache = allocateMemoryForRead / 10;
+  private long allocateMemoryForTimeSeriesMetaDataCache = allocateMemoryForRead / 150;
 
   /**
    * Memory allocated for chunkMetaData cache in read process

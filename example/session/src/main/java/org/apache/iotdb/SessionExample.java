@@ -23,10 +23,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.concurrent.CountDownLatch;
 import org.apache.iotdb.rpc.BatchExecutionException;
 import org.apache.iotdb.rpc.IoTDBConnectionException;
 import org.apache.iotdb.rpc.StatementExecutionException;
-import org.apache.iotdb.rpc.TSStatusCode;
 import org.apache.iotdb.session.Session;
 import org.apache.iotdb.session.SessionDataSet;
 import org.apache.iotdb.session.SessionDataSet.DataIterator;
@@ -47,29 +47,29 @@ public class SessionExample {
 
 
   public static void main(String[] args)
-      throws IoTDBConnectionException, StatementExecutionException {
-    session = new Session("127.0.0.1", 6667, "root", "root");
+      throws IoTDBConnectionException, StatementExecutionException, InterruptedException {
+    session = new Session("127.0.0.1", 6667, "root", "root", 1, null);
     session.open(false);
 
-    try {
-      session.setStorageGroup("root.sg1");
-    } catch (StatementExecutionException e) {
-      if (e.getStatusCode() != TSStatusCode.PATH_ALREADY_EXIST_ERROR.getStatusCode())
-        throw e;
-    }
+//    try {
+//      session.setStorageGroup("root.sg1");
+//    } catch (StatementExecutionException e) {
+//      if (e.getStatusCode() != TSStatusCode.PATH_ALREADY_EXIST_ERROR.getStatusCode())
+//        throw e;
+//    }
 
-    createTimeseries();
-    createMultiTimeseries();
-    insertRecord();
-    insertTablet();
-    insertTablets();
-    insertRecords();
-    nonQuery();
+//    createTimeseries();
+//    createMultiTimeseries();
+//    insertRecord();
+//    insertTablet();
+//    insertTablets();
+//    insertRecords();
+//    nonQuery();
     query();
-    rawDataQuery();
-    queryByIterator();
-    deleteData();
-    deleteTimeseries();
+//    rawDataQuery();
+//    queryByIterator();
+//    deleteData();
+//    deleteTimeseries();
     session.close();
   }
 
@@ -142,22 +142,23 @@ public class SessionExample {
   }
 
   private static void insertRecord() throws IoTDBConnectionException, StatementExecutionException {
-    String deviceId = ROOT_SG1_D1;
+
     List<String> measurements = new ArrayList<>();
     List<TSDataType> types = new ArrayList<>();
-    measurements.add("s1");
-    measurements.add("s2");
-    measurements.add("s3");
-    types.add(TSDataType.INT64);
-    types.add(TSDataType.INT64);
-    types.add(TSDataType.INT64);
+    for (int i = 0; i < 1000; i++) {
+      measurements.add("s" + i);
+      types.add(TSDataType.INT64);
+    }
 
-    for (long time = 0; time < 100; time++) {
+    for (long time = 0; time < 10; time++) {
       List<Object> values = new ArrayList<>();
-      values.add(1L);
-      values.add(2L);
-      values.add(3L);
-      session.insertRecord(deviceId, time, measurements, types, values);
+      for (int i = 0; i < 1000; i++) {
+        values.add(time);
+      }
+      for (int i = 0; i < 10; i++) {
+        session.insertRecord("root.sg1.d" + i, time, measurements, types, values);
+      }
+      session.executeNonQueryStatement("flush");
     }
   }
 
@@ -304,13 +305,13 @@ public class SessionExample {
     // The schema of measurements of one device
     // only measurementId and data type in MeasurementSchema take effects in Tablet
     List<MeasurementSchema> schemaList = new ArrayList<>();
-    schemaList.add(new MeasurementSchema("s1", TSDataType.INT64));
-    schemaList.add(new MeasurementSchema("s2", TSDataType.INT64));
-    schemaList.add(new MeasurementSchema("s3", TSDataType.INT64));
+    for (int i = 1; i <= 1000; i++) {
+      schemaList.add(new MeasurementSchema("s" + i, TSDataType.INT64));
+    }
 
-    Tablet tablet1 = new Tablet(ROOT_SG1_D1, schemaList, 100);
-    Tablet tablet2 = new Tablet("root.sg1.d2", schemaList, 100);
-    Tablet tablet3 = new Tablet("root.sg1.d3", schemaList, 100);
+    Tablet tablet1 = new Tablet("root.sg1.d1", schemaList, 1);
+    Tablet tablet2 = new Tablet("root.sg1.d2", schemaList, 1);
+    Tablet tablet3 = new Tablet("root.sg1.d3", schemaList, 1);
 
     Map<String, Tablet> tabletMap = new HashMap<>();
     tabletMap.put(ROOT_SG1_D1, tablet1);
@@ -403,16 +404,78 @@ public class SessionExample {
     session.deleteTimeseries(paths);
   }
 
-  private static void query() throws IoTDBConnectionException, StatementExecutionException {
-    SessionDataSet dataSet;
-    dataSet = session.executeQueryStatement("select * from root.sg1.d1");
-    System.out.println(dataSet.getColumnNames());
-    dataSet.setFetchSize(1024); // default is 10000
-    while (dataSet.hasNext()) {
-      System.out.println(dataSet.next());
+  private static void query() throws InterruptedException {
+    long startTime = System.nanoTime();
+    CountDownLatch countDownLatch = new CountDownLatch(1);
+    for (int device = 0; device < 1; device++) {
+      new Thread(new SumTask(device, countDownLatch)).start();
+//      for (int i = 0; i < 5; i++) {
+//        new Thread(new GroupByTask(device, i, i + 1, countDownLatch)).start();
+//      }
+    }
+    countDownLatch.await();
+    System.out.println("cost: " + (System.nanoTime() - startTime) / 1_000_000);
+  }
+
+  private static class GroupByTask implements Runnable {
+
+    private final int device;
+    private final int start;
+    private final int end;
+    private final CountDownLatch countDownLatch;
+
+    public GroupByTask(int device, int start, int end, CountDownLatch countDownLatch) {
+      this.device = device;
+      this.start = start;
+      this.end = end;
+      this.countDownLatch = countDownLatch;
     }
 
-    dataSet.closeOperationHandle();
+    @Override
+    public void run() {
+      SessionDataSet dataSet;
+      try {
+        dataSet = session.executeQueryStatement(String.format("select last_value(*) from root.sg1.d%d group by ([%d,%d),1ms)", device, start, end));
+        dataSet.setFetchSize(1); // default is 10000
+        while (dataSet.hasNext()) {
+          dataSet.next();
+        }
+        dataSet.closeOperationHandle();
+//        System.out.println("Device" + device + " finished " + start + "-group by task!");
+        countDownLatch.countDown();
+      } catch (StatementExecutionException | IoTDBConnectionException e) {
+        e.printStackTrace();
+      }
+    }
+  }
+
+  private static class SumTask implements Runnable {
+
+    private final int device;
+    private final CountDownLatch countDownLatch;
+
+
+    public SumTask(int device, CountDownLatch countDownLatch) {
+      this.device = device;
+      this.countDownLatch = countDownLatch;
+    }
+
+    @Override
+    public void run() {
+      SessionDataSet dataSet;
+      try {
+        dataSet = session.executeQueryStatement("select sum(*) from root.sg1.d" + device);
+        dataSet.setFetchSize(1); // default is 10000
+        while (dataSet.hasNext()) {
+          dataSet.next();
+        }
+        dataSet.closeOperationHandle();
+//        System.out.println("Device" + device + " finished sum task!");
+        countDownLatch.countDown();
+      } catch (StatementExecutionException | IoTDBConnectionException e) {
+        e.printStackTrace();
+      }
+    }
   }
 
   private static void rawDataQuery() throws IoTDBConnectionException, StatementExecutionException {

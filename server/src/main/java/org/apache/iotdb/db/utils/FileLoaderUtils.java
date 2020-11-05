@@ -19,6 +19,7 @@
 package org.apache.iotdb.db.utils;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -89,7 +90,7 @@ public class FileLoaderUtils {
     if (resource.isClosed()) {
       timeSeriesMetadata = TimeSeriesMetadataCache.getInstance()
           .get(new TimeSeriesMetadataCache.TimeSeriesMetadataCacheKey(resource.getPath(),
-              seriesPath.getDevice(), seriesPath.getMeasurement()), allSensors);
+              seriesPath.getDevice(), seriesPath.getMeasurement()), Collections.singleton(seriesPath.getMeasurement()));
       if (timeSeriesMetadata != null) {
         timeSeriesMetadata.setChunkMetadataLoader(
             new DiskChunkMetadataLoader(resource, seriesPath, context, filter));

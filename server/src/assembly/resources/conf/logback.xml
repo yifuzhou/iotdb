@@ -263,7 +263,4 @@
     <logger level="info" name="QUERY-FREQUENCY">
         <appender-ref ref="QUERY-FREQUENCY"/>
     </logger>
-    <logger level="info" name="ALL-SQL">
-        <appender-ref ref="ALL_SQL"/>
-    </logger>
 </configuration>

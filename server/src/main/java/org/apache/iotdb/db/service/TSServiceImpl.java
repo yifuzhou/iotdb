@@ -137,7 +137,6 @@ import org.slf4j.LoggerFactory;
 public class TSServiceImpl implements TSIService.Iface, ServerContext {
 
   private static final Logger logger = LoggerFactory.getLogger(TSServiceImpl.class);
-  private static final Logger ALL_SQL_LOGGER = LoggerFactory.getLogger("ALL-SQL");
   private static final Logger SLOW_SQL_LOGGER = LoggerFactory.getLogger("SLOW-SQL");
   private static final Logger QUERY_FREQUENCY_LOGGER = LoggerFactory.getLogger("QUERY-FREQUENCY");
   private static final String INFO_NOT_LOGIN = "{}: Not login.";
@@ -564,7 +563,6 @@ public class TSServiceImpl implements TSIService.Iface, ServerContext {
   private TSExecuteStatementResp internalExecuteQueryStatement(String statement,
       long statementId, PhysicalPlan plan, int fetchSize, String username) {
     queryCount.incrementAndGet();
-    ALL_SQL_LOGGER.info(statement);
     long startTime = System.currentTimeMillis();
     long queryId = -1;
     try {

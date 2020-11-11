@@ -289,6 +289,7 @@ public class TSServiceImpl implements TSIService.Iface, ServerContext {
       Set<Long> queryIds = statementId2QueryId.getOrDefault(statementId, Collections.emptySet());
       for (long queryId : queryIds) {
         try {
+          logger.info("QueryId: " + queryId + " released because of session is closed");
           releaseQueryResource(queryId);
         } catch (StorageEngineException e) {
           // release as many as resources as possible, so do not break as soon as one exception is
@@ -333,11 +334,13 @@ public class TSServiceImpl implements TSIService.Iface, ServerContext {
         Set<Long> queryIdSet = statementId2QueryId.remove(stmtId);
         if (queryIdSet != null) {
           for (long queryId : queryIdSet) {
+            logger.info("QueryId: " + queryId + " released because of statement is closed");
             releaseQueryResource(queryId);
           }
         }
       } else {
         // ResultSet close
+        logger.info("QueryId: " + req.queryId + " released because of ResultSet is closed");
         releaseQueryResource(req.queryId);
       }
 
@@ -744,6 +747,7 @@ public class TSServiceImpl implements TSIService.Iface, ServerContext {
       }
       if (queryId != -1) {
         try {
+          logger.info("QueryId: " + queryId + " released because of error happened while querying");
           releaseQueryResource(queryId);
         } catch (StorageEngineException ex) {
           logger.error("Error happened while releasing query resource: ", ex);
@@ -983,6 +987,7 @@ public class TSServiceImpl implements TSIService.Iface, ServerContext {
       }
 
       if (!queryId2DataSet.containsKey(req.queryId)) {
+        logger.error("The queryId: " + req.queryId + " does not have corresponding dataset.");
         return RpcUtils.getTSFetchResultsResp(
             RpcUtils.getStatus(TSStatusCode.EXECUTE_STATEMENT_ERROR, "Has not executed query"));
       }
@@ -993,6 +998,7 @@ public class TSServiceImpl implements TSIService.Iface, ServerContext {
             fillRpcReturnData(req.fetchSize, queryDataSet, sessionIdUsernameMap.get(req.sessionId));
         boolean hasResultSet = result.bufferForTime().limit() != 0;
         if (!hasResultSet) {
+          logger.info("QueryId: " + req.queryId + " released because of no align remaining data");
           releaseQueryResource(req.queryId);
         }
         TSFetchResultsResp resp = RpcUtils.getTSFetchResultsResp(TSStatusCode.SUCCESS_STATUS);
@@ -1012,7 +1018,8 @@ public class TSServiceImpl implements TSIService.Iface, ServerContext {
           }
         }
         if (!hasResultSet) {
-          queryId2DataSet.remove(req.queryId);
+          logger.info("QueryId: " + req.queryId + " released because of no nonAlign remaining data");
+          releaseQueryResource(req.queryId);
         }
         TSFetchResultsResp resp = RpcUtils.getTSFetchResultsResp(TSStatusCode.SUCCESS_STATUS);
         resp.setHasResultSet(hasResultSet);

@@ -1197,6 +1197,7 @@ public class TSServiceImpl implements TSIService.Iface, ServerContext {
   protected void handleClientExit() {
     Long sessionId = currSessionId.get();
     if (sessionId != null) {
+      logger.info("client exit and release session resource: " + sessionId);
       TSCloseSessionReq req = new TSCloseSessionReq(sessionId);
       closeSession(req);
     }

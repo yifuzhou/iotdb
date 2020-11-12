@@ -24,8 +24,8 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import org.apache.iotdb.rpc.IoTDBRpcDataSet;
 import org.apache.iotdb.rpc.IoTDBConnectionException;
+import org.apache.iotdb.rpc.IoTDBRpcDataSet;
 import org.apache.iotdb.rpc.StatementExecutionException;
 import org.apache.iotdb.service.rpc.thrift.TSIService;
 import org.apache.iotdb.service.rpc.thrift.TSQueryDataSet;
@@ -36,8 +36,12 @@ import org.apache.iotdb.tsfile.read.common.RowRecord;
 import org.apache.iotdb.tsfile.utils.Binary;
 import org.apache.iotdb.tsfile.utils.BytesUtils;
 import org.apache.thrift.TException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class SessionDataSet {
+
+  private static final Logger logger = LoggerFactory.getLogger(SessionDataSet.class);
 
   private final IoTDBRpcDataSet ioTDBRpcDataSet;
 
@@ -140,6 +144,7 @@ public class SessionDataSet {
   public void closeOperationHandle() throws StatementExecutionException, IoTDBConnectionException {
     try {
       ioTDBRpcDataSet.close();
+      logger.info("close dataset: " + ioTDBRpcDataSet.queryId);
     } catch (TException e) {
       throw new IoTDBConnectionException(e.getMessage());
     }

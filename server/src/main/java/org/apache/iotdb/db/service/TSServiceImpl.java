@@ -192,6 +192,8 @@ public class TSServiceImpl implements TSIService.Iface, ServerContext {
 
   private static final AtomicInteger queryCount = new AtomicInteger(0);
 
+  private static final Set<Long> set = new CopyOnWriteArraySet<>();
+
 
   public TSServiceImpl() throws QueryProcessException {
     processor = new Planner();
@@ -720,6 +722,10 @@ public class TSServiceImpl implements TSIService.Iface, ServerContext {
         }
         TSQueryDataSet result = fillRpcReturnData(fetchSize, newDataSet, username);
         resp.setQueryDataSet(result);
+      }
+
+      if (!set.add(queryId)) {
+        logger.error("Already have same queryId: " + queryId);
       }
       resp.setQueryId(queryId);
 

@@ -1140,24 +1140,26 @@ public class Session {
   }
 
   private boolean reconnect() {
-    boolean flag = false;
-    for (int i = 1; i <= Config.RETRY_NUM; i++) {
-      try {
-        if (transport != null) {
-          close();
-          open(enableRPCCompression, connectionTimeoutInMs);
-          flag = true;
-        }
-      } catch (Exception e) {
-        try {
-          Thread.sleep(Config.RETRY_INTERVAL_MS);
-        } catch (InterruptedException e1) {
-          logger.error("reconnect is interrupted.", e1);
-          Thread.currentThread().interrupt();
-        }
-      }
-    }
-    return flag;
+    return false;
+
+//    boolean flag = false;
+//    for (int i = 1; i <= Config.RETRY_NUM; i++) {
+//      try {
+//        if (transport != null) {
+//          close();
+//          open(enableRPCCompression, connectionTimeoutInMs);
+//          flag = true;
+//        }
+//      } catch (Exception e) {
+//        try {
+//          Thread.sleep(Config.RETRY_INTERVAL_MS);
+//        } catch (InterruptedException e1) {
+//          logger.error("reconnect is interrupted.", e1);
+//          Thread.currentThread().interrupt();
+//        }
+//      }
+//    }
+//    return flag;
   }
 
 }

@@ -144,7 +144,6 @@ public class SessionDataSet {
   public void closeOperationHandle() throws StatementExecutionException, IoTDBConnectionException {
     try {
       ioTDBRpcDataSet.close();
-      logger.info("close dataset: " + ioTDBRpcDataSet.queryId);
     } catch (TException e) {
       throw new IoTDBConnectionException(e.getMessage());
     }

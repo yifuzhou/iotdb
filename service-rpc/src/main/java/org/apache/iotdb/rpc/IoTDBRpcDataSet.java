@@ -37,9 +37,14 @@ import org.apache.iotdb.tsfile.file.metadata.enums.TSDataType;
 import org.apache.iotdb.tsfile.utils.BytesUtils;
 import org.apache.iotdb.tsfile.utils.ReadWriteIOUtils;
 import org.apache.thrift.TException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class IoTDBRpcDataSet {
+
+  private static final Logger logger = LoggerFactory.getLogger(IoTDBRpcDataSet.class);
+
 
   public static final String TIMESTAMP_STR = "Time";
   public static final String VALUE_IS_NULL = "The value got by %s (column name) is NULL.";
@@ -157,7 +162,10 @@ public class IoTDBRpcDataSet {
                   .format("Data type %s is not supported.", columnTypeDeduplicatedList.get(i)));
       }
     }
-    this.tsQueryDataSet = queryDataSet;
+    tsQueryDataSet = queryDataSet;
+    if (!tsQueryDataSet.time.hasRemaining()) {
+      emptyResultSet = true;
+    }
   }
 
   public void close() throws StatementExecutionException, TException {
@@ -170,6 +178,7 @@ public class IoTDBRpcDataSet {
         closeReq.setQueryId(queryId);
         TSStatus closeResp = client.closeOperation(closeReq);
         RpcUtils.verifySuccess(closeResp);
+        logger.info("successfully close query: " + queryId);
       } catch (StatementExecutionException e) {
         throw new StatementExecutionException(
             "Error occurs for close operation in server side because ", e);

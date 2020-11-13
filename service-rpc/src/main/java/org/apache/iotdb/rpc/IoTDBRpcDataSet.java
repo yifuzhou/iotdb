@@ -62,7 +62,7 @@ public class IoTDBRpcDataSet {
   public int columnSize;
 
   public long sessionId;
-  public long queryId;
+  public final long queryId;
   public boolean ignoreTimeStamp;
 
   public int rowsIndex = 0; // used to record the row index in current TSQueryDataSet

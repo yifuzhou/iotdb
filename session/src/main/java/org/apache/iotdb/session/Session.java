@@ -25,6 +25,8 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
 import org.apache.iotdb.rpc.BatchExecutionException;
 import org.apache.iotdb.rpc.IoTDBConnectionException;
 import org.apache.iotdb.rpc.RpcUtils;
@@ -85,8 +87,11 @@ public class Session {
   private boolean enableRPCCompression;
   private int connectionTimeoutInMs;
 
+  private static final Set<Long> set = new CopyOnWriteArraySet<>();
+
   public Session(String host, int rpcPort) {
-    this(host, rpcPort, Config.DEFAULT_USER, Config.DEFAULT_PASSWORD, Config.DEFAULT_FETCH_SIZE, null);
+    this(host, rpcPort, Config.DEFAULT_USER, Config.DEFAULT_PASSWORD, Config.DEFAULT_FETCH_SIZE,
+        null);
   }
 
   public Session(String host, String rpcPort, String username, String password) {
@@ -105,7 +110,8 @@ public class Session {
     this(host, rpcPort, username, password, Config.DEFAULT_FETCH_SIZE, zoneId);
   }
 
-  public Session(String host, int rpcPort, String username, String password, int fetchSize, ZoneId zoneId) {
+  public Session(String host, int rpcPort, String username, String password, int fetchSize,
+      ZoneId zoneId) {
     this.host = host;
     this.rpcPort = rpcPort;
     this.username = username;
@@ -969,6 +975,12 @@ public class Session {
         throw new IoTDBConnectionException(
             "Fail to reconnect to server. Please check server status");
       }
+    }
+
+    if (!set.add(execResp.getQueryId())) {
+      logger.error(
+          "duplicate query id: " + execResp.getQueryId() + " TSExecuteStatementResp is: " + execResp
+              .toString());
     }
 
     RpcUtils.verifySuccess(execResp.getStatus());

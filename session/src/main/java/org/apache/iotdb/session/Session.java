@@ -963,18 +963,20 @@ public class Session {
     try {
       execResp = client.executeQueryStatement(execReq);
     } catch (TException e) {
-      if (reconnect()) {
-        try {
-          execReq.setSessionId(sessionId);
-          execReq.setStatementId(statementId);
-          execResp = client.executeQueryStatement(execReq);
-        } catch (TException tException) {
-          throw new IoTDBConnectionException(tException);
-        }
-      } else {
-        throw new IoTDBConnectionException(
-            "Fail to reconnect to server. Please check server status");
-      }
+//      if (reconnect()) {
+//        try {
+//          execReq.setSessionId(sessionId);
+//          execReq.setStatementId(statementId);
+//          execResp = client.executeQueryStatement(execReq);
+//        } catch (TException tException) {
+//          throw new IoTDBConnectionException(tException);
+//        }
+//      } else {
+//        throw new IoTDBConnectionException(
+//            "Fail to reconnect to server. Please check server status");
+//      }
+      throw new IoTDBConnectionException(
+          "Fail to reconnect to server. Please check server status");
     }
 
     if (!set.add(execResp.getQueryId())) {

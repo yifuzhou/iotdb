@@ -206,6 +206,9 @@ public class TSServiceImpl implements TSIService.Iface, ServerContext {
             QUERY_FREQUENCY_LOGGER
                 .info("Query count in current 1 minute: " + queryCount.getAndSet(0));
           }
+          QUERY_FREQUENCY_LOGGER.info(
+              "query dataset count in server: " + queryId2DataSet.size() + " query ids are: "
+                  + queryId2DataSet.keySet());
         },
         config.getFrequencyIntervalInMinute(), config.getFrequencyIntervalInMinute(),
         TimeUnit.MINUTES);
@@ -1024,7 +1027,8 @@ public class TSServiceImpl implements TSIService.Iface, ServerContext {
           }
         }
         if (!hasResultSet) {
-          logger.info("QueryId: " + req.queryId + " released because of no nonAlign remaining data");
+          logger
+              .info("QueryId: " + req.queryId + " released because of no nonAlign remaining data");
           releaseQueryResource(req.queryId);
         }
         TSFetchResultsResp resp = RpcUtils.getTSFetchResultsResp(TSStatusCode.SUCCESS_STATUS);

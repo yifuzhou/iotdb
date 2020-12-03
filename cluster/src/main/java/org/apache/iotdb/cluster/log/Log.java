@@ -44,6 +44,10 @@ public abstract class Log implements Comparable<Log> {
   private long createTime;
   private long enqueueTime;
 
+  // this log is on the leader side, so we may apply it outside the log manager (apply it in the
+  // client thread) to increase parallelism
+  private boolean onLeaderSide;
+
   public abstract ByteBuffer serialize();
 
   public abstract void deserialize(ByteBuffer buffer);
@@ -126,5 +130,23 @@ public abstract class Log implements Comparable<Log> {
 
   public void setEnqueueTime(long enqueueTime) {
     this.enqueueTime = enqueueTime;
+  }
+
+  public boolean isOnLeaderSide() {
+    return onLeaderSide;
+  }
+
+  public void setOnLeaderSide(boolean onLeaderSide) {
+    this.onLeaderSide = onLeaderSide;
+  }
+
+  /**
+   *
+   * @return true if the log cannot be applied until all previous logs are applied, false
+   * otherwise. Only insertion logs can be applied before previous logs when allowWeakWriteOrder
+   * is true, other logs must wait or there may be inconsistency.
+   */
+  public boolean isBlockedLog() {
+    return true;
   }
 }

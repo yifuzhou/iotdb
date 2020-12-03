@@ -26,9 +26,11 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.Objects;
+import org.apache.iotdb.cluster.config.ClusterDescriptor;
 import org.apache.iotdb.cluster.log.Log;
 import org.apache.iotdb.db.exception.metadata.IllegalPathException;
 import org.apache.iotdb.db.qp.physical.PhysicalPlan;
+import org.apache.iotdb.db.qp.physical.crud.InsertPlan;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -108,5 +110,11 @@ public class PhysicalPlanLog extends Log {
   @Override
   public int hashCode() {
     return Objects.hash(super.hashCode(), plan);
+  }
+
+  @Override
+  public boolean isBlockedLog() {
+    // only insertions can be unblocked from previous logs if allowWeakWriteOrdering is true
+    return ClusterDescriptor.getInstance().getConfig().isAllowWeakWriteOrdering() && !(plan instanceof InsertPlan);
   }
 }

@@ -280,6 +280,7 @@ public class MetaGroupMember extends RaftMember {
 
     // committed logs are applied to the state machine (the IoTDB instance) through the applier
     LogApplier metaLogApplier = new MetaLogApplier(this);
+    directApplier = metaLogApplier;
     logManager = new MetaSingleSnapshotLogManager(metaLogApplier, this);
     term.set(logManager.getHardState().getCurrentTerm());
     voteFor = logManager.getHardState().getVoteFor();

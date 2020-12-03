@@ -162,6 +162,22 @@ public class ClusterConfig {
    */
   private boolean waitForSlowNode = true;
 
+  /**
+   * allowWeakWriteOrdering means that if there are concurrent modifications of the
+   * same data, they may be executed in different orders on different nodes, but the operation order
+   * of the same client is guaranteed. This increase throughput at the expense of weaker
+   * consistency.
+   */
+  private boolean allowWeakWriteOrdering = true;
+
+  public boolean isAllowWeakWriteOrdering() {
+    return allowWeakWriteOrdering;
+  }
+
+  public void setAllowWeakWriteOrdering(boolean allowWeakWriteOrdering) {
+    this.allowWeakWriteOrdering = allowWeakWriteOrdering;
+  }
+
   public int getSelectorNumOfClientPool() {
     return selectorNumOfClientPool;
   }

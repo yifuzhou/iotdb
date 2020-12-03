@@ -637,10 +637,36 @@ public abstract class RaftLogManager {
         blockedUnappliedLogList.add(entry);
         continue;
       }
+
+      waitForBlockedLog(entry);
+
       try {
-        logApplier.apply(entry);
+        // if the order of some logs is not required, we may apply them outside logManager to
+        // reduce lock contention
+        if (entry.isBlockedLog() ||
+            !ClusterDescriptor.getInstance().getConfig().isAllowWeakWriteOrdering() ||
+            !entry.isOnLeaderSide()) {
+          logApplier.apply(entry);
+        }
       } catch (Exception e) {
         entry.setException(e);
+      }
+    }
+  }
+
+  /**
+   * Some logs (like deletions) must wait until all previous logs are applied before they
+   * themselves can be applied.
+   * @param entry
+   */
+  private void waitForBlockedLog(Log entry) {
+    if (entry.isBlockedLog()) {
+      while (maxHaveAppliedCommitIndex < entry.getCurrLogIndex() - 1) {
+        try {
+          Thread.sleep(1);
+        } catch (InterruptedException e) {
+          Thread.currentThread().interrupt();
+        }
       }
     }
   }

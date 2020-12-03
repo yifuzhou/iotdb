@@ -169,6 +169,7 @@ public class DataGroupMember extends RaftMember {
     setQueryManager(new ClusterQueryManager());
     slotManager = new SlotManager(ClusterConstant.SLOT_NUM, getMemberDir());
     LogApplier applier = new DataLogApplier(metaGroupMember, this);
+    directApplier = applier;
     if (ClusterDescriptor.getInstance().getConfig().isUseAsyncApplier()) {
       applier = new AsyncDataLogApplier(applier, name);
     }

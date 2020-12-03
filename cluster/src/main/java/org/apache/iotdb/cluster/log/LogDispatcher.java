@@ -278,10 +278,10 @@ public class LogDispatcher {
         return;
       }
       AsyncMethodCallback<Long> handler = new AppendEntriesHandler(currBatch);
-      startTime = Timer.Statistic.RAFT_SENDER_SEND_LOG.getOperationStartTime();
+      startTime = Timer.Statistic.RAFT_SENDER_SEND_LOG_SYNC.getOperationStartTime();
       try {
         long result = client.appendEntries(request);
-        Timer.Statistic.RAFT_SENDER_SEND_LOG.calOperationCostTimeFromStart(startTime);
+        Timer.Statistic.RAFT_SENDER_SEND_LOG_SYNC.calOperationCostTimeFromStart(startTime);
         if (result != -1 && logger.isInfoEnabled()) {
           logger.info("{}: Append {} logs to {}, resp: {}", member.getName(), logList.size(),
               receiver, result);

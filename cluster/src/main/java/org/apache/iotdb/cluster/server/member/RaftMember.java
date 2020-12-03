@@ -57,6 +57,7 @@ import org.apache.iotdb.cluster.log.CommitLogCallback;
 import org.apache.iotdb.cluster.log.CommitLogTask;
 import org.apache.iotdb.cluster.log.HardState;
 import org.apache.iotdb.cluster.log.Log;
+import org.apache.iotdb.cluster.log.LogApplier;
 import org.apache.iotdb.cluster.log.LogDispatcher;
 import org.apache.iotdb.cluster.log.LogDispatcher.SendLogRequest;
 import org.apache.iotdb.cluster.log.LogParser;
@@ -244,6 +245,8 @@ public abstract class RaftMember {
    * logs.
    */
   private LogDispatcher logDispatcher;
+
+  protected LogApplier directApplier;
 
   protected RaftMember() {
   }
@@ -893,6 +896,7 @@ public abstract class RaftMember {
       log.setCurrLogTerm(getTerm().get());
       log.setCurrLogIndex(logManager.getLastLogIndex() + 1);
 
+      log.setOnLeaderSide(true);
       log.setPlan(plan);
       plan.setIndex(log.getCurrLogIndex());
       logManager.append(log);
@@ -924,6 +928,7 @@ public abstract class RaftMember {
       Statistic.RAFT_SENDER_COMPETE_LOG_MANAGER_BEFORE_APPEND_V2
           .calOperationCostTimeFromStart(startTime);
 
+      log.setOnLeaderSide(true);
       log.setCurrLogTerm(getTerm().get());
       log.setCurrLogIndex(logManager.getLastLogIndex() + 1);
       log.setPlan(plan);
@@ -951,7 +956,7 @@ public abstract class RaftMember {
           .calOperationCostTimeFromStart(sendLogRequest.getLog().getCreateTime());
       switch (appendLogResult) {
         case OK:
-          logger.debug("{}: log {} is accepted", name, log);
+          logger.debug("{}: log {} is accepted.", name, log);
           startTime = Timer.Statistic.RAFT_SENDER_COMMIT_LOG.getOperationStartTime();
           commitLog(log);
           Timer.Statistic.RAFT_SENDER_COMMIT_LOG.calOperationCostTimeFromStart(startTime);
@@ -1357,7 +1362,6 @@ public abstract class RaftMember {
     return AppendLogResult.OK;
   }
 
-  @SuppressWarnings("java:S2445")
   void commitLog(Log log) throws LogExecutionException {
     long startTime = Statistic.RAFT_SENDER_COMPETE_LOG_MANAGER_BEFORE_COMMIT
         .getOperationStartTime();
@@ -1369,21 +1373,37 @@ public abstract class RaftMember {
       logManager.commitTo(log.getCurrLogIndex());
     }
     Statistic.RAFT_SENDER_COMMIT_LOG_IN_MANAGER.calOperationCostTimeFromStart(startTime);
-    // when using async applier, the log here may not be applied. To return the execution
-    // result, we must wait until the log is applied.
-    startTime = Statistic.RAFT_SENDER_COMMIT_WAIT_LOG_APPLY.getOperationStartTime();
-    synchronized (log) {
-      while (!log.isApplied()) {
-        // wait until the log is applied
-        try {
-          log.wait(5);
-        } catch (InterruptedException e) {
-          Thread.currentThread().interrupt();
-          throw new LogExecutionException(e);
+    waitLogApplied(log);
+
+    if (log.getException() != null) {
+      throw new LogExecutionException(log.getException());
+    }
+  }
+
+  @SuppressWarnings("java:S2445")
+  private void waitLogApplied(Log log) throws LogExecutionException {
+    long startTime = Statistic.RAFT_SENDER_COMMIT_WAIT_LOG_APPLY.getOperationStartTime();
+    if (ClusterDescriptor.getInstance().getConfig().isAllowWeakWriteOrdering() && !log.isBlockedLog()) {
+      long operationStartTime = Statistic.RAFT_SENDER_DATA_LOG_APPLY.getOperationStartTime();
+      directApplier.apply(log);
+      Statistic.RAFT_SENDER_DATA_LOG_APPLY.calOperationCostTimeFromStart(operationStartTime);
+    } else {
+      // when using async applier, the log here may not be applied. To return the execution
+      // result, we must wait until the log is applied.
+      synchronized (log) {
+        while (!log.isApplied()) {
+          // wait until the log is applied
+          try {
+            log.wait(1);
+          } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new LogExecutionException(e);
+          }
         }
       }
     }
     Statistic.RAFT_SENDER_COMMIT_WAIT_LOG_APPLY.calOperationCostTimeFromStart(startTime);
+
     if (log.getException() != null) {
       throw new LogExecutionException(log.getException());
     }
@@ -1417,7 +1437,9 @@ public abstract class RaftMember {
     AppendEntryRequest request = new AppendEntryRequest();
     request.setTerm(term.get());
     if (serializeNow) {
+      long operationStartTime = Statistic.RAFT_SENDER_SERIALIZE_LOG.getOperationStartTime();
       request.setEntry(log.serialize());
+      Statistic.RAFT_SENDER_SERIALIZE_LOG.calOperationCostTimeFromStart(operationStartTime);
     }
     request.setLeader(getThisNode());
     // don't need lock because even if it's larger than the commitIndex when appending this log to
@@ -1685,7 +1707,9 @@ public abstract class RaftMember {
           node, leaderShipStale, newLeaderTerm, peer);
       try {
         logger.debug("{} sending a log to {}: {}", name, node, log);
+        long operationStartTime = Statistic.RAFT_SENDER_SEND_LOG_SYNC.getOperationStartTime();
         long result = client.appendEntry(request);
+        Statistic.RAFT_SENDER_SEND_LOG_SYNC.calOperationCostTimeFromStart(operationStartTime);
         handler.onComplete(result);
       } catch (TException e) {
         client.getInputProtocol().getTransport().close();

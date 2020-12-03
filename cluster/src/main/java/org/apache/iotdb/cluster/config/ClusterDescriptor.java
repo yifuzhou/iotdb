@@ -292,6 +292,10 @@ public class ClusterDescriptor {
         Boolean.parseBoolean(properties.getProperty("enable_use_persist_log_on_disk_to_catch_up",
             String.valueOf(config.isEnableUsePersistLogOnDiskToCatchUp()))));
 
+    config.setAllowWeakWriteOrdering(
+        Boolean.parseBoolean(properties.getProperty("allow_weak_write_ordering",
+            String.valueOf(config.isAllowWeakWriteOrdering()))));
+
     String consistencyLevel = properties.getProperty("consistency_level");
     if (consistencyLevel != null) {
       config.setConsistencyLevel(ConsistencyLevel.getConsistencyLevel(consistencyLevel));

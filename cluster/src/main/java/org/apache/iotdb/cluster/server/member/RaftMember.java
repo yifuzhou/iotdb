@@ -1767,6 +1767,8 @@ public abstract class RaftMember {
         resp = Response.RESPONSE_AGREE;
       } else {
         // the incoming log points to an illegal position, reject it
+        logger.info("{}: log {} is rejected, current progress: {}-{}", name, log,
+            logManager.getLastLogIndex(), logManager.getLastLogTerm());
         resp = Response.RESPONSE_LOG_MISMATCH;
       }
     }

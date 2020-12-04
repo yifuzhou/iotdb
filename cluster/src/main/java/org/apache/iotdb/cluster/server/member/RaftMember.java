@@ -1756,7 +1756,7 @@ public abstract class RaftMember {
   private boolean waitForPrevLog(long prevLogIndex) {
     long waitStart = System.currentTimeMillis();
     long alreadyWait = 0;
-    Object logUpdateCondition = logManager.getLogUpdateCondition();
+    Object logUpdateCondition = logManager.getLogUpdateCondition(prevLogIndex);
     while (logManager.getLastLogIndex() < prevLogIndex &&
         alreadyWait <= RaftServer.getWriteOperationTimeoutMS()) {
       try {
@@ -1766,7 +1766,7 @@ public abstract class RaftMember {
           return true;
         }
         synchronized (logUpdateCondition) {
-          logUpdateCondition.wait(1);
+          logUpdateCondition.wait(prevLogIndex - lastLogIndex);
         }
       } catch (InterruptedException e) {
         Thread.currentThread().interrupt();

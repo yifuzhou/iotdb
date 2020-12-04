@@ -364,13 +364,6 @@ public class StorageGroupProcessor {
     this.monitorSeriesValue += successPointsNum;
   }
 
-  private void updatePartitionFileVersion(long partitionNum, long fileVersion) {
-    long oldVersion = partitionMaxFileVersions.getOrDefault(partitionNum, 0L);
-    if (fileVersion > oldVersion) {
-      partitionMaxFileVersions.put(partitionNum, fileVersion);
-    }
-  }
-
   /**
    * use old seq file to update latestTimeForEachDevice, globalLatestFlushedTimeForEachDevice,
    * partitionLatestFlushedTimeForEachDevice and timePartitionIdVersionControllerMap
@@ -653,6 +646,9 @@ public class StorageGroupProcessor {
     if (!isAlive(insertRowPlan.getTime())) {
       throw new OutOfTTLException(insertRowPlan.getTime(), (System.currentTimeMillis() - dataTTL));
     }
+    if (enableMemControl) {
+      StorageEngine.blockInsertionIfReject();
+    }
     writeLock();
     try {
       // init map
@@ -687,6 +683,16 @@ public class StorageGroupProcessor {
    */
   @SuppressWarnings("squid:S3776") // Suppress high Cognitive Complexity warning
   public void insertTablet(InsertTabletPlan insertTabletPlan) throws BatchProcessException {
+    if (enableMemControl) {
+      try {
+        StorageEngine.blockInsertionIfReject();
+      } catch (WriteProcessException e) {
+        TSStatus[] results = new TSStatus[insertTabletPlan.getRowCount()];
+        Arrays.fill(results, RpcUtils.getStatus(TSStatusCode.INTERNAL_SERVER_ERROR));
+        throw new BatchProcessException(results);
+      }
+    }
+
     writeLock();
     try {
       TSStatus[] results = new TSStatus[insertTabletPlan.getRowCount()];
@@ -1017,7 +1023,7 @@ public class StorageGroupProcessor {
       tsFileProcessor = new TsFileProcessor(storageGroupName,
           fsFactory.getFileWithParent(filePath), storageGroupInfo,
           versionController, this::closeUnsealedTsFileProcessorCallBack,
-          this::updateLatestFlushTimeCallback, true, partitionMaxFileVersions.getOrDefault(timePartitionId, 0L));
+          this::updateLatestFlushTimeCallback, true);
       if (enableMemControl) {
         TsFileProcessorInfo tsFileProcessorInfo = new TsFileProcessorInfo(storageGroupInfo);
         tsFileProcessor.setTsFileProcessorInfo(tsFileProcessorInfo);
@@ -1029,7 +1035,7 @@ public class StorageGroupProcessor {
       tsFileProcessor = new TsFileProcessor(storageGroupName,
           fsFactory.getFileWithParent(filePath), storageGroupInfo,
           versionController, this::closeUnsealedTsFileProcessorCallBack,
-          this::unsequenceFlushCallback, false, partitionMaxFileVersions.getOrDefault(timePartitionId, 0L));
+          this::unsequenceFlushCallback, false);
       if (enableMemControl) {
         TsFileProcessorInfo tsFileProcessorInfo = new TsFileProcessorInfo(storageGroupInfo);
         tsFileProcessor.setTsFileProcessorInfo(tsFileProcessorInfo);
@@ -2389,9 +2395,31 @@ public class StorageGroupProcessor {
    */
   public boolean isFileAlreadyExist(TsFileResource tsFileResource, long partitionNum) {
     // examine working processor first as they have the largest plan index
-    for (TsFileProcessor workSequenceTsFileProcessor : getWorkSequenceTsFileProcessors()) {
-      if (workSequenceTsFileProcessor.getTimeRangeId() == partitionNum) {
-        TsFileResource workResource = workSequenceTsFileProcessor.getTsFileResource();
+    return isFileAlreadyExistInWorking(tsFileResource, partitionNum, getWorkSequenceTsFileProcessors()) ||
+        isFileAlreadyExistInWorking(tsFileResource, partitionNum, getWorkUnsequenceTsFileProcessors()) ||
+        isFileAlreadyExistInClosed(tsFileResource, partitionNum, getSequenceFileTreeSet()) ||
+        isFileAlreadyExistInClosed(tsFileResource, partitionNum, getUnSequenceFileList());
+  }
+
+  private boolean isFileAlreadyExistInClosed(TsFileResource tsFileResource, long partitionNum,
+      Collection<TsFileResource> existingFiles) {
+    for (TsFileResource resource : existingFiles) {
+      if (resource.getTimePartition() == partitionNum
+          && resource.getMaxPlanIndex() >= tsFileResource.getMaxPlanIndex()) {
+        logger.info("{} is covered by a closed file {}: [{}, {}] [{}, {}]", tsFileResource,
+            resource, tsFileResource.minPlanIndex, tsFileResource.maxPlanIndex,
+            resource.minPlanIndex, resource.maxPlanIndex);
+        return true;
+      }
+    }
+    return false;
+  }
+
+  private boolean isFileAlreadyExistInWorking(TsFileResource tsFileResource, long partitionNum,
+      Collection<TsFileProcessor> workingProcessors) {
+    for (TsFileProcessor workingProcesssor : workingProcessors) {
+      if (workingProcesssor.getTimeRangeId() == partitionNum) {
+        TsFileResource workResource = workingProcesssor.getTsFileResource();
         boolean isCovered =
             workResource.getMaxPlanIndex() >= tsFileResource
                 .getMaxPlanIndex();
@@ -2401,38 +2429,6 @@ public class StorageGroupProcessor {
               workResource.minPlanIndex, workResource.maxPlanIndex);
         }
         return isCovered;
-      }
-    }
-    for (TsFileProcessor workUnsequenceTsFileProcessor : getWorkUnsequenceTsFileProcessors()) {
-      if (workUnsequenceTsFileProcessor.getTimeRangeId() == partitionNum) {
-        TsFileResource workResource = workUnsequenceTsFileProcessor.getTsFileResource();
-        boolean isCovered =
-            workResource.getMaxPlanIndex() >= tsFileResource
-                .getMaxPlanIndex();
-        if (isCovered) {
-          logger.info("{} is covered by a working file {}: [{}, {}] [{}, {}]", tsFileResource,
-              workResource, tsFileResource.minPlanIndex, tsFileResource.maxPlanIndex,
-              workResource.minPlanIndex, workResource.maxPlanIndex);
-        }
-        return isCovered;
-      }
-    }
-    for (TsFileResource resource : getSequenceFileTreeSet()) {
-      if (resource.getTimePartition() == partitionNum
-          && resource.getMaxPlanIndex() >= tsFileResource.getMaxPlanIndex()) {
-        logger.info("{} is covered by a closed file {}: [{}, {}] [{}, {}]", tsFileResource,
-            resource, tsFileResource.minPlanIndex, tsFileResource.maxPlanIndex,
-            resource.minPlanIndex, resource.maxPlanIndex);
-        return true;
-      }
-    }
-    for (TsFileResource resource : getUnSequenceFileList()) {
-      if (resource.getTimePartition() == partitionNum
-          && resource.getMaxPlanIndex() >= tsFileResource.getMaxPlanIndex()) {
-        logger.info("{} is covered by a closed file {}: [{}, {}] [{}, {}]", tsFileResource,
-            resource, tsFileResource.minPlanIndex, tsFileResource.maxPlanIndex,
-            resource.minPlanIndex, resource.maxPlanIndex);
-        return true;
       }
     }
     return false;

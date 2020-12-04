@@ -22,19 +22,17 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedDeque;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-
 import org.apache.iotdb.db.conf.IoTDBConfig;
 import org.apache.iotdb.db.conf.IoTDBConstant;
 import org.apache.iotdb.db.conf.IoTDBDescriptor;
 import org.apache.iotdb.db.conf.adapter.CompressionRatio;
+import org.apache.iotdb.db.engine.StorageEngine;
 import org.apache.iotdb.db.engine.flush.CloseFileListener;
 import org.apache.iotdb.db.engine.flush.FlushListener;
 import org.apache.iotdb.db.engine.flush.FlushManager;
@@ -75,6 +73,7 @@ import org.apache.iotdb.tsfile.write.writer.RestorableTsFileIOWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@SuppressWarnings("java:S1135") // ignore todos
 public class TsFileProcessor {
 
   private static final Logger logger = LoggerFactory.getLogger(TsFileProcessor.class);
@@ -83,8 +82,6 @@ public class TsFileProcessor {
 
   private final IoTDBConfig config = IoTDBDescriptor.getInstance().getConfig();
   private final boolean enableMemControl = config.isEnableMemControl();
-  private final int waitingTimeWhenInsertBlocked = config.getWaitingTimeWhenInsertBlocked();
-  private final int maxWaitingTimeWhenInsertBlocked = config.getMaxWaitingTimeWhenInsertBlocked();
   private StorageGroupInfo storageGroupInfo;
   private TsFileProcessorInfo tsFileProcessorInfo;
 
@@ -129,7 +126,7 @@ public class TsFileProcessor {
       StorageGroupInfo storageGroupInfo,
       VersionController versionController,
       CloseFileListener closeTsFileCallback,
-      UpdateEndTimeCallBack updateLatestFlushTimeCallback, boolean sequence, long fileVersion)
+      UpdateEndTimeCallBack updateLatestFlushTimeCallback, boolean sequence)
       throws IOException {
     this.storageGroupName = storageGroupName;
     this.tsFileResource = new TsFileResource(tsfile, this);
@@ -145,6 +142,7 @@ public class TsFileProcessor {
     closeFileListeners.add(closeTsFileCallback);
   }
 
+  @SuppressWarnings("java:S107") // ignore number of arguments
   public TsFileProcessor(String storageGroupName, StorageGroupInfo storageGroupInfo, TsFileResource tsFileResource,
       VersionController versionController, CloseFileListener closeUnsealedTsFileProcessor,
       UpdateEndTimeCallBack updateLatestFlushTimeCallback, boolean sequence,
@@ -174,7 +172,6 @@ public class TsFileProcessor {
       workMemTable = new PrimitiveMemTable(enableMemControl);
     }
     if (enableMemControl) {
-      blockInsertionIfReject();
       checkMemCostAndAddToTspInfo(insertRowPlan);
     }
 
@@ -216,12 +213,11 @@ public class TsFileProcessor {
     if (workMemTable == null) {
       workMemTable = new PrimitiveMemTable(enableMemControl);
     }
-    if (enableMemControl) {
-      blockInsertionIfReject();
-      checkMemCostAndAddToTspInfo(insertTabletPlan, start, end);
-    }
 
     try {
+      if (enableMemControl) {
+        checkMemCostAndAddToTspInfo(insertTabletPlan, start, end);
+      }
       workMemTable.insertTablet(insertTabletPlan, start, end);
       if (IoTDBDescriptor.getInstance().getConfig().isEnableWal()) {
         insertTabletPlan.setStart(start);
@@ -282,22 +278,8 @@ public class TsFileProcessor {
         textDataIncrement += MemUtils.getBinarySize((Binary) insertRowPlan.getValues()[i]);
       }
     }
-    memTableIncrement += textDataIncrement;
-    storageGroupInfo.addStorageGroupMemCost(memTableIncrement);
-    tsFileProcessorInfo.addTSPMemCost(unsealedResourceIncrement + chunkMetadataIncrement);
-    if (storageGroupInfo.needToReportToSystem()) {
-      SystemInfo.getInstance().reportStorageGroupStatus(storageGroupInfo);
-      try {
-        blockInsertionIfReject();
-      } catch (WriteProcessException e) {
-        storageGroupInfo.releaseStorageGroupMemCost(memTableIncrement);
-        tsFileProcessorInfo.releaseTSPMemCost(unsealedResourceIncrement + chunkMetadataIncrement);
-        SystemInfo.getInstance().resetStorageGroupStatus(storageGroupInfo, false);
-        throw e;
-      }
-    }
-    workMemTable.addTVListRamCost(memTableIncrement);
-    workMemTable.addTextDataSize(textDataIncrement);
+    updateMemoryInfo(memTableIncrement, unsealedResourceIncrement, 
+        chunkMetadataIncrement, textDataIncrement);
   }
 
   private void checkMemCostAndAddToTspInfo(InsertTabletPlan insertTabletPlan, int start, int end)
@@ -305,9 +287,8 @@ public class TsFileProcessor {
     if (start >= end) {
       return;
     }
-    long memTableIncrement = 0L;
-    long textDataIncrement = 0L;
-    long chunkMetadataIncrement = 0L;
+    long[] memIncrements = new long[3]; // memTable, text, chunk metadata
+
     String deviceId = insertTabletPlan.getDeviceId().getFullPath();
     long unsealedResourceIncrement = tsFileResource.estimateRamIncrement(deviceId);
 
@@ -315,44 +296,61 @@ public class TsFileProcessor {
       // skip failed Measurements
       TSDataType dataType = insertTabletPlan.getDataTypes()[i];
       String measurement = insertTabletPlan.getMeasurements()[i];
+      Object column = insertTabletPlan.getColumns()[i];
       if (dataType == null) {
         continue;
       }
+      updateMemCost(dataType, measurement, deviceId, start, end, memIncrements, column);
+    }
+    long memTableIncrement = memIncrements[0];
+    long textDataIncrement = memIncrements[1];
+    long chunkMetadataIncrement = memIncrements[2];
+    updateMemoryInfo(memTableIncrement, unsealedResourceIncrement, 
+        chunkMetadataIncrement, textDataIncrement);
+  }
 
-      if (workMemTable.checkIfChunkDoesNotExist(deviceId, measurement)) {
-        // ChunkMetadataIncrement
-        chunkMetadataIncrement += ChunkMetadata.calculateRamSize(measurement, dataType);
-        memTableIncrement += ((end - start) / PrimitiveArrayManager.ARRAY_SIZE + 1)
+  private void updateMemCost(TSDataType dataType, String measurement, String deviceId, int start,
+   int end, long[] memIncrements, Object column) {
+    // memIncrements = [memTable, text, chunk metadata] respectively
+
+    if (workMemTable.checkIfChunkDoesNotExist(deviceId, measurement)) {
+      // ChunkMetadataIncrement
+      memIncrements[2] += ChunkMetadata.calculateRamSize(measurement, dataType);
+      memIncrements[0] += ((end - start) / PrimitiveArrayManager.ARRAY_SIZE + 1)
+          * TVList.tvListArrayMemSize(dataType);
+    }
+    else {
+      int currentChunkPointNum = workMemTable
+          .getCurrentChunkPointNum(deviceId, measurement);
+      if (currentChunkPointNum % PrimitiveArrayManager.ARRAY_SIZE == 0) {
+        memIncrements[0] += ((end - start) / PrimitiveArrayManager.ARRAY_SIZE + 1)
             * TVList.tvListArrayMemSize(dataType);
       }
       else {
-        int currentChunkPointNum = workMemTable
-            .getCurrentChunkPointNum(deviceId, measurement);
-        if (currentChunkPointNum % PrimitiveArrayManager.ARRAY_SIZE == 0) {
-          memTableIncrement += ((end - start) / PrimitiveArrayManager.ARRAY_SIZE + 1)
-              * TVList.tvListArrayMemSize(dataType);
-        }
-        else {
-          int acquireArray =
-              (end - start - 1 + (currentChunkPointNum % PrimitiveArrayManager.ARRAY_SIZE))
-                  / PrimitiveArrayManager.ARRAY_SIZE;
-          memTableIncrement += acquireArray == 0 ? 0
-              : acquireArray * TVList.tvListArrayMemSize(dataType);
-        }
-      }
-      // TEXT data size
-      if (dataType == TSDataType.TEXT) {
-        Binary[] column = (Binary[]) insertTabletPlan.getColumns()[i];
-        textDataIncrement += MemUtils.getBinaryColumnSize(column, start, end);
+        int acquireArray =
+            (end - start - 1 + (currentChunkPointNum % PrimitiveArrayManager.ARRAY_SIZE))
+                / PrimitiveArrayManager.ARRAY_SIZE;
+        memIncrements[0] += acquireArray == 0 ? 0
+            : acquireArray * TVList.tvListArrayMemSize(dataType);
       }
     }
+    // TEXT data size
+    if (dataType == TSDataType.TEXT) {
+      Binary[] binColumn = (Binary[]) column;
+      memIncrements[1] += MemUtils.getBinaryColumnSize(binColumn, start, end);
+    }
+  }
+
+
+  private void updateMemoryInfo(long memTableIncrement, long unsealedResourceIncrement,
+      long chunkMetadataIncrement, long textDataIncrement) throws WriteProcessException {
     memTableIncrement += textDataIncrement;
     storageGroupInfo.addStorageGroupMemCost(memTableIncrement);
     tsFileProcessorInfo.addTSPMemCost(unsealedResourceIncrement + chunkMetadataIncrement);
     if (storageGroupInfo.needToReportToSystem()) {
       SystemInfo.getInstance().reportStorageGroupStatus(storageGroupInfo);
       try {
-        blockInsertionIfReject();
+        StorageEngine.blockInsertionIfReject();
       } catch (WriteProcessException e) {
         storageGroupInfo.releaseStorageGroupMemCost(memTableIncrement);
         tsFileProcessorInfo.releaseTSPMemCost(unsealedResourceIncrement + chunkMetadataIncrement);
@@ -362,21 +360,6 @@ public class TsFileProcessor {
     }
     workMemTable.addTVListRamCost(memTableIncrement);
     workMemTable.addTextDataSize(textDataIncrement);
-  }
-
-  private void blockInsertionIfReject() throws WriteProcessException {
-    long startTime = System.currentTimeMillis();
-    while (SystemInfo.getInstance().isRejected()) {
-      try {
-        TimeUnit.MILLISECONDS.sleep(waitingTimeWhenInsertBlocked);
-        if (System.currentTimeMillis() - startTime > maxWaitingTimeWhenInsertBlocked) {
-          throw new WriteProcessException("System rejected over " + maxWaitingTimeWhenInsertBlocked + "ms");
-        }
-      } catch (InterruptedException e) {
-        logger.error("Failed when waiting for getting memory for insertion ", e);
-        Thread.currentThread().interrupt();
-      }
-    }
   }
 
   /**
@@ -515,7 +498,7 @@ public class TsFileProcessor {
       }
       // when a flush thread serves this TsFileProcessor (because the processor is submitted by
       // registerTsFileProcessor()), the thread will seal the corresponding TsFile and
-      // execute other cleanup works if (shouldClose == true and flushingMemTables is empty).
+      // execute other cleanup works if "shouldClose == true and flushingMemTables is empty".
 
       // To ensure there must be a flush thread serving this processor after the field `shouldClose`
       // is set true, we need to generate a NotifyFlushMemTable as a signal task and submit it to
@@ -765,25 +748,7 @@ public class TsFileProcessor {
     if (shouldClose && flushingMemTables.isEmpty() && writer != null) {
       try {
         writer.mark();
-        try {
-          double compressionRatio = ((double) totalMemTableSize) / writer.getPos();
-          if (logger.isDebugEnabled()) {
-            logger.debug(
-                "The compression ratio of tsfile {} is {}, totalMemTableSize: {}, the file size: {}",
-                writer.getFile().getAbsolutePath(), compressionRatio, totalMemTableSize,
-                writer.getPos());
-          }
-          if (compressionRatio == 0 && !memTableToFlush.isSignalMemTable()) {
-            logger.error(
-                "{} The compression ratio of tsfile {} is 0, totalMemTableSize: {}, the file size: {}",
-                storageGroupName, writer.getFile().getAbsolutePath(), totalMemTableSize,
-                writer.getPos());
-          }
-          CompressionRatio.getInstance().updateRatio(compressionRatio);
-        } catch (IOException e) {
-          logger.error("{}: {} update compression ratio failed", storageGroupName,
-              tsFileResource.getTsFile().getName(), e);
-        }
+        updateCompressionRatio(memTableToFlush);
         if (logger.isDebugEnabled()) {
           logger
               .debug("{}: {} flushingMemtables is empty and will close the file", storageGroupName,
@@ -814,6 +779,28 @@ public class TsFileProcessor {
       synchronized (flushingMemTables) {
         flushingMemTables.notifyAll();
       }
+    }
+  }
+
+  private void updateCompressionRatio(IMemTable memTableToFlush) {
+    try {
+      double compressionRatio = ((double) totalMemTableSize) / writer.getPos();
+      if (logger.isDebugEnabled()) {
+        logger.debug(
+            "The compression ratio of tsfile {} is {}, totalMemTableSize: {}, the file size: {}",
+            writer.getFile().getAbsolutePath(), compressionRatio, totalMemTableSize,
+            writer.getPos());
+      }
+      if (compressionRatio == 0 && !memTableToFlush.isSignalMemTable()) {
+        logger.error(
+            "{} The compression ratio of tsfile {} is 0, totalMemTableSize: {}, the file size: {}",
+            storageGroupName, writer.getFile().getAbsolutePath(), totalMemTableSize,
+            writer.getPos());
+      }
+      CompressionRatio.getInstance().updateRatio(compressionRatio);
+    } catch (IOException e) {
+      logger.error("{}: {} update compression ratio failed", storageGroupName,
+          tsFileResource.getTsFile().getName(), e);
     }
   }
 

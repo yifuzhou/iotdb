@@ -45,6 +45,7 @@ public class SystemInfo {
   private Map<StorageGroupInfo, Long> reportedSgMemCostMap = new ConcurrentHashMap<>();
 
   private static final double FLUSH_PROPORTION = config.getFlushProportion();
+  private static final double FORCE_FLUSH_PROPORTION = config.getForceFlushProportion();
   private static final double REJECT_PROPORTION = config.getRejectProportion();
 
   /**
@@ -201,5 +202,9 @@ public class SystemInfo {
     }
 
     private static SystemInfo instance = new SystemInfo();
+  }
+
+  public boolean forceFlush(){
+    return totalSgMemCost.get() >= config.getAllocateMemoryForWrite() * FORCE_FLUSH_PROPORTION;
   }
 }

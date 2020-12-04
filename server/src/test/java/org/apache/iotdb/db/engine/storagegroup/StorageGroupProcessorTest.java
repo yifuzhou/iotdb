@@ -137,6 +137,31 @@ public class StorageGroupProcessorTest {
   }
 
   @Test
+  public void testSlidingMemTable()
+      throws WriteProcessException, IOException, MetadataException {
+    TSRecord record;
+
+    for (int j = 5; j <= 10; j++) {
+      record = new TSRecord(j, deviceId);
+      record.addTuple(DataPoint.getDataPoint(TSDataType.INT32, measurementId, String.valueOf(j)));
+      processor.insert(new InsertRowPlan(record));
+    }
+
+    for (TsFileProcessor tsfileProcessor : processor.getWorkSequenceTsFileProcessors()) {
+      tsfileProcessor.asyncFlush();
+    }
+
+    for (int j = 1; j <= 3; j++) {
+      record = new TSRecord(j, deviceId);
+      record.addTuple(DataPoint.getDataPoint(TSDataType.INT32, measurementId, String.valueOf(j)));
+      processor.insert(new InsertRowPlan(record));
+    }
+//    System.exit(0);
+    processor.syncCloseAllWorkingTsFileProcessors();
+
+  }
+
+  @Test
   public void testSequenceSyncClose()
       throws WriteProcessException, QueryProcessException, IllegalPathException {
     for (int j = 1; j <= 10; j++) {

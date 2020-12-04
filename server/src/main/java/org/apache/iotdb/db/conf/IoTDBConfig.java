@@ -152,6 +152,11 @@ public class IoTDBConfig {
   private double flushProportion = 0.3;
 
   /**
+   * Force flush proportion for system
+   */
+  private double forceFlushProportion = 0.6;
+
+  /**
    * Reject proportion for system
    */
   private double rejectProportion = 0.8;
@@ -203,6 +208,16 @@ public class IoTDBConfig {
   private int walBufferSize = 16 * 1024 * 1024;
 
   private int estimatedSeriesSize = 300;
+
+  /**
+   * Whether to enable sliding memory table
+   */
+  private boolean enableSlidingMemTable = true;
+
+  /**
+   * Save the flushing memtable in the memory during the period, can help reduce the unseq ratio, Unit: millis.
+   */
+  private int flushWaitTime = 60000;
 
   /**
    * default base dir, stores all IoTDB runtime files
@@ -989,6 +1004,22 @@ public class IoTDBConfig {
     this.forceWalPeriodInMs = forceWalPeriodInMs;
   }
 
+  public boolean isEnableSlidingMemTable() {
+    return enableSlidingMemTable;
+  }
+
+  public void setEnableSlidingMemTable(boolean enableSlidingMemTable) {
+    this.enableSlidingMemTable = enableSlidingMemTable;
+  }
+
+  public int getFlushWaitTime() {
+    return flushWaitTime;
+  }
+
+  public void setFlushWaitTime(int flushWaitTime) {
+    this.flushWaitTime = flushWaitTime;
+  }
+
   public String getSystemDir() {
     return systemDir;
   }
@@ -1259,6 +1290,14 @@ public class IoTDBConfig {
 
   public void setFlushProportion(double flushProportion) {
     this.flushProportion = flushProportion;
+  }
+
+  public double getForceFlushProportion() {
+    return forceFlushProportion;
+  }
+
+  public void setForceFlushProportion(double forceFlushProportion) {
+    this.forceFlushProportion = forceFlushProportion;
   }
 
   public double getRejectProportion() {

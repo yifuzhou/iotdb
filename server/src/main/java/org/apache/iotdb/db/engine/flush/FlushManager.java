@@ -92,9 +92,9 @@ public class FlushManager implements FlushManagerMBean, IService {
       if (tsFileProcessor.isSequence() && IoTDBDescriptor.getInstance().getConfig()
           .isEnableSlidingMemTable() && !SystemInfo.getInstance().forceFlush()) {
         long startTime = System.currentTimeMillis();
-        while (!tsFileProcessor.isShouldClose()
-            && System.currentTimeMillis() - startTime < IoTDBDescriptor.getInstance().getConfig()
-            .getFlushWaitTime()) {
+        while (!tsFileProcessor.isShouldClose() &&
+            System.currentTimeMillis() - startTime < IoTDBDescriptor.getInstance().getConfig()
+                .getFlushWaitTime()) {
           // wait
           try {
             TimeUnit.MILLISECONDS
@@ -104,9 +104,12 @@ public class FlushManager implements FlushManagerMBean, IService {
           }
         }
       }
-      tsFileProcessor.setFlushingMemTable(null);
-      tsFileProcessor.setFlushMemTableAlive(false);
-      tsFileProcessor.getUpdateLatestFlushTimeCallback().call(tsFileProcessor);
+      if (tsFileProcessor.isSequence() && IoTDBDescriptor.getInstance().getConfig()
+          .isEnableSlidingMemTable()) {
+        tsFileProcessor.getUpdateLatestFlushTimeCallback().call(tsFileProcessor);
+        tsFileProcessor.setFlushingMemTable(null);
+        tsFileProcessor.setFlushMemTableAlive(false);
+      }
       tsFileProcessor.flushOneMemTable();
       tsFileProcessor.setManagedByFlushManager(false);
       if (logger.isDebugEnabled()) {

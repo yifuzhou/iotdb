@@ -28,6 +28,7 @@ import org.apache.iotdb.cluster.rpc.thrift.Node;
 import org.apache.iotdb.cluster.server.member.DataGroupMember;
 import org.apache.iotdb.cluster.server.member.MetaGroupMember;
 import org.apache.iotdb.db.exception.StorageEngineException;
+import org.apache.iotdb.db.exception.UserException;
 import org.apache.iotdb.db.exception.metadata.MetadataException;
 import org.apache.iotdb.db.exception.metadata.PathNotExistException;
 import org.apache.iotdb.db.exception.metadata.StorageGroupNotSetException;
@@ -64,7 +65,7 @@ abstract class BaseApplier implements LogApplier {
    * @throws StorageEngineException
    */
   void applyPhysicalPlan(PhysicalPlan plan, DataGroupMember dataGroupMember)
-      throws QueryProcessException, StorageGroupNotSetException, StorageEngineException {
+      throws QueryProcessException, StorageGroupNotSetException, StorageEngineException, UserException {
     if (plan instanceof InsertPlan) {
       processPlanWithTolerance((InsertPlan) plan, dataGroupMember);
     } else if (plan != null && !plan.isQuery()) {
@@ -85,7 +86,7 @@ abstract class BaseApplier implements LogApplier {
   }
 
   private void executeAfterSync(PhysicalPlan plan)
-      throws QueryProcessException, StorageGroupNotSetException, StorageEngineException {
+      throws QueryProcessException, StorageGroupNotSetException, StorageEngineException, UserException {
     try {
       metaGroupMember.syncLeaderWithConsistencyCheck(true);
     } catch (CheckConsistencyException ce) {
@@ -103,7 +104,7 @@ abstract class BaseApplier implements LogApplier {
    * @throws StorageEngineException
    */
   private void processPlanWithTolerance(InsertPlan plan, DataGroupMember dataGroupMember)
-      throws QueryProcessException, StorageGroupNotSetException, StorageEngineException {
+      throws QueryProcessException, StorageGroupNotSetException, StorageEngineException, UserException {
     try {
       getQueryExecutor().processNonQuery(plan);
     } catch (QueryProcessException | StorageGroupNotSetException | StorageEngineException e) {

@@ -38,6 +38,7 @@ import org.apache.iotdb.db.conf.IoTDBDescriptor;
 import org.apache.iotdb.db.engine.StorageEngine;
 import org.apache.iotdb.db.engine.storagegroup.TsFileResource;
 import org.apache.iotdb.db.exception.StorageEngineException;
+import org.apache.iotdb.db.exception.UserException;
 import org.apache.iotdb.db.exception.metadata.IllegalPathException;
 import org.apache.iotdb.db.exception.metadata.StorageGroupNotSetException;
 import org.apache.iotdb.db.exception.query.QueryProcessException;
@@ -269,7 +270,7 @@ public class TestUtils {
   }
 
   public static void prepareData()
-      throws QueryProcessException, StorageGroupNotSetException, StorageEngineException, IllegalPathException {
+      throws QueryProcessException, StorageGroupNotSetException, StorageEngineException, IllegalPathException, UserException {
     InsertRowPlan insertPlan = new InsertRowPlan();
     // data for raw data query and aggregation
     // 10 devices (storage groups)

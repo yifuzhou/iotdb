@@ -69,6 +69,7 @@ import org.apache.iotdb.db.engine.storagegroup.StorageGroupProcessor.TimePartiti
 import org.apache.iotdb.db.engine.storagegroup.TsFileResource;
 import org.apache.iotdb.db.exception.BatchProcessException;
 import org.apache.iotdb.db.exception.StorageEngineException;
+import org.apache.iotdb.db.exception.UserException;
 import org.apache.iotdb.db.exception.metadata.DeleteFailedException;
 import org.apache.iotdb.db.exception.metadata.IllegalPathException;
 import org.apache.iotdb.db.exception.metadata.MetadataException;
@@ -186,7 +187,7 @@ public class PlanExecutor implements IPlanExecutor {
 
   @Override
   public boolean processNonQuery(PhysicalPlan plan)
-      throws QueryProcessException, StorageGroupNotSetException, StorageEngineException {
+      throws QueryProcessException, StorageGroupNotSetException, StorageEngineException, UserException {
     switch (plan.getOperatorType()) {
       case DELETE:
         delete((DeletePlan) plan);
@@ -306,7 +307,7 @@ public class PlanExecutor implements IPlanExecutor {
     IoTDBDescriptor.getInstance().getConfig().setEnablePerformanceTracing(plan.isTracingOn());
   }
 
-  private void operateFlush(FlushPlan plan) throws StorageGroupNotSetException {
+  private void operateFlush(FlushPlan plan) throws UserException {
     if (plan.getPaths().isEmpty()) {
       StorageEngine.getInstance().syncCloseAllProcessor();
     } else {
@@ -318,14 +319,16 @@ public class PlanExecutor implements IPlanExecutor {
       if (!noExistSg.isEmpty()) {
         StringBuilder sb = new StringBuilder();
         noExistSg.forEach(storageGroup -> sb.append(storageGroup.getFullPath()).append(","));
-        throw new StorageGroupNotSetException(
-            sb.subSequence(0, sb.length() - 1).toString());
+        throw new UserException(String
+            .format("Storage group is not set for current seriesPath: [%s]",
+                sb.subSequence(0, sb.length() - 1).toString()),
+            TSStatusCode.METADATA_ERROR.getStatusCode());
       }
     }
   }
 
   public static void flushSpecifiedStorageGroups(FlushPlan plan)
-      throws StorageGroupNotSetException {
+      throws UserException {
     Map<PartialPath, List<Pair<Long, Boolean>>> storageGroupMap = plan
         .getStorageGroupPartitionIds();
     for (Entry<PartialPath, List<Pair<Long, Boolean>>> entry : storageGroupMap.entrySet()) {
@@ -935,7 +938,7 @@ public class PlanExecutor implements IPlanExecutor {
     }
   }
 
-  private boolean operateAuthor(AuthorPlan author) throws QueryProcessException {
+  private boolean operateAuthor(AuthorPlan author) throws QueryProcessException, UserException {
     AuthorOperator.AuthorType authorType = author.getAuthorType();
     String userName = author.getUserName();
     String roleName = author.getRoleName();
@@ -990,7 +993,7 @@ public class PlanExecutor implements IPlanExecutor {
           throw new QueryProcessException("Unsupported operation " + authorType);
       }
     } catch (AuthException e) {
-      throw new QueryProcessException(e.getMessage());
+      throw new UserException(e.getMessage(), TSStatusCode.AUTHORITY_ERROR.getStatusCode());
     }
     return true;
   }
@@ -1133,14 +1136,16 @@ public class PlanExecutor implements IPlanExecutor {
   }
 
   protected boolean deleteStorageGroups(DeleteStorageGroupPlan deleteStorageGroupPlan)
-      throws QueryProcessException {
+      throws QueryProcessException, UserException {
     List<PartialPath> deletePathList = new ArrayList<>();
     try {
       for (PartialPath storageGroupPath : deleteStorageGroupPlan.getPaths()) {
         List<PartialPath> allRelatedStorageGroupPath = IoTDB.metaManager
             .getStorageGroupPaths(storageGroupPath);
         if (allRelatedStorageGroupPath.isEmpty()) {
-          throw new PathNotExistException(storageGroupPath.getFullPath());
+          throw new UserException(
+              String.format("Path [%s] does not exist", storageGroupPath.getFullPath()),
+              TSStatusCode.TIMESERIES_NOT_EXIST.getStatusCode());
         }
         for (PartialPath path : allRelatedStorageGroupPath) {
           StorageEngine.getInstance().deleteStorageGroup(path);

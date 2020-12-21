@@ -54,6 +54,7 @@ import org.apache.iotdb.db.engine.cache.TimeSeriesMetadataCache;
 import org.apache.iotdb.db.exception.BatchProcessException;
 import org.apache.iotdb.db.exception.QueryInBatchStatementException;
 import org.apache.iotdb.db.exception.StorageEngineException;
+import org.apache.iotdb.db.exception.UserException;
 import org.apache.iotdb.db.exception.metadata.IllegalPathException;
 import org.apache.iotdb.db.exception.metadata.MetadataException;
 import org.apache.iotdb.db.exception.metadata.StorageGroupNotSetException;
@@ -1133,7 +1134,7 @@ public class TSServiceImpl implements TSIService.Iface, ServerContext {
   }
 
   private boolean executeNonQuery(PhysicalPlan plan)
-      throws QueryProcessException, StorageGroupNotSetException, StorageEngineException {
+      throws QueryProcessException, StorageGroupNotSetException, StorageEngineException, UserException {
     if (IoTDBDescriptor.getInstance().getConfig().isReadOnly()) {
       throw new QueryProcessException(
           "Current system mode is read-only, does not support non-query operation");
@@ -1792,6 +1793,9 @@ public class TSServiceImpl implements TSIService.Iface, ServerContext {
       execRet = executeNonQuery(plan);
     } catch (BatchProcessException e) {
       return RpcUtils.getStatus(Arrays.asList(e.getFailingStatus()));
+    } catch (UserException e) {
+      logger.warn("meet error while processing non-query {}", e.getMessage());
+      return RpcUtils.getStatus(e.getErrorCode(), e.getMessage());
     } catch (QueryProcessException e) {
       logger.warn("meet error while processing non-query. ", e);
       Throwable cause = e;

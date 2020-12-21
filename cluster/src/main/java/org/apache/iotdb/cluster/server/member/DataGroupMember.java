@@ -89,6 +89,7 @@ import org.apache.iotdb.db.conf.IoTDBDescriptor;
 import org.apache.iotdb.db.engine.StorageEngine;
 import org.apache.iotdb.db.engine.storagegroup.StorageGroupProcessor.TimePartitionFilter;
 import org.apache.iotdb.db.exception.StorageEngineException;
+import org.apache.iotdb.db.exception.UserException;
 import org.apache.iotdb.db.exception.metadata.IllegalPathException;
 import org.apache.iotdb.db.exception.metadata.StorageGroupNotSetException;
 import org.apache.iotdb.db.metadata.PartialPath;
@@ -641,8 +642,8 @@ public class DataGroupMember extends RaftMember {
     try {
       PlanExecutor.flushSpecifiedStorageGroups(flushPlan);
       return true;
-    } catch (StorageGroupNotSetException e) {
-      logger.error("Some SGs are missing while flushing", e);
+    } catch (UserException e) {
+      logger.warn("Some SGs are missing while flushing {}", e.getMessage());
     }
     return false;
   }

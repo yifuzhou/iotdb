@@ -30,6 +30,7 @@ import org.apache.iotdb.cluster.server.member.MetaGroupMember;
 import org.apache.iotdb.cluster.utils.IOUtils;
 import org.apache.iotdb.db.engine.StorageEngine;
 import org.apache.iotdb.db.exception.StorageEngineException;
+import org.apache.iotdb.db.exception.UserException;
 import org.apache.iotdb.db.exception.metadata.PathNotExistException;
 import org.apache.iotdb.db.exception.metadata.StorageGroupNotSetException;
 import org.apache.iotdb.db.exception.query.QueryProcessException;
@@ -89,7 +90,7 @@ public class DataLogApplier extends BaseApplier {
   }
 
   private void applyInsert(InsertPlan plan)
-      throws StorageGroupNotSetException, QueryProcessException, StorageEngineException {
+      throws StorageGroupNotSetException, QueryProcessException, StorageEngineException, UserException {
     // check if the corresponding slot is being pulled
     PartialPath sg;
     long time = plan.getMinTime();

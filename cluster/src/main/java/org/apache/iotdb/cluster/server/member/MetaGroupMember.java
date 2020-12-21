@@ -126,6 +126,7 @@ import org.apache.iotdb.db.conf.IoTDBDescriptor;
 import org.apache.iotdb.db.engine.StorageEngine;
 import org.apache.iotdb.db.exception.StartupException;
 import org.apache.iotdb.db.exception.StorageEngineException;
+import org.apache.iotdb.db.exception.UserException;
 import org.apache.iotdb.db.exception.metadata.IllegalPathException;
 import org.apache.iotdb.db.exception.metadata.MetadataException;
 import org.apache.iotdb.db.exception.metadata.PathNotExistException;
@@ -1352,6 +1353,9 @@ public class MetaGroupMember extends RaftMember {
     boolean execRet;
     try {
       execRet = getLocalExecutor().processNonQuery(plan);
+    } catch (UserException e) {
+      logger.warn("meet error while processing non-query {}", e.getMessage());
+      return RpcUtils.getStatus(e.getErrorCode(), e.getMessage());
     } catch (QueryProcessException e) {
       if (e.getErrorCode() != TSStatusCode.INTERNAL_SERVER_ERROR.getStatusCode()) {
         logger.debug("meet error while processing non-query. ", e);

@@ -59,11 +59,11 @@ import org.apache.iotdb.db.exception.ShutdownException;
 import org.apache.iotdb.db.exception.StorageEngineException;
 import org.apache.iotdb.db.exception.StorageGroupProcessorException;
 import org.apache.iotdb.db.exception.TsFileProcessorException;
+import org.apache.iotdb.db.exception.UserException;
 import org.apache.iotdb.db.exception.WriteProcessException;
 import org.apache.iotdb.db.exception.WriteProcessRejectException;
 import org.apache.iotdb.db.exception.metadata.IllegalPathException;
 import org.apache.iotdb.db.exception.metadata.MetadataException;
-import org.apache.iotdb.db.exception.metadata.StorageGroupNotSetException;
 import org.apache.iotdb.db.exception.query.QueryProcessException;
 import org.apache.iotdb.db.exception.runtime.StorageEngineFailureException;
 import org.apache.iotdb.db.metadata.PartialPath;
@@ -497,15 +497,14 @@ public class StorageEngine implements IService {
    * @param partitionId      the partition id
    * @param isSeq            is sequence tsfile or unsequence tsfile
    * @param isSync           close tsfile synchronously or asynchronously
-   * @throws StorageGroupNotSetException
    */
   public void closeStorageGroupProcessor(PartialPath storageGroupPath, long partitionId,
       boolean isSeq,
-      boolean isSync)
-      throws StorageGroupNotSetException {
+      boolean isSync) throws UserException {
     StorageGroupProcessor processor = processorMap.get(storageGroupPath);
     if (processor == null) {
-      throw new StorageGroupNotSetException(storageGroupPath.getFullPath());
+      throw new UserException(String.format("Storage group is not set for current seriesPath: [%s]",
+          storageGroupPath.getFullPath()), TSStatusCode.METADATA_ERROR.getStatusCode());
     }
 
     logger.info("async closing sg processor is called for closing {}, seq = {}, partitionId = {}",
@@ -871,8 +870,9 @@ public class StorageEngine implements IService {
       try {
         TimeUnit.MILLISECONDS.sleep(config.getCheckPeriodWhenInsertBlocked());
         if (System.currentTimeMillis() - startTime > config.getMaxWaitingTimeWhenInsertBlocked()) {
-          throw new WriteProcessRejectException("System rejected over " + config.getMaxWaitingTimeWhenInsertBlocked() +
-              "ms");
+          throw new WriteProcessRejectException(
+              "System rejected over " + config.getMaxWaitingTimeWhenInsertBlocked() +
+                  "ms");
         }
       } catch (InterruptedException e) {
         Thread.currentThread().interrupt();

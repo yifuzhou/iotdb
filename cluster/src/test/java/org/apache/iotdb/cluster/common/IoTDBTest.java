@@ -29,6 +29,7 @@ import org.apache.iotdb.db.conf.IoTDBConstant;
 import org.apache.iotdb.db.conf.IoTDBDescriptor;
 import org.apache.iotdb.db.exception.StartupException;
 import org.apache.iotdb.db.exception.StorageEngineException;
+import org.apache.iotdb.db.exception.UserException;
 import org.apache.iotdb.db.exception.metadata.IllegalPathException;
 import org.apache.iotdb.db.exception.metadata.MetadataException;
 import org.apache.iotdb.db.exception.metadata.StorageGroupNotSetException;
@@ -141,7 +142,7 @@ public abstract class IoTDBTest {
           schema.getMeasurementId()),
           schema.getType(), schema.getEncodingType(), schema.getCompressor(), schema.getProps(),
           Collections.emptyMap(), Collections.emptyMap(), null));
-    } catch (QueryProcessException | StorageGroupNotSetException | StorageEngineException | IllegalPathException e) {
+    } catch (QueryProcessException | StorageGroupNotSetException | StorageEngineException | IllegalPathException | UserException e) {
       // ignore
     }
   }

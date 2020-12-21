@@ -24,8 +24,8 @@ import org.apache.iotdb.cluster.log.LogApplier;
 import org.apache.iotdb.cluster.log.logtypes.CloseFileLog;
 import org.apache.iotdb.cluster.log.logtypes.PhysicalPlanLog;
 import org.apache.iotdb.db.engine.StorageEngine;
+import org.apache.iotdb.db.exception.UserException;
 import org.apache.iotdb.db.exception.metadata.IllegalPathException;
-import org.apache.iotdb.db.exception.metadata.StorageGroupNotSetException;
 import org.apache.iotdb.db.exception.query.QueryProcessException;
 import org.apache.iotdb.db.metadata.PartialPath;
 import org.apache.iotdb.db.qp.executor.PlanExecutor;
@@ -47,7 +47,7 @@ public class TestLogApplier implements LogApplier {
               .closeStorageGroupProcessor(new PartialPath(closeFileLog.getStorageGroupName()),
                   closeFileLog.getPartitionId(),
                   closeFileLog.isSeq(), false);
-        } catch (StorageGroupNotSetException | IllegalPathException e) {
+        } catch (UserException | IllegalPathException e) {
           throw new QueryProcessException(e);
         }
       }

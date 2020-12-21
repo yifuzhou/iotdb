@@ -26,6 +26,7 @@ import org.apache.iotdb.cluster.log.logtypes.RemoveNodeLog;
 import org.apache.iotdb.cluster.rpc.thrift.Node;
 import org.apache.iotdb.cluster.server.member.MetaGroupMember;
 import org.apache.iotdb.db.exception.StorageEngineException;
+import org.apache.iotdb.db.exception.UserException;
 import org.apache.iotdb.db.exception.metadata.StorageGroupNotSetException;
 import org.apache.iotdb.db.exception.query.QueryProcessException;
 import org.slf4j.Logger;
@@ -60,7 +61,7 @@ public class MetaLogApplier extends BaseApplier {
       } else {
         logger.error("Unsupported log: {} {}", log.getClass().getName(), log);
       }
-    } catch (StorageEngineException | StorageGroupNotSetException | QueryProcessException e) {
+    } catch (StorageEngineException | StorageGroupNotSetException | QueryProcessException | UserException e) {
       logger.debug("Exception occurred when executing {}", log, e);
       log.setException(e);
     } finally {

@@ -579,6 +579,7 @@ public class TsFileSequenceReader implements AutoCloseable {
   }
 
   private List<TimeseriesMetadata> getDeviceTimeseriesMetadata(String device) throws IOException {
+    readFileMetadata();
     MetadataIndexNode metadataIndexNode = tsFileMetaData.getMetadataIndex();
     Pair<MetadataIndexEntry, Long> metadataIndexPair = getMetadataAndEndOffset(
         metadataIndexNode, device, MetadataIndexNodeType.INTERNAL_DEVICE, false);
@@ -980,6 +981,7 @@ public class TsFileSequenceReader implements AutoCloseable {
    */
   public List<ChunkMetadata> readChunkMetaDataList(TimeseriesMetadata timeseriesMetaData)
       throws IOException {
+    readFileMetadata();
     List<Pair<Long, Long>> versionInfo = tsFileMetaData.getVersionInfo();
     ArrayList<ChunkMetadata> chunkMetadataList = new ArrayList<>();
     long startOffsetOfChunkMetadataList = timeseriesMetaData.getOffsetOfChunkMetaDataList();

@@ -297,12 +297,12 @@ public class IoTDBConfig {
   /**
    * whether to cache meta data(ChunkMetaData and TsFileMetaData) or not.
    */
-  private boolean metaDataCacheEnable = false;
+  private boolean metaDataCacheEnable = true;
 
   /**
    * Memory allocated for timeSeriesMetaData cache in read process
    */
-  private long allocateMemoryForTimeSeriesMetaDataCache = allocateMemoryForRead * 2 / 15;
+  private long allocateMemoryForTimeSeriesMetaDataCache = allocateMemoryForRead / 6;
 
   /**
    * Memory allocated for chunkMetaData cache in read process

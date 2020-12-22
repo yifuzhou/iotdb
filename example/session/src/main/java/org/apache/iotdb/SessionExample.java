@@ -71,11 +71,11 @@ public class SessionExample {
 
   private static void query() throws InterruptedException {
     long startTime = System.nanoTime();
-    CountDownLatch countDownLatch = new CountDownLatch(6);
+    CountDownLatch countDownLatch = new CountDownLatch(1);
     for (int device = 0; device < 1; device++) {
-      new Thread(new SumTask(device, countDownLatch)).start();
-      for (int i = 0; i < 5; i++) {
-        new Thread(new GroupByTask(device, i * 20, i * 20 + 20, countDownLatch)).start();
+//      new Thread(new SumTask(device, countDownLatch)).start();
+      for (int i = 0; i < 1; i++) {
+        new Thread(new GroupByTask(device, 0, 100, countDownLatch)).start();
       }
     }
     countDownLatch.await();
@@ -100,8 +100,8 @@ public class SessionExample {
     public void run() {
       SessionDataSet dataSet;
       try {
-        dataSet = session.executeQueryStatement(String.format("select last_value(*) from root.sg1.d%d group by ([%d,%d),1ms)", device, start, end));
-        dataSet.setFetchSize(1); // default is 10000
+        dataSet = session.executeQueryStatement(String.format("select last_value(*) from root.sg1.d%d group by ([%d,%d),10ms)", device, start, end));
+        dataSet.setFetchSize(10); // default is 10000
         while (dataSet.hasNext()) {
           dataSet.next();
         }

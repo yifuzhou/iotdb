@@ -139,6 +139,7 @@ import org.apache.iotdb.tsfile.file.metadata.enums.TSDataType;
 import org.apache.iotdb.tsfile.file.metadata.enums.TSEncoding;
 import org.apache.iotdb.tsfile.read.common.Path;
 import org.apache.iotdb.tsfile.read.query.dataset.QueryDataSet;
+import org.apache.iotdb.tsfile.utils.ReadWriteIOUtils;
 import org.apache.thrift.TException;
 import org.apache.thrift.server.ServerContext;
 import org.slf4j.Logger;
@@ -1499,8 +1500,31 @@ public class TSServiceImpl implements TSIService.Iface, ServerContext {
   public TSStatus insertTablets(TSInsertTabletsReq req) {
     // transfer to another
     if(!req.isFinal){
-      req.isFinal = true;
-      AsyncInsertPool.getInstance().submit(req);
+      TSInsertTabletsReq transferReq = new TSInsertTabletsReq();
+      transferReq.deviceIds = req.deviceIds;
+      transferReq.isFinal = true;
+      transferReq.measurementsList = req.measurementsList;
+      transferReq.typesList = req.typesList;
+      transferReq.sizeList = new ArrayList<>(req.sizeList);
+      List<ByteBuffer> valueBuffer = new ArrayList<>(req.valuesList.size());
+      for(ByteBuffer byteBuffer : req.valuesList){
+        valueBuffer.add(ReadWriteIOUtils.clone(byteBuffer));
+        byteBuffer.flip();
+      }
+      List<ByteBuffer> timeBuffer = new ArrayList<>(req.timestampsList.size());
+      for(ByteBuffer byteBuffer : req.timestampsList){
+        timeBuffer.add(ReadWriteIOUtils.clone(byteBuffer));
+        byteBuffer.flip();
+      }
+      transferReq.valuesList = valueBuffer;
+      transferReq.timestampsList = timeBuffer;
+
+      AsyncInsertPool.getInstance().submit(transferReq);
+    }
+    else{
+      for(ByteBuffer byteBuffer : req.timestampsList){
+        System.out.println(byteBuffer);
+      }
     }
     //
     long t1 = System.currentTimeMillis();

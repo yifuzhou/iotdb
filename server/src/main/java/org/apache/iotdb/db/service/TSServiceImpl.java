@@ -1498,6 +1498,7 @@ public class TSServiceImpl implements TSIService.Iface, ServerContext {
 
   @Override
   public TSStatus insertTablets(TSInsertTabletsReq req) {
+    logger.error("!!!!" + req.isFinal);
     // transfer to another
     if(!req.isFinal){
       TSInsertTabletsReq transferReq = new TSInsertTabletsReq();
@@ -1523,6 +1524,8 @@ public class TSServiceImpl implements TSIService.Iface, ServerContext {
     }
     else{
       for(ByteBuffer byteBuffer : req.timestampsList){
+        logger.error("!!!!" + byteBuffer);
+
         System.out.println(byteBuffer);
       }
     }

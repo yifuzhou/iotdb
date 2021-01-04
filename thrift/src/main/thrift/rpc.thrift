@@ -221,6 +221,7 @@ struct TSInsertTabletsReq {
   5: required list<binary> timestampsList
   6: required list<list<i32>> typesList
   7: required list<i32> sizeList
+  8: optional bool isFinal
 }
 
 struct TSInsertRecordsReq {

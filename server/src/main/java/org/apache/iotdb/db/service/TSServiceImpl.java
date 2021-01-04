@@ -1497,6 +1497,12 @@ public class TSServiceImpl implements TSIService.Iface, ServerContext {
 
   @Override
   public TSStatus insertTablets(TSInsertTabletsReq req) {
+    // transfer to another
+    if(!req.isFinal){
+      req.isFinal = true;
+      AsyncInsertPool.getInstance().submit(req);
+    }
+    //
     long t1 = System.currentTimeMillis();
     try {
       if (!checkLogin(req.getSessionId())) {

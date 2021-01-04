@@ -1498,12 +1498,11 @@ public class TSServiceImpl implements TSIService.Iface, ServerContext {
 
   @Override
   public TSStatus insertTablets(TSInsertTabletsReq req) {
-    logger.error("!!!!" + req.isFinal);
     // transfer to another
     if(!req.isFinal){
       TSInsertTabletsReq transferReq = new TSInsertTabletsReq();
       transferReq.deviceIds = req.deviceIds;
-      transferReq.isFinal = true;
+      transferReq.setIsFinal(true);
       transferReq.measurementsList = req.measurementsList;
       transferReq.typesList = req.typesList;
       transferReq.sizeList = new ArrayList<>(req.sizeList);
@@ -1522,13 +1521,7 @@ public class TSServiceImpl implements TSIService.Iface, ServerContext {
 
       AsyncInsertPool.getInstance().submit(transferReq);
     }
-    else{
-      for(ByteBuffer byteBuffer : req.timestampsList){
-        logger.error("!!!!" + byteBuffer);
 
-        System.out.println(byteBuffer);
-      }
-    }
     //
     long t1 = System.currentTimeMillis();
     try {

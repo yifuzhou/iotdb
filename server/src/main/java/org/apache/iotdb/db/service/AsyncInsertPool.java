@@ -18,6 +18,9 @@
  */
 package org.apache.iotdb.db.service;
 
+import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import org.apache.iotdb.db.concurrent.IoTDBThreadPoolFactory;
 import org.apache.iotdb.db.serviceSession.pool.SessionPool;
@@ -45,8 +48,25 @@ public class AsyncInsertPool {
     pool.submit(new Runnable() {
       @Override
       public void run() {
+        TSInsertTabletsReq transferReq = new TSInsertTabletsReq();
+        transferReq.deviceIds = req.deviceIds;
+        transferReq.setIsFinal(true);
+        transferReq.measurementsList = req.measurementsList;
+        transferReq.typesList = req.typesList;
+        transferReq.sizeList = new ArrayList<>(req.sizeList);
+        List<ByteBuffer> valueBuffer = new ArrayList<>(req.valuesList.size());
+        for(ByteBuffer byteBuffer : req.valuesList){
+          valueBuffer.add(ByteBuffer.wrap(byteBuffer.array()));
+        }
+        List<ByteBuffer> timeBuffer = new ArrayList<>(req.timestampsList.size());
+        for(ByteBuffer byteBuffer : req.timestampsList){
+          timeBuffer.add(ByteBuffer.wrap(byteBuffer.array()));
+        }
+        transferReq.valuesList = valueBuffer;
+        transferReq.timestampsList = timeBuffer;
+
         try {
-          sessionPool.insertTablets(req);
+          sessionPool.insertTablets(transferReq);
         } catch (IoTDBConnectionException | StatementExecutionException e) {
           logger.error("transfer request failed", e);
         }

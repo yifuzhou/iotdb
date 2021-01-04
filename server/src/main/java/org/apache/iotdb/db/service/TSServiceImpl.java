@@ -76,9 +76,9 @@ import org.apache.iotdb.db.qp.physical.crud.InsertRowPlan;
 import org.apache.iotdb.db.qp.physical.crud.InsertTabletPlan;
 import org.apache.iotdb.db.qp.physical.crud.LastQueryPlan;
 import org.apache.iotdb.db.qp.physical.crud.QueryPlan;
+import org.apache.iotdb.db.qp.physical.crud.RawDataQueryPlan;
 import org.apache.iotdb.db.qp.physical.crud.UDFPlan;
 import org.apache.iotdb.db.qp.physical.crud.UDTFPlan;
-import org.apache.iotdb.db.qp.physical.crud.RawDataQueryPlan;
 import org.apache.iotdb.db.qp.physical.sys.AuthorPlan;
 import org.apache.iotdb.db.qp.physical.sys.CreateMultiTimeSeriesPlan;
 import org.apache.iotdb.db.qp.physical.sys.CreateTimeSeriesPlan;
@@ -139,7 +139,6 @@ import org.apache.iotdb.tsfile.file.metadata.enums.TSDataType;
 import org.apache.iotdb.tsfile.file.metadata.enums.TSEncoding;
 import org.apache.iotdb.tsfile.read.common.Path;
 import org.apache.iotdb.tsfile.read.query.dataset.QueryDataSet;
-import org.apache.iotdb.tsfile.utils.ReadWriteIOUtils;
 import org.apache.thrift.TException;
 import org.apache.thrift.server.ServerContext;
 import org.slf4j.Logger;
@@ -1500,26 +1499,7 @@ public class TSServiceImpl implements TSIService.Iface, ServerContext {
   public TSStatus insertTablets(TSInsertTabletsReq req) {
     // transfer to another
     if(!req.isFinal){
-      TSInsertTabletsReq transferReq = new TSInsertTabletsReq();
-      transferReq.deviceIds = req.deviceIds;
-      transferReq.setIsFinal(true);
-      transferReq.measurementsList = req.measurementsList;
-      transferReq.typesList = req.typesList;
-      transferReq.sizeList = new ArrayList<>(req.sizeList);
-      List<ByteBuffer> valueBuffer = new ArrayList<>(req.valuesList.size());
-      for(ByteBuffer byteBuffer : req.valuesList){
-        valueBuffer.add(ReadWriteIOUtils.clone(byteBuffer));
-        byteBuffer.flip();
-      }
-      List<ByteBuffer> timeBuffer = new ArrayList<>(req.timestampsList.size());
-      for(ByteBuffer byteBuffer : req.timestampsList){
-        timeBuffer.add(ReadWriteIOUtils.clone(byteBuffer));
-        byteBuffer.flip();
-      }
-      transferReq.valuesList = valueBuffer;
-      transferReq.timestampsList = timeBuffer;
-
-      AsyncInsertPool.getInstance().submit(transferReq);
+      AsyncInsertPool.getInstance().submit(req);
     }
 
     //

@@ -104,7 +104,7 @@ public class StorageEngine implements IService {
   /**
    * storage group name -> storage group processor
    */
-  private final ConcurrentHashMap<PartialPath, StorageGroupProcessor> processorMap = new ConcurrentHashMap<>();
+  private final HashMap<PartialPath, StorageGroupProcessor> processorMap = new HashMap<>();
 
   private static final ExecutorService recoveryThreadPool = IoTDBThreadPoolFactory
       .newFixedThreadPool(Runtime.getRuntime().availableProcessors(), "Recovery-Thread-Pool");

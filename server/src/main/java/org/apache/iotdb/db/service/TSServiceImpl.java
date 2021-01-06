@@ -32,7 +32,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -77,9 +79,9 @@ import org.apache.iotdb.db.qp.physical.crud.InsertRowsOfOneDevicePlan;
 import org.apache.iotdb.db.qp.physical.crud.InsertTabletPlan;
 import org.apache.iotdb.db.qp.physical.crud.LastQueryPlan;
 import org.apache.iotdb.db.qp.physical.crud.QueryPlan;
+import org.apache.iotdb.db.qp.physical.crud.RawDataQueryPlan;
 import org.apache.iotdb.db.qp.physical.crud.UDFPlan;
 import org.apache.iotdb.db.qp.physical.crud.UDTFPlan;
-import org.apache.iotdb.db.qp.physical.crud.RawDataQueryPlan;
 import org.apache.iotdb.db.qp.physical.sys.AuthorPlan;
 import org.apache.iotdb.db.qp.physical.sys.CreateMultiTimeSeriesPlan;
 import org.apache.iotdb.db.qp.physical.sys.CreateTimeSeriesPlan;
@@ -178,6 +180,7 @@ public class TSServiceImpl implements TSIService.Iface, ServerContext {
   private AtomicLong sessionIdGenerator = new AtomicLong();
   // The statementId is unique in one IoTDB instance.
   private AtomicLong statementIdGenerator = new AtomicLong();
+  private ExecutorService e = Executors.newSingleThreadExecutor();
 
   // (sessionId -> Set(statementId))
   private Map<Long, Set<Long>> sessionId2StatementId = new ConcurrentHashMap<>();
@@ -1514,7 +1517,9 @@ public class TSServiceImpl implements TSIService.Iface, ServerContext {
         return status;
       }
 
-      return executeNonQueryPlan(insertTabletPlan);
+      Future<TSStatus> result = e.submit(new Test(insertTabletPlan, this));
+
+      return result.get();
     } catch (NullPointerException e) {
       logger.error("{}: error occurs when executing statements", IoTDBConstant.GLOBAL_DB_NAME, e);
       return RpcUtils

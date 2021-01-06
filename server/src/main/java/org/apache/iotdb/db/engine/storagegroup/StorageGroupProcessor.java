@@ -711,7 +711,7 @@ public class StorageGroupProcessor {
       }
     }
 
-    writeLock();
+//    writeLock();
     try {
       TSStatus[] results = new TSStatus[insertTabletPlan.getRowCount()];
       Arrays.fill(results, RpcUtils.SUCCESS_STATUS);
@@ -798,8 +798,10 @@ public class StorageGroupProcessor {
       if (!noFailure) {
         throw new BatchProcessException(results);
       }
+//    } finally {
+//      writeUnlock();
     } finally {
-      writeUnlock();
+
     }
   }
 

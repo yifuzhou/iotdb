@@ -42,6 +42,7 @@ import org.apache.iotdb.db.writelog.io.LogWriter;
 import org.apache.iotdb.db.writelog.io.MultiFileLogReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import sun.nio.ch.DirectBuffer;
 
 /**
  * This WriteLogNode is used to manage insert ahead logs of a TsFile.
@@ -60,9 +61,9 @@ public class ExclusiveWriteLogNode implements WriteLogNode, Comparable<Exclusive
   private IoTDBConfig config = IoTDBDescriptor.getInstance().getConfig();
 
   private ByteBuffer logBufferWorking = ByteBuffer
-      .allocate(IoTDBDescriptor.getInstance().getConfig().getWalBufferSize() / 2);
+      .allocateDirect(IoTDBDescriptor.getInstance().getConfig().getWalBufferSize() / 2);
   private ByteBuffer logBufferIdle = ByteBuffer
-      .allocate(IoTDBDescriptor.getInstance().getConfig().getWalBufferSize() / 2);
+      .allocateDirect(IoTDBDescriptor.getInstance().getConfig().getWalBufferSize() / 2);
   private ByteBuffer logBufferFlushing;
 
   private final Object switchBufferCondition = new Object();
@@ -149,6 +150,13 @@ public class ExclusiveWriteLogNode implements WriteLogNode, Comparable<Exclusive
       Thread.currentThread().interrupt();
       logger.warn("Waiting for current buffer being flushed interrupted");
     } finally {
+      logBufferFlushing = null;
+      if (logBufferWorking.isDirect()) {
+        ((DirectBuffer) logBufferWorking).cleaner().clean();
+      }
+      if (logBufferIdle.isDirect()) {
+        ((DirectBuffer) logBufferIdle).cleaner().clean();
+      }
       lock.unlock();
     }
   }

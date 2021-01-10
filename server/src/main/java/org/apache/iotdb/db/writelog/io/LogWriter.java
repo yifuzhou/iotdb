@@ -18,11 +18,6 @@
  */
 package org.apache.iotdb.db.writelog.io;
 
-import org.apache.iotdb.db.engine.fileSystem.SystemFileFactory;
-import org.apache.iotdb.db.utils.TestOnly;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -31,6 +26,11 @@ import java.nio.ByteBuffer;
 import java.nio.channels.ClosedChannelException;
 import java.nio.channels.FileChannel;
 import java.util.zip.CRC32;
+import org.apache.iotdb.db.engine.fileSystem.SystemFileFactory;
+import org.apache.iotdb.db.utils.TestOnly;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import sun.nio.ch.DirectBuffer;
 
 /**
  * LogWriter writes the binary logs into a file using FileChannel together with check sums of
@@ -43,8 +43,8 @@ public class LogWriter implements ILogWriter {
   private FileOutputStream fileOutputStream;
   private FileChannel channel;
   private final CRC32 checkSummer = new CRC32();
-  private final ByteBuffer lengthBuffer = ByteBuffer.allocate(4);
-  private final ByteBuffer checkSumBuffer = ByteBuffer.allocate(8);
+  private final ByteBuffer lengthBuffer = ByteBuffer.allocateDirect(4);
+  private final ByteBuffer checkSumBuffer = ByteBuffer.allocateDirect(8);
   private final boolean forceEachWrite;
 
   /**
@@ -114,15 +114,25 @@ public class LogWriter implements ILogWriter {
 
   @Override
   public void close() throws IOException {
-    if (channel != null) {
-      if (channel.isOpen()) {
-        channel.force(true);
+    try {
+      if (channel != null) {
+        if (channel.isOpen()) {
+          channel.force(true);
+        }
+        fileOutputStream.close();
+        fileOutputStream = null;
+        channel.close();
+        channel = null;
       }
-      fileOutputStream.close();
-      fileOutputStream = null;
-      channel.close();
-      channel = null;
+    } finally {
+      if (lengthBuffer.isDirect()) {
+        ((DirectBuffer) lengthBuffer).cleaner().clean();
+      }
+      if (checkSumBuffer.isDirect()) {
+        ((DirectBuffer) checkSumBuffer).cleaner().clean();
+      }
     }
+
   }
 
   @Override

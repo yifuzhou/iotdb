@@ -18,6 +18,7 @@
  */
 package org.apache.iotdb.db.qp.physical.crud;
 
+import io.netty.buffer.ByteBuf;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -217,6 +218,18 @@ public class InsertTabletPlan extends InsertPlan {
     writeValues(buffer);
   }
 
+  @Override
+  public void serialize(ByteBuf buffer) {
+    int type = PhysicalPlanType.BATCHINSERT.ordinal();
+    buffer.writeByte((byte) type);
+
+    putString(buffer, deviceId.getFullPath());
+    writeMeasurements(buffer);
+    writeDataTypes(buffer);
+    writeTimes(buffer);
+    writeValues(buffer);
+  }
+
   private void writeMeasurements(ByteBuffer buffer) {
     buffer
         .putInt(measurements.length - (failedMeasurements == null ? 0 : failedMeasurements.size()));
@@ -227,7 +240,26 @@ public class InsertTabletPlan extends InsertPlan {
     }
   }
 
+  private void writeMeasurements(ByteBuf buffer) {
+    buffer
+        .writeInt(measurements.length - (failedMeasurements == null ? 0 : failedMeasurements.size()));
+    for (String m : measurements) {
+      if (m != null) {
+        putString(buffer, m);
+      }
+    }
+  }
+
   private void writeDataTypes(ByteBuffer buffer) {
+    for (int i = 0, dataTypesLength = dataTypes.length; i < dataTypesLength; i++) {
+      TSDataType dataType = dataTypes[i];
+      if (measurements[i] != null) {
+        dataType.serializeTo(buffer);
+      }
+    }
+  }
+
+  private void writeDataTypes(ByteBuf buffer) {
     for (int i = 0, dataTypesLength = dataTypes.length; i < dataTypesLength; i++) {
       TSDataType dataType = dataTypes[i];
       if (measurements[i] != null) {
@@ -259,6 +291,29 @@ public class InsertTabletPlan extends InsertPlan {
     }
   }
 
+  private void writeTimes(ByteBuf buffer) {
+    if (isExecuting) {
+      buffer.writeInt(end - start);
+    } else {
+      buffer.writeInt(rowCount);
+    }
+
+    if (timeBuffer == null) {
+      if (isExecuting) {
+        for (int i = start; i < end; i++) {
+          buffer.writeLong(times[i]);
+        }
+      } else {
+        for (long time : times) {
+          buffer.writeLong(time);
+        }
+      }
+    } else {
+      buffer.writeBytes(timeBuffer.array());
+      timeBuffer = null;
+    }
+  }
+
   private void writeValues(ByteBuffer buffer) {
     if (valueBuffer == null) {
       serializeValues(buffer);
@@ -268,6 +323,17 @@ public class InsertTabletPlan extends InsertPlan {
     }
 
     buffer.putLong(index);
+  }
+
+  private void writeValues(ByteBuf buffer) {
+    if (valueBuffer == null) {
+      serializeValues(buffer);
+    } else {
+      buffer.writeBytes(valueBuffer.array());
+      valueBuffer = null;
+    }
+
+    buffer.writeLong(index);
   }
 
   private void serializeValues(DataOutputStream outputStream) throws IOException {
@@ -280,6 +346,15 @@ public class InsertTabletPlan extends InsertPlan {
   }
 
   private void serializeValues(ByteBuffer buffer) {
+    for (int i = 0; i < measurements.length; i++) {
+      if (measurements[i] == null) {
+        continue;
+      }
+      serializeColumn(dataTypes[i], columns[i], buffer, start, end);
+    }
+  }
+
+  private void serializeValues(ByteBuf buffer) {
     for (int i = 0; i < measurements.length; i++) {
       if (measurements[i] == null) {
         continue;
@@ -328,6 +403,54 @@ public class InsertTabletPlan extends InsertPlan {
         for (int j = curStart; j < curEnd; j++) {
           buffer.putInt(binaryValues[j].getLength());
           buffer.put(binaryValues[j].getValues());
+        }
+        break;
+      default:
+        throw new UnSupportedDataTypeException(
+            String.format(DATATYPE_UNSUPPORTED, dataType));
+    }
+  }
+
+  private void serializeColumn(TSDataType dataType, Object column, ByteBuf buffer,
+      int start, int end) {
+    int curStart = isExecuting ? start : 0;
+    int curEnd = isExecuting ? end : rowCount;
+    switch (dataType) {
+      case INT32:
+        int[] intValues = (int[]) column;
+        for (int j = curStart; j < curEnd; j++) {
+          buffer.writeInt(intValues[j]);
+        }
+        break;
+      case INT64:
+        long[] longValues = (long[]) column;
+        for (int j = curStart; j < curEnd; j++) {
+          buffer.writeLong(longValues[j]);
+        }
+        break;
+      case FLOAT:
+        float[] floatValues = (float[]) column;
+        for (int j = curStart; j < curEnd; j++) {
+          buffer.writeFloat(floatValues[j]);
+        }
+        break;
+      case DOUBLE:
+        double[] doubleValues = (double[]) column;
+        for (int j = curStart; j < curEnd; j++) {
+          buffer.writeDouble(doubleValues[j]);
+        }
+        break;
+      case BOOLEAN:
+        boolean[] boolValues = (boolean[]) column;
+        for (int j = curStart; j < curEnd; j++) {
+          buffer.writeByte(BytesUtils.boolToByte(boolValues[j]));
+        }
+        break;
+      case TEXT:
+        Binary[] binaryValues = (Binary[]) column;
+        for (int j = curStart; j < curEnd; j++) {
+          buffer.writeInt(binaryValues[j].getLength());
+          buffer.writeBytes(binaryValues[j].getValues());
         }
         break;
       default:

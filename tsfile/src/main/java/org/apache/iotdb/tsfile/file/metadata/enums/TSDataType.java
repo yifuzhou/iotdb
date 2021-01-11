@@ -18,6 +18,7 @@
  */
 package org.apache.iotdb.tsfile.file.metadata.enums;
 
+import io.netty.buffer.ByteBuf;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -84,6 +85,10 @@ public enum TSDataType {
 
   public void serializeTo(ByteBuffer byteBuffer) {
     byteBuffer.putShort(serialize());
+  }
+
+  public void serializeTo(ByteBuf byteBuffer) {
+    byteBuffer.writeShort(serialize());
   }
 
   public void serializeTo(DataOutputStream outputStream) throws IOException {

@@ -19,11 +19,11 @@
 package org.apache.iotdb.db.writelog.node;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.PooledByteBufAllocator;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.BufferOverflowException;
-import java.nio.ByteBuffer;
 import java.nio.channels.ClosedChannelException;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -42,7 +42,6 @@ import org.apache.iotdb.db.writelog.io.LogWriter;
 import org.apache.iotdb.db.writelog.io.MultiFileLogReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import sun.nio.ch.DirectBuffer;
 
 /**
  * This WriteLogNode is used to manage insert ahead logs of a TsFile.
@@ -51,6 +50,7 @@ public class ExclusiveWriteLogNode implements WriteLogNode, Comparable<Exclusive
 
   public static final String WAL_FILE_NAME = "wal";
   private static final Logger logger = LoggerFactory.getLogger(ExclusiveWriteLogNode.class);
+  private static final PooledByteBufAllocator allocator = PooledByteBufAllocator.DEFAULT;
 
   private String identifier;
 
@@ -60,11 +60,12 @@ public class ExclusiveWriteLogNode implements WriteLogNode, Comparable<Exclusive
 
   private IoTDBConfig config = IoTDBDescriptor.getInstance().getConfig();
 
-  private ByteBuffer logBufferWorking = ByteBuffer
-      .allocateDirect(IoTDBDescriptor.getInstance().getConfig().getWalBufferSize() / 2);
-  private ByteBuffer logBufferIdle = ByteBuffer
-      .allocateDirect(IoTDBDescriptor.getInstance().getConfig().getWalBufferSize() / 2);
-  private ByteBuffer logBufferFlushing;
+  private final int WAL_BUFFER_THRESHOLD =
+      IoTDBDescriptor.getInstance().getConfig().getWalBufferSize() / 2;
+
+  private ByteBuf logBufferWorking = allocator.directBuffer(WAL_BUFFER_THRESHOLD);
+  private ByteBuf logBufferIdle = allocator.directBuffer(WAL_BUFFER_THRESHOLD);
+  private ByteBuf logBufferFlushing;
 
   private final Object switchBufferCondition = new Object();
   private ReentrantLock lock = new ReentrantLock();
@@ -104,23 +105,16 @@ public class ExclusiveWriteLogNode implements WriteLogNode, Comparable<Exclusive
       if (bufferedLogNum >= config.getFlushWalThreshold()) {
         sync();
       }
-    } catch (BufferOverflowException e) {
-      throw new IOException(
-          "Log cannot fit into the buffer, please increase wal_buffer_size", e);
     } finally {
       lock.unlock();
     }
   }
 
   private void putLog(PhysicalPlan plan) {
-    logBufferWorking.mark();
-    try {
-      plan.serialize(logBufferWorking);
-    } catch (BufferOverflowException e) {
-      logger.info("WAL BufferOverflow !");
-      logBufferWorking.reset();
+    logBufferWorking.markWriterIndex();
+    plan.serialize(logBufferWorking);
+    if (logBufferWorking.readableBytes() >= WAL_BUFFER_THRESHOLD) {
       sync();
-      plan.serialize(logBufferWorking);
     }
     bufferedLogNum++;
   }
@@ -150,13 +144,6 @@ public class ExclusiveWriteLogNode implements WriteLogNode, Comparable<Exclusive
       Thread.currentThread().interrupt();
       logger.warn("Waiting for current buffer being flushed interrupted");
     } finally {
-      logBufferFlushing = null;
-      if (logBufferWorking.isDirect()) {
-        ((DirectBuffer) logBufferWorking).cleaner().clean();
-      }
-      if (logBufferIdle.isDirect()) {
-        ((DirectBuffer) logBufferIdle).cleaner().clean();
-      }
       lock.unlock();
     }
   }
@@ -212,6 +199,15 @@ public class ExclusiveWriteLogNode implements WriteLogNode, Comparable<Exclusive
       FileUtils.deleteDirectory(SystemFileFactory.INSTANCE.getFile(logDirectory));
       deleted = true;
     } finally {
+      if (logBufferFlushing != null && logBufferFlushing.refCnt() != 0) {
+        logBufferFlushing.release();
+      }
+      if (logBufferIdle != null && logBufferIdle.refCnt() != 0) {
+        logBufferIdle.release();
+      }
+      if (logBufferWorking != null && logBufferWorking.refCnt() != 0) {
+        logBufferWorking.release();
+      }
       lock.unlock();
     }
   }

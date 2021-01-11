@@ -239,7 +239,7 @@ public class WriteLogNodeTest {
     } catch (IOException e) {
       caught = true;
     }
-    assertTrue(caught);
+    assertFalse(caught);
 
     logNode.delete();
   }

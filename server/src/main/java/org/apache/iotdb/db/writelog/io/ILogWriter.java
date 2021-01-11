@@ -18,6 +18,7 @@
  */
 package org.apache.iotdb.db.writelog.io;
 
+import io.netty.buffer.ByteBuf;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
@@ -37,6 +38,8 @@ public interface ILogWriter {
    * @throws IOException
    */
   void write(ByteBuffer logBuffer) throws IOException;
+
+  void write(ByteBuf logBuffer) throws IOException;
 
   /**
    * force the OS/FileSystem to flush its cache to make sure logs are persisted.

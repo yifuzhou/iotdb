@@ -18,6 +18,7 @@
  */
 package org.apache.iotdb.db.qp.physical;
 
+import io.netty.buffer.ByteBuf;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -30,14 +31,14 @@ import org.apache.iotdb.db.metadata.PartialPath;
 import org.apache.iotdb.db.qp.logical.Operator;
 import org.apache.iotdb.db.qp.logical.Operator.OperatorType;
 import org.apache.iotdb.db.qp.physical.crud.DeletePlan;
-import org.apache.iotdb.db.qp.physical.sys.AlterTimeSeriesPlan;
 import org.apache.iotdb.db.qp.physical.crud.InsertRowPlan;
 import org.apache.iotdb.db.qp.physical.crud.InsertTabletPlan;
+import org.apache.iotdb.db.qp.physical.sys.AlterTimeSeriesPlan;
 import org.apache.iotdb.db.qp.physical.sys.AuthorPlan;
-import org.apache.iotdb.db.qp.physical.sys.CreateMultiTimeSeriesPlan;
 import org.apache.iotdb.db.qp.physical.sys.ChangeAliasPlan;
 import org.apache.iotdb.db.qp.physical.sys.ChangeTagOffsetPlan;
 import org.apache.iotdb.db.qp.physical.sys.CreateIndexPlan;
+import org.apache.iotdb.db.qp.physical.sys.CreateMultiTimeSeriesPlan;
 import org.apache.iotdb.db.qp.physical.sys.CreateTimeSeriesPlan;
 import org.apache.iotdb.db.qp.physical.sys.DataAuthPlan;
 import org.apache.iotdb.db.qp.physical.sys.DeleteStorageGroupPlan;
@@ -139,6 +140,10 @@ public abstract class PhysicalPlan {
     throw new UnsupportedOperationException(SERIALIZATION_UNIMPLEMENTED);
   }
 
+  public void serialize(ByteBuf buffer) {
+    throw new UnsupportedOperationException(SERIALIZATION_UNIMPLEMENTED);
+  }
+
   /**
    * Deserialize the plan from the given buffer. This is provided for WAL, and must be used with
    * serializeToWAL.
@@ -157,7 +162,21 @@ public abstract class PhysicalPlan {
     }
   }
 
+  protected void putString(ByteBuf buffer, String value) {
+    if (value == null) {
+      buffer.writeInt(NULL_VALUE_LEN);
+    } else {
+      ReadWriteIOUtils.write(value, buffer);
+    }
+  }
+
   protected void putStrings(ByteBuffer buffer, List<String> values) {
+    for (String value : values) {
+      putString(buffer, value);
+    }
+  }
+
+  protected void putStrings(ByteBuf buffer, List<String> values) {
     for (String value : values) {
       putString(buffer, value);
     }

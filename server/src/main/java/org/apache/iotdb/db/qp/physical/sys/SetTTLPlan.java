@@ -19,6 +19,7 @@
 
 package org.apache.iotdb.db.qp.physical.sys;
 
+import io.netty.buffer.ByteBuf;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -73,6 +74,16 @@ public class SetTTLPlan extends PhysicalPlan {
     putString(buffer, storageGroup.getFullPath());
 
     buffer.putLong(index);
+  }
+
+  @Override
+  public void serialize(ByteBuf buffer) {
+    int type = PhysicalPlanType.TTL.ordinal();
+    buffer.writeByte((byte) type);
+    buffer.writeLong(dataTTL);
+    putString(buffer, storageGroup.getFullPath());
+
+    buffer.writeLong(index);
   }
 
   @Override

@@ -18,6 +18,7 @@
  */
 package org.apache.iotdb.db.qp.physical.crud;
 
+import io.netty.buffer.ByteBuf;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -145,6 +146,20 @@ public class DeletePlan extends PhysicalPlan {
     }
 
     buffer.putLong(index);
+  }
+
+  @Override
+  public void serialize(ByteBuf buffer) {
+    int type = PhysicalPlanType.DELETE.ordinal();
+    buffer.writeByte((byte) type);
+    buffer.writeLong(deleteStartTime);
+    buffer.writeLong(deleteEndTime);
+    buffer.writeInt(paths.size());
+    for (PartialPath path : paths) {
+      putString(buffer, path.getFullPath());
+    }
+
+    buffer.writeLong(index);
   }
 
   @Override

@@ -18,6 +18,7 @@
  */
 package org.apache.iotdb.db.qp.physical.sys;
 
+import io.netty.buffer.ByteBuf;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -67,6 +68,13 @@ public class SetStorageGroupPlan extends PhysicalPlan {
     buffer.put((byte) PhysicalPlanType.SET_STORAGE_GROUP.ordinal());
     putString(buffer, path.getFullPath());
     buffer.putLong(index);
+  }
+
+  @Override
+  public void serialize(ByteBuf buffer) {
+    buffer.writeByte((byte) PhysicalPlanType.SET_STORAGE_GROUP.ordinal());
+    putString(buffer, path.getFullPath());
+    buffer.writeLong(index);
   }
 
   @Override

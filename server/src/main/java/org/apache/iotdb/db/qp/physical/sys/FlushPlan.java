@@ -18,6 +18,7 @@
  */
 package org.apache.iotdb.db.qp.physical.sys;
 
+import io.netty.buffer.ByteBuf;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -158,6 +159,19 @@ public class FlushPlan extends PhysicalPlan {
     writeStorageGroupPartitionIds(buffer);
   }
 
+  @Override
+  public void serialize(ByteBuf buffer) {
+    int type = PhysicalPlanType.FLUSH.ordinal();
+    buffer.writeByte((byte) type);
+    if (isSeq == null) {
+      buffer.writeByte((byte) 2);
+    } else {
+      buffer.writeByte((byte) (Boolean.TRUE.equals(isSeq) ? 1 : 0));
+    }
+    buffer.writeByte((byte) (isSync ? 1 : 0));
+    writeStorageGroupPartitionIds(buffer);
+  }
+
   public void writeStorageGroupPartitionIds(ByteBuffer buffer) {
     if (storageGroupPartitionIds == null) {
       // null value
@@ -174,6 +188,32 @@ public class FlushPlan extends PhysicalPlan {
           buffer.put((byte) 0);
         } else {
           buffer.put((byte) 1);
+          ReadWriteIOUtils.write(entry.getValue().size(), buffer);
+          for (Pair<Long, Boolean> pair : entry.getValue()) {
+            ReadWriteIOUtils.write(pair.left, buffer);
+            ReadWriteIOUtils.write(pair.right, buffer);
+          }
+        }
+      }
+    }
+  }
+
+  public void writeStorageGroupPartitionIds(ByteBuf buffer) {
+    if (storageGroupPartitionIds == null) {
+      // null value
+      buffer.writeByte((byte) 0);
+    } else {
+      // null value
+      buffer.writeByte((byte) 1);
+      buffer.writeInt(storageGroupPartitionIds.size());
+      for (Entry<PartialPath, List<Pair<Long, Boolean>>> entry : storageGroupPartitionIds
+          .entrySet()) {
+        ReadWriteIOUtils.write(entry.getKey().getFullPath(), buffer);
+        if (entry.getValue() == null) {
+          // null value
+          buffer.writeByte((byte) 0);
+        } else {
+          buffer.writeByte((byte) 1);
           ReadWriteIOUtils.write(entry.getValue().size(), buffer);
           for (Pair<Long, Boolean> pair : entry.getValue()) {
             ReadWriteIOUtils.write(pair.left, buffer);

@@ -18,6 +18,7 @@
  */
 package org.apache.iotdb.db.qp.physical.sys;
 
+import io.netty.buffer.ByteBuf;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -68,6 +69,18 @@ public class DeleteStorageGroupPlan extends PhysicalPlan {
     }
 
     buffer.putLong(index);
+  }
+
+  @Override
+  public void serialize(ByteBuf buffer) {
+    int type = PhysicalPlanType.DELETE_STORAGE_GROUP.ordinal();
+    buffer.writeByte((byte) type);
+    buffer.writeInt(this.getPaths().size());
+    for (PartialPath path : this.getPaths()) {
+      putString(buffer, path.getFullPath());
+    }
+
+    buffer.writeLong(index);
   }
 
   @Override

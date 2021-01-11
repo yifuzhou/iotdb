@@ -18,6 +18,7 @@
  */
 package org.apache.iotdb.db.qp.physical.sys;
 
+import io.netty.buffer.ByteBuf;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -227,6 +228,33 @@ public class CreateMultiTimeSeriesPlan extends PhysicalPlan {
     buffer.putLong(index);
   }
 
+  @Override
+  public void serialize(ByteBuf buffer) {
+    int type = PhysicalPlanType.CREATE_MULTI_TIMESERIES.ordinal();
+    buffer.writeByte((byte) type);
+    buffer.writeInt(paths.size());
+
+    for (PartialPath path : paths) {
+      putString(buffer, path.getFullPath());
+    }
+
+    for (TSDataType dataType : dataTypes) {
+      buffer.writeByte((byte) dataType.ordinal());
+    }
+
+    for (TSEncoding encoding : encodings) {
+      buffer.writeByte((byte) encoding.ordinal());
+    }
+
+    for (CompressionType compressor : compressors) {
+      buffer.writeByte((byte) compressor.ordinal());
+    }
+
+    serializeOptional(buffer);
+
+    buffer.writeLong(index);
+  }
+
   private void serializeOptional(ByteBuffer buffer) {
     if (alias != null) {
       buffer.put((byte) 1);
@@ -254,6 +282,36 @@ public class CreateMultiTimeSeriesPlan extends PhysicalPlan {
       ReadWriteIOUtils.write(attributes, buffer);
     } else {
       buffer.put((byte) 0);
+    }
+  }
+
+  private void serializeOptional(ByteBuf buffer) {
+    if (alias != null) {
+      buffer.writeByte((byte) 1);
+      putStrings(buffer, alias);
+    } else {
+      buffer.writeByte((byte) 0);
+    }
+
+    if (props != null) {
+      buffer.writeByte((byte) 1);
+      ReadWriteIOUtils.write(props, buffer);
+    } else {
+      buffer.writeByte((byte) 0);
+    }
+
+    if (tags != null) {
+      buffer.writeByte((byte) 1);
+      ReadWriteIOUtils.write(tags, buffer);
+    } else {
+      buffer.writeByte((byte) 0);
+    }
+
+    if (attributes != null) {
+      buffer.writeByte((byte) 1);
+      ReadWriteIOUtils.write(attributes, buffer);
+    } else {
+      buffer.writeByte((byte) 0);
     }
   }
 

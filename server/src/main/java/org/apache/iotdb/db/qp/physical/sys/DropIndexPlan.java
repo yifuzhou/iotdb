@@ -18,6 +18,7 @@
  */
 package org.apache.iotdb.db.qp.physical.sys;
 
+import io.netty.buffer.ByteBuf;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -91,6 +92,20 @@ public class DropIndexPlan extends PhysicalPlan {
     }
 
     buffer.putLong(index);
+  }
+
+  @Override
+  public void serialize(ByteBuf buffer) {
+    int type = PhysicalPlanType.DROP_INDEX.ordinal();
+    buffer.writeByte((byte) type);
+    buffer.writeByte((byte) indexType.serialize());
+
+    buffer.writeInt(paths.size());
+    for (PartialPath path : paths) {
+      putString(buffer, path.getFullPath());
+    }
+
+    buffer.writeLong(index);
   }
 
   @Override

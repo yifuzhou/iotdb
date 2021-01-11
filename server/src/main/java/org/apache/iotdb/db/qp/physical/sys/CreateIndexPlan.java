@@ -18,6 +18,7 @@
  */
 package org.apache.iotdb.db.qp.physical.sys;
 
+import io.netty.buffer.ByteBuf;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -131,6 +132,28 @@ public class CreateIndexPlan extends PhysicalPlan {
     }
 
     buffer.putLong(index);
+  }
+
+  @Override
+  public void serialize(ByteBuf buffer) {
+    int type = PhysicalPlanType.CREATE_INDEX.ordinal();
+    buffer.writeByte((byte) type);
+    buffer.writeByte((byte) indexType.serialize());
+    buffer.writeLong(time);
+    buffer.writeInt(paths.size());
+    for (PartialPath path : paths) {
+      putString(buffer, path.getFullPath());
+    }
+
+    // props
+    if (props != null && !props.isEmpty()) {
+      buffer.writeByte((byte) 1);
+      ReadWriteIOUtils.write(props, buffer);
+    } else {
+      buffer.writeByte((byte) 0);
+    }
+
+    buffer.writeLong(index);
   }
 
   @Override

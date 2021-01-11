@@ -18,6 +18,7 @@
  */
 package org.apache.iotdb.db.qp.physical.sys;
 
+import io.netty.buffer.ByteBuf;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -330,6 +331,33 @@ public class AuthorPlan extends PhysicalPlan {
     }
 
     buffer.putLong(index);
+  }
+
+  @Override
+  public void serialize(ByteBuf buffer) {
+    int type = this.getPlanType(super.getOperatorType());
+    buffer.writeByte((byte) type);
+    buffer.writeInt(authorType.ordinal());
+    putString(buffer, userName);
+    putString(buffer, roleName);
+    putString(buffer, password);
+    putString(buffer, newPassword);
+    if (permissions == null) {
+      buffer.writeByte((byte) 0);
+    } else {
+      buffer.writeInt((byte) 1);
+      buffer.writeInt(permissions.size());
+      for (int permission : permissions) {
+        buffer.writeInt(permission);
+      }
+    }
+    if (nodeName == null) {
+      putString(buffer, null);
+    } else {
+      putString(buffer, nodeName.getFullPath());
+    }
+
+    buffer.writeLong(index);
   }
 
   @Override

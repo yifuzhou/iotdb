@@ -18,6 +18,7 @@
  */
 package org.apache.iotdb.db.writelog.io;
 
+import io.netty.buffer.ByteBuf;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -30,7 +31,6 @@ import org.apache.iotdb.db.engine.fileSystem.SystemFileFactory;
 import org.apache.iotdb.db.utils.TestOnly;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import sun.nio.ch.DirectBuffer;
 
 /**
  * LogWriter writes the binary logs into a file using FileChannel together with check sums of
@@ -43,8 +43,8 @@ public class LogWriter implements ILogWriter {
   private FileOutputStream fileOutputStream;
   private FileChannel channel;
   private final CRC32 checkSummer = new CRC32();
-  private final ByteBuffer lengthBuffer = ByteBuffer.allocateDirect(4);
-  private final ByteBuffer checkSumBuffer = ByteBuffer.allocateDirect(8);
+  private final ByteBuffer lengthBuffer = ByteBuffer.allocate(4);
+  private final ByteBuffer checkSumBuffer = ByteBuffer.allocate(8);
   private final boolean forceEachWrite;
 
   /**
@@ -106,6 +106,39 @@ public class LogWriter implements ILogWriter {
   }
 
   @Override
+  public void write(ByteBuf logBuffer) throws IOException {
+    if (channel == null) {
+      fileOutputStream = new FileOutputStream(logFile, true);
+      channel = fileOutputStream.getChannel();
+    }
+    int logSize = logBuffer.readableBytes();
+    // 4 bytes size and 8 bytes check sum
+
+    checkSummer.reset();
+    checkSummer.update(logBuffer.nioBuffer());
+    long checkSum = checkSummer.getValue();
+
+    lengthBuffer.clear();
+    checkSumBuffer.clear();
+    lengthBuffer.putInt(logSize);
+    checkSumBuffer.putLong(checkSum);
+    lengthBuffer.flip();
+    checkSumBuffer.flip();
+
+    try {
+      channel.write(lengthBuffer);
+      logBuffer.getBytes(0, channel, channel.position(), logBuffer.readableBytes());
+      channel.write(checkSumBuffer);
+
+      if (this.forceEachWrite) {
+        channel.force(true);
+      }
+    } catch (ClosedChannelException ignored) {
+      logger.warn("someone interrupt current thread, so no need to do write for io safety");
+    }
+  }
+
+  @Override
   public void force() throws IOException {
     if (channel != null && channel.isOpen()) {
       channel.force(true);
@@ -114,25 +147,15 @@ public class LogWriter implements ILogWriter {
 
   @Override
   public void close() throws IOException {
-    try {
-      if (channel != null) {
-        if (channel.isOpen()) {
-          channel.force(true);
-        }
-        fileOutputStream.close();
-        fileOutputStream = null;
-        channel.close();
-        channel = null;
+    if (channel != null) {
+      if (channel.isOpen()) {
+        channel.force(true);
       }
-    } finally {
-      if (lengthBuffer.isDirect()) {
-        ((DirectBuffer) lengthBuffer).cleaner().clean();
-      }
-      if (checkSumBuffer.isDirect()) {
-        ((DirectBuffer) checkSumBuffer).cleaner().clean();
-      }
+      fileOutputStream.close();
+      fileOutputStream = null;
+      channel.close();
+      channel = null;
     }
-
   }
 
   @Override

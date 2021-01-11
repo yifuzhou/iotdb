@@ -19,17 +19,17 @@
 
 package org.apache.iotdb.db.qp.physical.sys;
 
-import org.apache.iotdb.db.exception.metadata.IllegalPathException;
-import org.apache.iotdb.db.metadata.PartialPath;
-import org.apache.iotdb.db.qp.logical.Operator;
-import org.apache.iotdb.db.qp.physical.PhysicalPlan;
-
+import io.netty.buffer.ByteBuf;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import org.apache.iotdb.db.exception.metadata.IllegalPathException;
+import org.apache.iotdb.db.metadata.PartialPath;
+import org.apache.iotdb.db.qp.logical.Operator;
+import org.apache.iotdb.db.qp.physical.PhysicalPlan;
 
 public class ChangeAliasPlan extends PhysicalPlan {
   private PartialPath path;
@@ -74,6 +74,14 @@ public class ChangeAliasPlan extends PhysicalPlan {
   public void serialize(ByteBuffer buffer) {
     int type = PhysicalPlanType.CHANGE_ALIAS.ordinal();
     buffer.put((byte) type);
+    putString(buffer, path.getFullPath());
+    putString(buffer, alias);
+  }
+
+  @Override
+  public void serialize(ByteBuf buffer) {
+    int type = PhysicalPlanType.CHANGE_ALIAS.ordinal();
+    buffer.writeByte((byte) type);
     putString(buffer, path.getFullPath());
     putString(buffer, alias);
   }

@@ -18,6 +18,7 @@
  */
 package org.apache.iotdb.db.qp.physical.crud;
 
+import io.netty.buffer.ByteBuf;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -108,6 +109,20 @@ public class InsertRowsOfOneDevicePlan extends InsertPlan {
     buffer.putInt(rowPlans.length);
     for (InsertRowPlan plan : rowPlans) {
       buffer.putLong(plan.getTime());
+      plan.serializeMeasurementsAndValues(buffer);
+    }
+  }
+
+  @Override
+  public void serialize(ByteBuf buffer) {
+    int type = PhysicalPlanType.INSERT.ordinal();
+    buffer.writeByte((byte) type);
+
+    putString(buffer, deviceId.getFullPath());
+
+    buffer.writeInt(rowPlans.length);
+    for (InsertRowPlan plan : rowPlans) {
+      buffer.writeLong(plan.getTime());
       plan.serializeMeasurementsAndValues(buffer);
     }
   }

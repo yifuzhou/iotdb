@@ -18,6 +18,7 @@
  */
 package org.apache.iotdb.db.qp.physical.sys;
 
+import io.netty.buffer.ByteBuf;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -74,6 +75,19 @@ public class DataAuthPlan extends PhysicalPlan {
     }
 
     buffer.putLong(index);
+  }
+
+  @Override
+  public void serialize(ByteBuf buffer) {
+    int type = this.getPlanType(super.getOperatorType());
+    buffer.writeByte((byte) type);
+    buffer.writeInt(users.size());
+
+    for (String user : users) {
+      putString(buffer, user);
+    }
+
+    buffer.writeLong(index);
   }
 
   @Override

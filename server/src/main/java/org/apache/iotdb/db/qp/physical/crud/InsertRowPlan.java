@@ -18,6 +18,7 @@
  */
 package org.apache.iotdb.db.qp.physical.crud;
 
+import io.netty.buffer.ByteBuf;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -369,6 +370,44 @@ public class InsertRowPlan extends InsertPlan {
     }
   }
 
+  private void putValues(ByteBuf buffer) throws QueryProcessException {
+    for (int i = 0; i < values.length; i++) {
+      if (measurements[i] == null) {
+        continue;
+      }
+      // types are not determined, the situation mainly occurs when the plan uses string values
+      // and is forwarded to other nodes
+      if (dataTypes == null || dataTypes[i] == null) {
+        ReadWriteIOUtils.write(TYPE_RAW_STRING, buffer);
+        ReadWriteIOUtils.write((String) values[i], buffer);
+      } else {
+        ReadWriteIOUtils.write(dataTypes[i], buffer);
+        switch (dataTypes[i]) {
+          case BOOLEAN:
+            ReadWriteIOUtils.write((Boolean) values[i], buffer);
+            break;
+          case INT32:
+            ReadWriteIOUtils.write((Integer) values[i], buffer);
+            break;
+          case INT64:
+            ReadWriteIOUtils.write((Long) values[i], buffer);
+            break;
+          case FLOAT:
+            ReadWriteIOUtils.write((Float) values[i], buffer);
+            break;
+          case DOUBLE:
+            ReadWriteIOUtils.write((Double) values[i], buffer);
+            break;
+          case TEXT:
+            ReadWriteIOUtils.write((Binary) values[i], buffer);
+            break;
+          default:
+            throw new QueryProcessException("Unsupported data type:" + dataTypes[i]);
+        }
+      }
+    }
+  }
+
   /**
    * Make sure the values is already inited before calling this
    */
@@ -418,6 +457,16 @@ public class InsertRowPlan extends InsertPlan {
     serializeMeasurementsAndValues(buffer);
   }
 
+  @Override
+  public void serialize(ByteBuf buffer) {
+    int type = PhysicalPlanType.INSERT.ordinal();
+    buffer.writeByte((byte) type);
+    buffer.writeLong(time);
+
+    putString(buffer, deviceId.getFullPath());
+    serializeMeasurementsAndValues(buffer);
+  }
+
   void serializeMeasurementsAndValues(ByteBuffer buffer) {
     buffer
         .putInt(measurements.length - (failedMeasurements == null ? 0 : failedMeasurements.size()));
@@ -437,6 +486,27 @@ public class InsertRowPlan extends InsertPlan {
     // the types are not inferred before the plan is serialized
     buffer.put((byte) (isNeedInferType ? 1 : 0));
     buffer.putLong(index);
+  }
+
+  void serializeMeasurementsAndValues(ByteBuf buffer) {
+    buffer
+        .writeInt(measurements.length - (failedMeasurements == null ? 0 : failedMeasurements.size()));
+
+    for (String measurement : measurements) {
+      if (measurement != null) {
+        putString(buffer, measurement);
+      }
+    }
+
+    try {
+      putValues(buffer);
+    } catch (QueryProcessException e) {
+      logger.error("Failed to serialize values for {}", this, e);
+    }
+
+    // the types are not inferred before the plan is serialized
+    buffer.writeByte((byte) (isNeedInferType ? 1 : 0));
+    buffer.writeLong(index);
   }
 
   @Override

@@ -18,6 +18,7 @@
  */
 package org.apache.iotdb.tsfile.write.schema;
 
+import io.netty.buffer.ByteBuf;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -246,6 +247,30 @@ public class MeasurementSchema implements Comparable<MeasurementSchema>, Seriali
    * function for serializing data to byte buffer.
    */
   public int serializeTo(ByteBuffer buffer) {
+    int byteLen = 0;
+
+    byteLen += ReadWriteIOUtils.write(measurementId, buffer);
+
+    byteLen += ReadWriteIOUtils.write((short) type, buffer);
+
+    byteLen += ReadWriteIOUtils.write((short) encoding, buffer);
+
+    byteLen += ReadWriteIOUtils.write((short) compressor, buffer);
+
+    if (props == null) {
+      byteLen += ReadWriteIOUtils.write(0, buffer);
+    } else {
+      byteLen += ReadWriteIOUtils.write(props.size(), buffer);
+      for (Map.Entry<String, String> entry : props.entrySet()) {
+        byteLen += ReadWriteIOUtils.write(entry.getKey(), buffer);
+        byteLen += ReadWriteIOUtils.write(entry.getValue(), buffer);
+      }
+    }
+
+    return byteLen;
+  }
+
+  public int serializeTo(ByteBuf buffer) {
     int byteLen = 0;
 
     byteLen += ReadWriteIOUtils.write(measurementId, buffer);

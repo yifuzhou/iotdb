@@ -18,16 +18,17 @@
  */
 
 package org.apache.iotdb.db.qp.physical.sys;
-import org.apache.iotdb.db.metadata.PartialPath;
-import org.apache.iotdb.db.qp.logical.Operator;
-import org.apache.iotdb.tsfile.write.schema.MeasurementSchema;
 
+import io.netty.buffer.ByteBuf;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import org.apache.iotdb.db.metadata.PartialPath;
+import org.apache.iotdb.db.qp.logical.Operator;
+import org.apache.iotdb.tsfile.write.schema.MeasurementSchema;
 
 public class MeasurementMNodePlan extends MNodePlan {
   private MeasurementSchema schema;
@@ -64,6 +65,19 @@ public class MeasurementMNodePlan extends MNodePlan {
     schema.serializeTo(buffer);
 
     buffer.putLong(index);
+  }
+
+  @Override
+  public void serialize(ByteBuf buffer) {
+    buffer.writeByte((byte) PhysicalPlanType.MEASUREMENT_MNODE.ordinal());
+
+    putString(buffer, name);
+    putString(buffer, alias);
+    buffer.writeLong(offset);
+    buffer.writeInt(childSize);
+    schema.serializeTo(buffer);
+
+    buffer.writeLong(index);
   }
 
   @Override

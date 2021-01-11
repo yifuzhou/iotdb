@@ -28,6 +28,7 @@ import static org.apache.iotdb.tsfile.utils.ReadWriteIOUtils.ClassSerializeId.LO
 import static org.apache.iotdb.tsfile.utils.ReadWriteIOUtils.ClassSerializeId.NULL;
 import static org.apache.iotdb.tsfile.utils.ReadWriteIOUtils.ClassSerializeId.STRING;
 
+import io.netty.buffer.ByteBuf;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -157,7 +158,33 @@ public class ReadWriteIOUtils {
     return length;
   }
 
+  public static int write(Map<String, String> map, ByteBuf buffer) {
+    int length = 0;
+    byte[] bytes;
+    buffer.writeInt(map.size());
+    length += 4;
+    for (Entry<String, String> entry : map.entrySet()) {
+      bytes = entry.getKey().getBytes();
+      buffer.writeInt(bytes.length);
+      length += 4;
+      buffer.writeBytes(bytes);
+      length += bytes.length;
+      bytes = entry.getValue().getBytes();
+      buffer.writeInt(bytes.length);
+      length += 4;
+      buffer.writeBytes(bytes);
+      length += bytes.length;
+    }
+    return length;
+  }
+
   public static void write(List<Map<String, String>> maps, ByteBuffer buffer) {
+    for (Map<String, String> map : maps) {
+      write(map, buffer);
+    }
+  }
+
+  public static void write(List<Map<String, String>> maps, ByteBuf buffer) {
     for (Map<String, String> map : maps) {
       write(map, buffer);
     }
@@ -187,6 +214,18 @@ public class ReadWriteIOUtils {
     }
 
     buffer.put(a);
+    return 1;
+  }
+
+  public static int write(Boolean flag, ByteBuf buffer) {
+    byte a;
+    if (Boolean.TRUE.equals(flag)) {
+      a = 1;
+    } else {
+      a = 0;
+    }
+
+    buffer.writeByte(a);
     return 1;
   }
 
@@ -223,6 +262,11 @@ public class ReadWriteIOUtils {
     return Byte.BYTES;
   }
 
+  public static int write(byte n, ByteBuf buffer) {
+    buffer.writeByte(n);
+    return Byte.BYTES;
+  }
+
   /**
    * write a short n to byteBuffer.
    *
@@ -230,6 +274,11 @@ public class ReadWriteIOUtils {
    */
   public static int write(short n, ByteBuffer buffer) {
     buffer.putShort(n);
+    return SHORT_LEN;
+  }
+
+  public static int write(short n, ByteBuf buffer) {
+    buffer.writeShort(n);
     return SHORT_LEN;
   }
 
@@ -241,6 +290,12 @@ public class ReadWriteIOUtils {
   public static int write(Binary n, ByteBuffer buffer) {
     buffer.putInt(n.getLength());
     buffer.put(n.getValues());
+    return INT_LEN + n.getLength();
+  }
+
+  public static int write(Binary n, ByteBuf buffer) {
+    buffer.writeInt(n.getLength());
+    buffer.writeBytes(n.getValues());
     return INT_LEN + n.getLength();
   }
 
@@ -272,6 +327,11 @@ public class ReadWriteIOUtils {
    */
   public static int write(int n, ByteBuffer buffer) {
     buffer.putInt(n);
+    return INT_LEN;
+  }
+
+  public static int write(int n, ByteBuf buffer) {
+    buffer.writeInt(n);
     return INT_LEN;
   }
 
@@ -316,6 +376,11 @@ public class ReadWriteIOUtils {
     return LONG_LEN;
   }
 
+  public static int write(long n, ByteBuf buffer) {
+    buffer.writeLong(n);
+    return LONG_LEN;
+  }
+
   /**
    * write a float n to byteBuffer.
    */
@@ -324,11 +389,21 @@ public class ReadWriteIOUtils {
     return FLOAT_LEN;
   }
 
+  public static int write(float n, ByteBuf buffer) {
+    buffer.writeFloat(n);
+    return FLOAT_LEN;
+  }
+
   /**
    * write a double n to byteBuffer.
    */
   public static int write(double n, ByteBuffer buffer) {
     buffer.putDouble(n);
+    return DOUBLE_LEN;
+  }
+
+  public static int write(double n, ByteBuf buffer) {
+    buffer.writeDouble(n);
     return DOUBLE_LEN;
   }
 
@@ -365,6 +440,18 @@ public class ReadWriteIOUtils {
     byte[] bytes = s.getBytes();
     len += write(bytes.length, buffer);
     buffer.put(bytes);
+    len += bytes.length;
+    return len;
+  }
+
+  public static int write(String s, ByteBuf buffer) {
+    if (s == null) {
+      return write(-1, buffer);
+    }
+    int len = 0;
+    byte[] bytes = s.getBytes();
+    len += write(bytes.length, buffer);
+    buffer.writeBytes(bytes);
     len += bytes.length;
     return len;
   }
@@ -425,6 +512,11 @@ public class ReadWriteIOUtils {
   }
 
   public static int write(TSDataType dataType, ByteBuffer buffer) {
+    short n = dataType.serialize();
+    return write(n, buffer);
+  }
+
+  public static int write(TSDataType dataType, ByteBuf buffer) {
     short n = dataType.serialize();
     return write(n, buffer);
   }

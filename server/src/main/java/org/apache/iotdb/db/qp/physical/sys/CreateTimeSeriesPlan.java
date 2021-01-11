@@ -18,6 +18,7 @@
  */
 package org.apache.iotdb.db.qp.physical.sys;
 
+import io.netty.buffer.ByteBuf;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -243,6 +244,52 @@ public class CreateTimeSeriesPlan extends PhysicalPlan {
     }
 
     buffer.putLong(index);
+  }
+
+  @Override
+  public void serialize(ByteBuf buffer) {
+    buffer.writeByte((byte) PhysicalPlanType.CREATE_TIMESERIES.ordinal());
+    byte[] bytes = path.getFullPath().getBytes();
+    buffer.writeInt(bytes.length);
+    buffer.writeBytes(bytes);
+    buffer.writeByte((byte) dataType.ordinal());
+    buffer.writeByte((byte) encoding.ordinal());
+    buffer.writeByte((byte) compressor.ordinal());
+    buffer.writeLong(tagOffset);
+
+    // alias
+    if (alias != null) {
+      buffer.writeByte((byte) 1);
+      ReadWriteIOUtils.write(alias, buffer);
+    } else {
+      buffer.writeByte((byte) 0);
+    }
+
+    // props
+    if (props != null && !props.isEmpty()) {
+      buffer.writeByte((byte) 1);
+      ReadWriteIOUtils.write(props, buffer);
+    } else {
+      buffer.writeByte((byte) 0);
+    }
+
+    // tags
+    if (tags != null && !tags.isEmpty()) {
+      buffer.writeByte((byte) 1);
+      ReadWriteIOUtils.write(tags, buffer);
+    } else {
+      buffer.writeByte((byte) 0);
+    }
+
+    // attributes
+    if (attributes != null && !attributes.isEmpty()) {
+      buffer.writeByte((byte) 1);
+      ReadWriteIOUtils.write(attributes, buffer);
+    } else {
+      buffer.writeByte((byte) 0);
+    }
+
+    buffer.writeLong(index);
   }
 
   @Override

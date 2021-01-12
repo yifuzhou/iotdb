@@ -562,7 +562,7 @@ public class Coordinator {
 
   private TSStatus forwardDataPlanSync(PhysicalPlan plan, Node receiver, Node header)
     throws IOException {
-    RaftService.Client client = null;
+    RaftService.Client client;
     try {
       client = metaGroupMember.getClientProvider().getSyncDataClient(receiver,
         RaftServer.getWriteOperationTimeoutMS());

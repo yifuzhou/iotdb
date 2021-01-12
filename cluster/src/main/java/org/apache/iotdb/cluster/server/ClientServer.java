@@ -19,6 +19,7 @@
 
 package org.apache.iotdb.cluster.server;
 
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.List;
@@ -29,9 +30,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.SynchronousQueue;
-import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 import org.apache.iotdb.cluster.client.async.AsyncDataClient;
 import org.apache.iotdb.cluster.client.sync.SyncDataClient;
@@ -80,7 +79,7 @@ import org.slf4j.LoggerFactory;
 /**
  * ClientServer is the cluster version of TSServiceImpl, which is responsible for the processing of
  * the user requests (sqls and session api). It inherits the basic procedures from TSServiceImpl,
- * but redirect the queries of data and metadata to a MetaGroupMember of the local node.
+ * but redirects the queries of data and metadata to the coordinator of the local node.
  */
 public class ClientServer extends TSServiceImpl {
 
@@ -107,7 +106,7 @@ public class ClientServer extends TSServiceImpl {
   private TServer poolServer;
 
   /**
-   * The socket poolServer will listen to. Async service requires nonblocking socket
+   * The socket poolServer will listen to.
    */
   private TServerTransport serverTransport;
 
@@ -124,8 +123,8 @@ public class ClientServer extends TSServiceImpl {
   }
 
   /**
-   * Create a thrift server to listen to the client port and accept requests from clients. This
-   * server is run in a separate thread. Calling the method twice does not induce side effects.
+   * Create a thrift server to listen to the client port and accept requests from external clients.
+   * This server is run in a separate thread. Calling the method twice does not induce side effects.
    *
    * @throws TTransportException
    */
@@ -147,27 +146,20 @@ public class ClientServer extends TSServiceImpl {
     }
     serverTransport = new TServerSocket(new InetSocketAddress(config.getClusterRpcIp(),
         config.getClusterRpcPort()));
-    // async service also requires nonblocking server, and HsHaServer is basically more efficient a
-    // nonblocking server
-    int maxConcurrentClientNum = Math.max(CommonUtils.getCpuCores(),
+
+    int minConcurrentClientNum = CommonUtils.getCpuCores();
+    int maxConcurrentClientNum = Math.max(minConcurrentClientNum,
         config.getMaxConcurrentClientNum());
     TThreadPoolServer.Args poolArgs =
         new TThreadPoolServer.Args(serverTransport).maxWorkerThreads(maxConcurrentClientNum)
-            .minWorkerThreads(CommonUtils.getCpuCores());
+            .minWorkerThreads(minConcurrentClientNum);
     poolArgs.executorService(new ThreadPoolExecutor(poolArgs.minWorkerThreads,
         poolArgs.maxWorkerThreads, poolArgs.stopTimeoutVal, poolArgs.stopTimeoutUnit,
-        new SynchronousQueue<>(), new ThreadFactory() {
-      private AtomicLong threadIndex = new AtomicLong(0);
-
-      @Override
-      public Thread newThread(Runnable r) {
-        return new Thread(r, "ClusterClient" + threadIndex.incrementAndGet());
-      }
-    }));
-    // ClientServer will do the following processing when the HsHaServer has parsed a request
+        new SynchronousQueue<>(),
+        new ThreadFactoryBuilder().setNameFormat("ClusterClient-%d").setDaemon(true).build()));
+    // ClientServer will do the following processing when the server has parsed a request
     poolArgs.processor(new Processor<>(this));
     poolArgs.protocolFactory(protocolFactory);
-    // nonblocking server requests FramedTransport
     poolArgs.transportFactory(RpcTransportFactory.INSTANCE);
 
     poolServer = new TThreadPoolServer(poolArgs);
@@ -254,20 +246,6 @@ public class ClientServer extends TSServiceImpl {
       List<String> aggregations)
       throws MetadataException {
     return ((CMManager) IoTDB.metaManager).getSeriesTypesByPath(paths, aggregations).left;
-  }
-
-  /**
-   * Get the data types of each path in “paths”. If "aggregation" is not null, all "paths" will use
-   * this aggregation.
-   *
-   * @param paths       full timeseries paths
-   * @param aggregation if not null, it means "paths" all use this aggregation
-   * @return the data types of "paths" (using the aggregation)
-   * @throws MetadataException
-   */
-  protected List<TSDataType> getSeriesTypesByString(List<PartialPath> paths, String aggregation)
-      throws MetadataException {
-    return ((CMManager) IoTDB.metaManager).getSeriesTypesByPaths(paths, aggregation).left;
   }
 
   /**

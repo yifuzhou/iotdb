@@ -1104,8 +1104,8 @@ public class StorageGroupProcessor {
     logger.info("Async close tsfile: {}",
         tsFileProcessor.getTsFileResource().getTsFile().getAbsolutePath());
     if (sequence) {
-      closingSequenceTsFileProcessor.add(tsFileProcessor);
-      updateEndTimeMap(tsFileProcessor);
+      // closingSequenceTsFileProcessor.add(tsFileProcessor);
+      updateEndTimeMap(tsFileProcessor);f
       tsFileProcessor.asyncClose();
 
       workSequenceTsFileProcessors.remove(tsFileProcessor.getTimeRangeId());
@@ -1115,7 +1115,7 @@ public class StorageGroupProcessor {
       }
       logger.info("close a sequence tsfile processor {}", logicalStorageGroupName + "-" + virtualStorageGroupId);
     } else {
-      closingUnSequenceTsFileProcessor.add(tsFileProcessor);
+      // closingUnSequenceTsFileProcessor.add(tsFileProcessor);
       tsFileProcessor.asyncClose();
 
       workUnsequenceTsFileProcessors.remove(tsFileProcessor.getTimeRangeId());

@@ -26,7 +26,6 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicLong;
 import org.apache.iotdb.db.engine.flush.pool.FlushSubTaskPoolManager;
 import org.apache.iotdb.db.engine.memtable.IMemTable;
 import org.apache.iotdb.db.engine.memtable.IWritableMemChunk;
@@ -82,8 +81,6 @@ public class MemTableFlushTask {
         storageGroup, memTable.memSize(),
         memTable.getTotalPointsNum() / memTable.getSeriesNumber());
     long start = System.currentTimeMillis();
-    long sortTime = 0L;
-    long memSerializeTime = 0L;
 
     Set<Entry<String, Map<String, IWritableMemChunk>>> ite = memTable.getMemTableMap().entrySet();
     try {
@@ -92,18 +89,14 @@ public class MemTableFlushTask {
         this.writer.startChunkGroup(memTableEntry.getKey());
         final Map<String, IWritableMemChunk> value = memTableEntry.getValue();
         for (Entry<String, IWritableMemChunk> iWritableMemChunkEntry : value.entrySet()) {
-          long startTime = System.currentTimeMillis();
           IWritableMemChunk series = iWritableMemChunkEntry.getValue();
           MeasurementSchema desc = series.getSchema();
           TVList tvList = series.getSortedTVListForFlush();
-          sortTime += (System.currentTimeMillis() - startTime);
 
           //start flush
-          long starTime = System.currentTimeMillis();
           IChunkWriter seriesWriter = new ChunkWriterImpl(desc);
           writeOneSeries(tvList, seriesWriter, desc.getType());
           seriesWriter.writeToFileWriter(this.writer);
-          memSerializeTime += (System.currentTimeMillis() - starTime);
         }
         this.writer.setMinPlanIndex(memTable.getMinPlanIndex());
         this.writer.setMaxPlanIndex(memTable.getMaxPlanIndex());
@@ -117,10 +110,6 @@ public class MemTableFlushTask {
           memTable.getVersion(), e);
       throw new FlushRunTimeException(e);
     }
-    noMoreEncodingTask = true;
-    LOGGER.debug(
-        "Storage group {} memtable {}, flushing into disk: data sort time cost {} ms.",
-        storageGroup, memTable.getVersion(), sortTime);
     LOGGER.info(
         "Storage group {} memtable {} flushing a memtable has finished! Time consumption: {}ms",
         storageGroup, memTable, System.currentTimeMillis() - start);

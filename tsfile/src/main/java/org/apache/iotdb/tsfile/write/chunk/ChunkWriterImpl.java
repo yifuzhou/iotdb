@@ -320,6 +320,7 @@ public class ChunkWriterImpl implements IChunkWriter {
 
     // reinit this chunk writer
     pageBuffer.reset();
+    numOfPages = 0;
     this.statistics = Statistics.getStatsByType(measurementSchema.getType());
   }
 
@@ -342,6 +343,10 @@ public class ChunkWriterImpl implements IChunkWriter {
     if (pageWriter.getPointNumber() > 0) {
       writePageToPageBuffer();
     }
+  }
+
+  public void clearPageWriter() {
+    pageWriter = null;
   }
 
   @Override

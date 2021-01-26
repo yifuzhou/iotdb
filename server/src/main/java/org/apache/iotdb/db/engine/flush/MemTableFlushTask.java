@@ -102,7 +102,7 @@ public class MemTableFlushTask {
     }
 
     noMoreEncodingTask = true;
-    LOGGER.debug(
+    LOGGER.info(
         "Storage group {} memtable {}, flushing into disk: data sort time cost {} ms.",
         storageGroup, memTable.getVersion(), sortTime);
 
@@ -199,13 +199,15 @@ public class MemTableFlushTask {
             Pair<TVList, MeasurementSchema> encodingMessage = (Pair<TVList, MeasurementSchema>) task;
             IChunkWriter seriesWriter = new ChunkWriterImpl(encodingMessage.right);
             writeOneSeries(encodingMessage.left, seriesWriter, encodingMessage.right.getType());
+            seriesWriter.sealCurrentPage();
+            seriesWriter.clearPageWriter();
             ioTaskQueue.add(seriesWriter);
             memSerializeTime += System.currentTimeMillis() - starTime;
           }
         }
       }
       noMoreIOTask = true;
-      LOGGER.debug("Storage group {}, flushing memtable {} into disk: Encoding data cost "
+      LOGGER.info("Storage group {}, flushing memtable {} into disk: Encoding data cost "
               + "{} ms.",
           storageGroup, memTable.getVersion(), memSerializeTime);
     }
@@ -254,7 +256,7 @@ public class MemTableFlushTask {
         ioTime += System.currentTimeMillis() - starTime;
       }
     }
-    LOGGER.debug("flushing a memtable {} in storage group {}, io cost {}ms", memTable.getVersion(),
+    LOGGER.info("flushing a memtable {} in storage group {}, io cost {}ms", memTable.getVersion(),
         storageGroup, ioTime);
   };
 

@@ -20,7 +20,7 @@
 
 -->
 <assembly>
-    <id>server</id>
+    <id>session-example</id>
     <formats>
         <format>dir</format>
         <format>zip</format>
@@ -31,10 +31,4 @@
             <outputDirectory>lib</outputDirectory>
         </dependencySet>
     </dependencySets>
-    <fileSets>
-        <fileSet>
-            <directory>src/assembly/resources</directory>
-            <outputDirectory>${file.separator}</outputDirectory>
-        </fileSet>
-    </fileSets>
 </assembly>

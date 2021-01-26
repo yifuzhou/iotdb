@@ -48,7 +48,7 @@ public class SessionExample {
 
   public static void main(String[] args)
       throws IoTDBConnectionException, StatementExecutionException {
-    session = new Session("192.168.130.36", 6667, "root", "root");
+    session = new Session("127.0.0.1", 6667, "root", "root");
     session.open(false);
 
     //set session fetchSize
@@ -64,7 +64,9 @@ public class SessionExample {
 //    createTimeseries();
 //    createMultiTimeseries();
 //    insertRecord();
-    insertTablet();
+    long MAX_ROW_NUM = Long.parseLong(args[0]);
+    System.out.println("MAX_ROW_NUM: " + MAX_ROW_NUM);
+    insertTablet(MAX_ROW_NUM);
 //    insertTablets();
 //    insertRecords();
 //    nonQuery();
@@ -261,7 +263,7 @@ public class SessionExample {
    *
    * Users need to control the count of Tablet and write a batch when it reaches the maxBatchSize
    */
-  private static void insertTablet() throws IoTDBConnectionException, StatementExecutionException {
+  private static void insertTablet(long MAX_ROW_NUM) throws IoTDBConnectionException, StatementExecutionException {
     // The schema of measurements of one device
     // only measurementId and data type in MeasurementSchema take effects in Tablet
     List<MeasurementSchema> schemaList = new ArrayList<>();
@@ -273,8 +275,6 @@ public class SessionExample {
 
     //Method 1 to add tablet data
     long timestamp = System.currentTimeMillis();
-
-    long MAX_ROW_NUM = 1000L;
 
     for (long row = 0; row < MAX_ROW_NUM; row++) {
       int rowIndex = tablet.rowSize++;

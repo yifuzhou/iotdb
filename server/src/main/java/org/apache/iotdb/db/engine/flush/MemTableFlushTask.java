@@ -201,8 +201,8 @@ public class MemTableFlushTask {
             writeOneSeries(encodingMessage.left, seriesWriter, encodingMessage.right.getType());
             seriesWriter.sealCurrentPage();
             seriesWriter.clearPageWriter();
-            ioTaskQueue.add(seriesWriter);
             memSerializeTime += System.currentTimeMillis() - starTime;
+            ioTaskQueue.add(seriesWriter);
           }
         }
       }

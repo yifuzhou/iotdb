@@ -104,7 +104,7 @@ public class MemTableFlushTask {
           seriesWriter.sealCurrentPage();
           seriesWriter.clearPageWriter();
           long ioStartTime = System.currentTimeMillis();
-          sortCost += (ioStartTime - encodingStartTime);
+          encodingCost += (ioStartTime - encodingStartTime);
           seriesWriter.writeToFileWriter(this.writer);
           ioCost += (System.currentTimeMillis() - ioStartTime);
         }
@@ -128,7 +128,7 @@ public class MemTableFlushTask {
     LOGGER.info("Storage group {}, flushing memtable {} into disk: Encoding data cost "
             + "{} ms.",
         storageGroup, memTable.getVersion(), encodingCost);
-    LOGGER.debug("flushing a memtable {} in storage group {}, io cost {}ms", memTable.getVersion(),
+    LOGGER.info("flushing a memtable {} in storage group {}, io cost {}ms", memTable.getVersion(),
         storageGroup, ioCost);
     LOGGER.info(
         "Storage group {} memtable {} flushing a memtable has finished! Time consumption: {}ms",

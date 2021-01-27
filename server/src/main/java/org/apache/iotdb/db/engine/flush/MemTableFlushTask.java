@@ -195,13 +195,13 @@ public class MemTableFlushTask {
           if (task instanceof StartFlushGroupIOTask || task instanceof EndChunkGroupIoTask) {
             ioTaskQueue.add(task);
           } else {
-            long starTime = System.currentTimeMillis();
             Pair<TVList, MeasurementSchema> encodingMessage = (Pair<TVList, MeasurementSchema>) task;
+            long starTime = System.currentTimeMillis();
             IChunkWriter seriesWriter = new ChunkWriterImpl(encodingMessage.right);
             writeOneSeries(encodingMessage.left, seriesWriter, encodingMessage.right.getType());
             seriesWriter.sealCurrentPage();
             seriesWriter.clearPageWriter();
-            memSerializeTime += System.currentTimeMillis() - starTime;
+            memSerializeTime += (System.currentTimeMillis() - starTime);
             ioTaskQueue.add(seriesWriter);
           }
         }

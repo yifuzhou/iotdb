@@ -96,6 +96,8 @@ public class MemTableFlushTask {
           //start flush
           IChunkWriter seriesWriter = new ChunkWriterImpl(desc);
           writeOneSeries(tvList, seriesWriter, desc.getType());
+          seriesWriter.sealCurrentPage();
+          seriesWriter.clearPageWriter();
           seriesWriter.writeToFileWriter(this.writer);
         }
         this.writer.setMinPlanIndex(memTable.getMinPlanIndex());

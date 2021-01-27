@@ -19,7 +19,6 @@
 package org.apache.iotdb.tsfile.write.chunk;
 
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.nio.ByteBuffer;
 import org.apache.iotdb.tsfile.exception.write.PageException;
 import org.apache.iotdb.tsfile.file.header.PageHeader;
@@ -115,6 +114,8 @@ public interface IChunkWriter {
    * seal the current page which may has not enough data points in force.
    */
   void sealCurrentPage();
+
+  void clearPageWriter();
 
   int getNumOfPages();
 

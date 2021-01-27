@@ -80,7 +80,10 @@ public class MemTableFlushTask {
     LOGGER.info("The memTable size of SG {} is {}, the avg series points num in chunk is {} ",
         storageGroup, memTable.memSize(),
         memTable.getTotalPointsNum() / memTable.getSeriesNumber());
-    long start = System.currentTimeMillis();
+    long startTime = System.currentTimeMillis();
+    long sortCost = 0;
+    long encodingCost = 0;
+    long ioCost = 0;
 
     Set<Entry<String, Map<String, IWritableMemChunk>>> ite = memTable.getMemTableMap().entrySet();
     try {
@@ -89,20 +92,27 @@ public class MemTableFlushTask {
         this.writer.startChunkGroup(memTableEntry.getKey());
         final Map<String, IWritableMemChunk> value = memTableEntry.getValue();
         for (Entry<String, IWritableMemChunk> iWritableMemChunkEntry : value.entrySet()) {
+          long sortStartTime = System.currentTimeMillis();
           IWritableMemChunk series = iWritableMemChunkEntry.getValue();
           MeasurementSchema desc = series.getSchema();
           TVList tvList = series.getSortedTVListForFlush();
-
+          long encodingStartTime = System.currentTimeMillis();
+          sortCost += (encodingStartTime - sortStartTime);
           //start flush
           IChunkWriter seriesWriter = new ChunkWriterImpl(desc);
           writeOneSeries(tvList, seriesWriter, desc.getType());
           seriesWriter.sealCurrentPage();
           seriesWriter.clearPageWriter();
+          long ioStartTime = System.currentTimeMillis();
+          sortCost += (ioStartTime - encodingStartTime);
           seriesWriter.writeToFileWriter(this.writer);
+          ioCost += (System.currentTimeMillis() - ioStartTime);
         }
+        long ioStartTime = System.currentTimeMillis();
         this.writer.setMinPlanIndex(memTable.getMinPlanIndex());
         this.writer.setMaxPlanIndex(memTable.getMaxPlanIndex());
         this.writer.endChunkGroup();
+        ioCost += (System.currentTimeMillis() - ioStartTime);
       }
 
       writer.writeVersion(memTable.getVersion());
@@ -113,8 +123,16 @@ public class MemTableFlushTask {
       throw new FlushRunTimeException(e);
     }
     LOGGER.info(
+        "Storage group {} memtable {}, flushing into disk: data sort time cost {} ms.",
+        storageGroup, memTable.getVersion(), sortCost);
+    LOGGER.info("Storage group {}, flushing memtable {} into disk: Encoding data cost "
+            + "{} ms.",
+        storageGroup, memTable.getVersion(), encodingCost);
+    LOGGER.debug("flushing a memtable {} in storage group {}, io cost {}ms", memTable.getVersion(),
+        storageGroup, ioCost);
+    LOGGER.info(
         "Storage group {} memtable {} flushing a memtable has finished! Time consumption: {}ms",
-        storageGroup, memTable, System.currentTimeMillis() - start);
+        storageGroup, memTable, System.currentTimeMillis() - startTime);
   }
 
 

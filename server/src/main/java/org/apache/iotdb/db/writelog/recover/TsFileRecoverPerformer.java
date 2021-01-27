@@ -26,7 +26,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.concurrent.ExecutionException;
 import org.apache.iotdb.db.engine.fileSystem.SystemFileFactory;
 import org.apache.iotdb.db.engine.flush.MemTableFlushTask;
 import org.apache.iotdb.db.engine.memtable.IMemTable;
@@ -219,7 +218,7 @@ public class TsFileRecoverPerformer {
 
       // otherwise this file is not closed before crush, do nothing so we can continue writing
       // into it
-    } catch (IOException | ExecutionException e) {
+    } catch (IOException e) {
       throw new StorageGroupProcessorException(e);
     } catch (InterruptedException e) {
       Thread.currentThread().interrupt();

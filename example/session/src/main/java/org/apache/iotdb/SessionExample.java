@@ -273,21 +273,19 @@ public class SessionExample {
 
     Tablet tablet = new Tablet(ROOT_SG1_D1, schemaList, 1000);
 
-    //Method 1 to add tablet data
-    long timestamp = System.currentTimeMillis();
-
+    Random random = new Random(19876);
     for (long row = 0; row < MAX_ROW_NUM; row++) {
       int rowIndex = tablet.rowSize++;
+      long timestamp = random.nextInt((int) MAX_ROW_NUM);
       tablet.addTimestamp(rowIndex, timestamp);
       for (int s = 0; s < 1000; s++) {
-        double value = new Random().nextDouble();
+        double value = random.nextDouble();
         tablet.addValue(schemaList.get(s).getMeasurementId(), rowIndex, value);
       }
       if (tablet.rowSize == tablet.getMaxRowNumber()) {
-        session.insertTablet(tablet, true);
+        session.insertTablet(tablet);
         tablet.reset();
       }
-      timestamp++;
     }
 
     if (tablet.rowSize != 0) {

@@ -128,17 +128,17 @@ public class IoTDBConfig {
   /**
    * Memory allocated for the write process
    */
-  private long allocateMemoryForWrite = Runtime.getRuntime().maxMemory() * 4 / 10;
+  private long allocateMemoryForWrite = Runtime.getRuntime().maxMemory() * 7 / 10;
 
   /**
    * Memory allocated for the read process
    */
-  private long allocateMemoryForRead = Runtime.getRuntime().maxMemory() * 3 / 10;
+  private long allocateMemoryForRead = Runtime.getRuntime().maxMemory() / 10;
 
   /**
    * Memory allocated for the mtree
    */
-  private long allocateMemoryForSchema = Runtime.getRuntime().maxMemory() * 1 / 10;
+  private long allocateMemoryForSchema = Runtime.getRuntime().maxMemory() / 10;
 
   /**
    * Memory allocated for the read process besides cache
@@ -298,7 +298,7 @@ public class IoTDBConfig {
   /**
    * Is the write mem control for writing enable.
    */
-  private boolean enableMemControl = true;
+  private boolean enableMemControl = false;
 
   /**
    * Is the write ahead log enable.
@@ -340,12 +340,12 @@ public class IoTDBConfig {
   /**
    * When a memTable's size (in byte) exceeds this, the memtable is flushed to disk.
    */
-  private long memtableSizeThreshold = 1024 * 1024 * 1024L;
+  private long memtableSizeThreshold = 5 * 1024 * 1024 * 1024L;
 
   /**
    * When average series point number reaches this, flush the memtable to disk
    */
-  private int avgSeriesPointNumberThreshold = 100000;
+  private int avgSeriesPointNumberThreshold = 1000000000;
 
   /**
    * Work when tsfile_manage_strategy is level_strategy. When merge point number reaches this, merge

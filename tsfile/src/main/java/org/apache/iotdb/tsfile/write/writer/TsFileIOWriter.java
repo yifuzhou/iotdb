@@ -77,7 +77,7 @@ public class TsFileIOWriter {
   protected File file;
 
   // current flushed Chunk
-  private ChunkMetadata currentChunkMetadata;
+  public ChunkMetadata currentChunkMetadata;
   // current flushed ChunkGroup
   protected List<ChunkMetadata> chunkMetadataList = new ArrayList<>();
   // all flushed ChunkGroups
@@ -191,7 +191,6 @@ public class TsFileIOWriter {
     ChunkHeader header = new ChunkHeader(measurementSchema.getMeasurementId(), dataSize, tsDataType,
         compressionCodecName, encodingType, numOfPages);
     header.serializeTo(out.wrapAsStream());
-
   }
 
   /**

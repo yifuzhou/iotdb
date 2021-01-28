@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.ExecutionException;
 import org.apache.iotdb.db.engine.fileSystem.SystemFileFactory;
 import org.apache.iotdb.db.engine.flush.MemTableFlushTask;
 import org.apache.iotdb.db.engine.memtable.IMemTable;
@@ -220,7 +221,7 @@ public class TsFileRecoverPerformer {
       // into it
     } catch (IOException e) {
       throw new StorageGroupProcessorException(e);
-    } catch (InterruptedException e) {
+    } catch (InterruptedException | ExecutionException e) {
       Thread.currentThread().interrupt();
       throw new StorageGroupProcessorException(e);
     }

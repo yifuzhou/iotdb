@@ -19,6 +19,8 @@
 package org.apache.iotdb.tsfile.utils;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 
 /**
  * A subclass extending <code>ByteArrayOutputStream</code>. It's used to return
@@ -46,4 +48,7 @@ public class PublicBAOS extends ByteArrayOutputStream {
     return this.buf;
   }
 
+  public void writeTo(OutputStream out) throws IOException {
+    out.write(buf, 0, count);
+  }
 }

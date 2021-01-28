@@ -51,12 +51,14 @@ public class ChunkWriterImpl implements IChunkWriter {
    */
   private PublicBAOS pageBuffer;
 
-  private int numOfPages;
+  public int numOfPages;
 
   /**
    * write data into current page
    */
   private PageWriter pageWriter;
+
+  private int chunkDataSize;
 
   /**
    * page size threshold.
@@ -76,7 +78,7 @@ public class ChunkWriterImpl implements IChunkWriter {
   /**
    * statistic of this chunk.
    */
-  private Statistics<?> statistics;
+  public Statistics<?> statistics;
 
   private boolean isSdtEncoding;
 
@@ -319,8 +321,9 @@ public class ChunkWriterImpl implements IChunkWriter {
     writeAllPagesOfChunkToTsFile(tsfileWriter, statistics);
 
     // reinit this chunk writer
-    pageBuffer.reset();
+//    pageBuffer.reset();
     numOfPages = 0;
+    chunkDataSize = 0;
     this.statistics = Statistics.getStatsByType(measurementSchema.getType());
   }
 
@@ -347,6 +350,7 @@ public class ChunkWriterImpl implements IChunkWriter {
 
   public void clearPageWriter() {
     pageWriter = null;
+    chunkDataSize = pageBuffer.size();
   }
 
   @Override
@@ -406,15 +410,15 @@ public class ChunkWriterImpl implements IChunkWriter {
 
     // start to write this column chunk
     writer.startFlushChunk(measurementSchema, compressor.getType(), measurementSchema.getType(),
-        measurementSchema.getEncodingType(), statistics, pageBuffer.size(), numOfPages);
+        measurementSchema.getEncodingType(), statistics, chunkDataSize, numOfPages);
 
     long dataOffset = writer.getPos();
 
-    // write all pages of this column
+//     write all pages of this column
     writer.writeBytesToStream(pageBuffer);
 
     long dataSize = writer.getPos() - dataOffset;
-    if (dataSize != pageBuffer.size()) {
+    if (dataSize != chunkDataSize) {
       throw new IOException(
           "Bytes written is inconsistent with the size of data: " + dataSize + " !="
               + " " + pageBuffer.size());
@@ -441,5 +445,21 @@ public class ChunkWriterImpl implements IChunkWriter {
 
   public boolean isMerging() {
     return isMerging;
+  }
+
+  public PublicBAOS getPageBuffer() {
+    return pageBuffer;
+  }
+
+  public MeasurementSchema getMeasurementSchema() {
+    return measurementSchema;
+  }
+
+  public Statistics<?> getStatistics() {
+    return statistics;
+  }
+
+  public PageWriter getPageWriter() {
+    return pageWriter;
   }
 }

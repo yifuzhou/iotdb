@@ -47,19 +47,6 @@ public class SessionExample {
     insertTablet(MAX_ROW_NUM);
     session.close();
   }
-  /**
-   * insert the data of a device. For each timestamp, the number of measurements is the same.
-   *
-   * a Tablet example:
-   *
-   *      device1
-   * time s1, s2, s3
-   * 1,   1,  1,  1
-   * 2,   2,  2,  2
-   * 3,   3,  3,  3
-   *
-   * Users need to control the count of Tablet and write a batch when it reaches the maxBatchSize
-   */
   private static void insertTablet(long MAX_ROW_NUM) throws IoTDBConnectionException, StatementExecutionException {
     // The schema of measurements of one device
     // only measurementId and data type in MeasurementSchema take effects in Tablet
@@ -70,21 +57,19 @@ public class SessionExample {
 
     Tablet tablet = new Tablet(ROOT_SG1_D1, schemaList, 1000);
 
-    //Method 1 to add tablet data
-    long timestamp = System.currentTimeMillis();
-
+    Random random = new Random(19876);
     for (long row = 0; row < MAX_ROW_NUM; row++) {
       int rowIndex = tablet.rowSize++;
+      long timestamp = random.nextInt((int) MAX_ROW_NUM);
       tablet.addTimestamp(rowIndex, timestamp);
       for (int s = 0; s < 1000; s++) {
-        double value = new Random().nextDouble();
+        double value = random.nextDouble();
         tablet.addValue(schemaList.get(s).getMeasurementId(), rowIndex, value);
       }
       if (tablet.rowSize == tablet.getMaxRowNumber()) {
-        session.insertTablet(tablet, true);
+        session.insertTablet(tablet);
         tablet.reset();
       }
-      timestamp++;
     }
 
     if (tablet.rowSize != 0) {

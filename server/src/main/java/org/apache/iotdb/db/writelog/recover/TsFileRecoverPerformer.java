@@ -222,9 +222,6 @@ public class TsFileRecoverPerformer {
       // into it
     } catch (IOException | ExecutionException e) {
       throw new StorageGroupProcessorException(e);
-    } catch (InterruptedException e) {
-      Thread.currentThread().interrupt();
-      throw new StorageGroupProcessorException(e);
     }
   }
 

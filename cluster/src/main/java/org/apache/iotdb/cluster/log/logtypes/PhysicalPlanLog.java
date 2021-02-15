@@ -32,16 +32,13 @@ import org.apache.iotdb.db.qp.physical.PhysicalPlan;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * PhysicalPlanLog contains a non-partitioned physical plan like set storage group.
- */
+/** PhysicalPlanLog contains a non-partitioned physical plan like set storage group. */
 public class PhysicalPlanLog extends Log {
 
   private static final Logger logger = LoggerFactory.getLogger(PhysicalPlanLog.class);
   private PhysicalPlan plan;
 
-  public PhysicalPlanLog() {
-  }
+  public PhysicalPlanLog() {}
 
   public PhysicalPlanLog(PhysicalPlan plan) {
     this.plan = plan;
@@ -72,8 +69,12 @@ public class PhysicalPlanLog extends Log {
     try {
       plan = PhysicalPlan.Factory.create(buffer);
     } catch (IOException | IllegalPathException e) {
-      logger.error("Cannot parse a physical {}:{} plan {}", getCurrLogIndex(), getCurrLogTerm(),
-          buffer.array().length, e);
+      logger.error(
+          "Cannot parse a physical {}:{} plan {}",
+          getCurrLogIndex(),
+          getCurrLogTerm(),
+          buffer.array().length,
+          e);
     }
   }
 

@@ -19,7 +19,6 @@
 package org.apache.iotdb.tsfile.v2.file.metadata;
 
 import java.nio.ByteBuffer;
-
 import org.apache.iotdb.tsfile.file.metadata.ChunkMetadata;
 import org.apache.iotdb.tsfile.file.metadata.enums.TSDataType;
 import org.apache.iotdb.tsfile.file.metadata.statistics.Statistics;
@@ -43,10 +42,9 @@ public class ChunkMetadataV2 {
     TSDataType tsDataType = TSDataType.deserialize((byte) ReadWriteIOUtils.readShort(buffer));
 
     Statistics<?> statistics = StatisticsV2.deserialize(buffer, tsDataType);
-    ChunkMetadata chunkMetaData = new ChunkMetadata(measurementUid, tsDataType,
-        offsetOfChunkHeader, statistics);
+    ChunkMetadata chunkMetaData =
+        new ChunkMetadata(measurementUid, tsDataType, offsetOfChunkHeader, statistics);
     chunkMetaData.setFromOldTsFile(true);
     return chunkMetaData;
   }
-
 }

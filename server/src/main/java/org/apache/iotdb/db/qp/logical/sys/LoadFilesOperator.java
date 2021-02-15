@@ -36,7 +36,6 @@ public class LoadFilesOperator extends RootOperator {
     this.operatorType = OperatorType.LOAD_FILES;
   }
 
-
   public File getFile() {
     return file;
   }

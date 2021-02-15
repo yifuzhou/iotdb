@@ -30,13 +30,30 @@ import org.apache.iotdb.service.rpc.thrift.TSQueryDataSet;
 
 public class IoTDBJDBCResultSet extends AbstractIoTDBJDBCResultSet {
 
-  public IoTDBJDBCResultSet(Statement statement, List<String> columnNameList,
-      List<String> columnTypeList, Map<String, Integer> columnNameIndex, boolean ignoreTimeStamp,
+  public IoTDBJDBCResultSet(
+      Statement statement,
+      List<String> columnNameList,
+      List<String> columnTypeList,
+      Map<String, Integer> columnNameIndex,
+      boolean ignoreTimeStamp,
       TSIService.Iface client,
-      String sql, long queryId, long sessionId, TSQueryDataSet dataset, long timeout)
+      String sql,
+      long queryId,
+      long sessionId,
+      TSQueryDataSet dataset,
+      long timeout)
       throws SQLException {
-    super(statement, columnNameList, columnTypeList, columnNameIndex, ignoreTimeStamp, client, sql,
-        queryId, sessionId, timeout);
+    super(
+        statement,
+        columnNameList,
+        columnTypeList,
+        columnNameIndex,
+        ignoreTimeStamp,
+        client,
+        sql,
+        queryId,
+        sessionId,
+        timeout);
     ioTDBRpcDataSet.setTsQueryDataSet(dataset);
   }
 
@@ -67,7 +84,6 @@ public class IoTDBJDBCResultSet extends AbstractIoTDBJDBCResultSet {
   protected void constructOneRow() {
     ioTDBRpcDataSet.constructOneRow();
   }
-
 
   @Override
   protected void checkRecord() throws SQLException {

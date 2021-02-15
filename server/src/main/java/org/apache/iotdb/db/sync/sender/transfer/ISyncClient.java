@@ -36,24 +36,17 @@ public interface ISyncClient {
   void init();
 
   /**
-   * Verify whether the client lock file is locked or not, ensuring that only one client is
-   * running.
+   * Verify whether the client lock file is locked or not, ensuring that only one client is running.
    */
   void verifySingleton() throws IOException;
 
-  /**
-   * Start monitor thread, which monitor sync status.
-   */
+  /** Start monitor thread, which monitor sync status. */
   void startMonitor();
 
-  /**
-   * Start sync task in a certain time.
-   */
+  /** Start sync task in a certain time. */
   void startTimedTask();
 
-  /**
-   * Establish a connection to receiver end.
-   */
+  /** Establish a connection to receiver end. */
   void establishConnection(String serverIp, int serverPort) throws SyncConnectionException;
 
   /**
@@ -61,9 +54,7 @@ public interface ISyncClient {
    */
   void confirmIdentity() throws SyncConnectionException, IOException;
 
-  /**
-   * Sync schema file to receiver before all data to be synced.
-   */
+  /** Sync schema file to receiver before all data to be synced. */
   void syncSchema() throws SyncConnectionException, TException;
 
   /**
@@ -77,14 +68,10 @@ public interface ISyncClient {
   void syncDeletedFilesNameInOneGroup(String sgName, Long timeRangeId, Set<File> deletedFilesName)
       throws SyncConnectionException, IOException;
 
-  /**
-   * Execute a sync task for all data directory.
-   */
+  /** Execute a sync task for all data directory. */
   void syncAll() throws SyncConnectionException, IOException, TException;
 
-  /**
-   * Execute a sync task for a data directory.
-   */
+  /** Execute a sync task for a data directory. */
   void sync() throws SyncConnectionException, IOException;
 
   /**
@@ -98,9 +85,6 @@ public interface ISyncClient {
   void syncDataFilesInOneGroup(String sgName, Long timeRangeId, Set<File> toBeSyncFiles)
       throws SyncConnectionException, IOException, SyncDeviceOwnerConflictException;
 
-  /**
-   * Stop sync process
-   */
+  /** Stop sync process */
   void stop();
-
 }

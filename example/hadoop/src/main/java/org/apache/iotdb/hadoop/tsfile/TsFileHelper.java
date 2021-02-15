@@ -63,20 +63,20 @@ public class TsFileHelper {
 
       // add measurements into file schema (all with INT64 data type)
       for (int i = 0; i < 2; i++) {
-        MeasurementSchema measurementSchema = new MeasurementSchema(
-            Constant.SENSOR_PREFIX + (i + 1), TSDataType.INT64,
-            TSEncoding.TS_2DIFF);
-        schema.registerTimeseries(new Path(Constant.DEVICE_1, Constant.SENSOR_PREFIX + (i + 1)),
-            measurementSchema);
+        MeasurementSchema measurementSchema =
+            new MeasurementSchema(
+                Constant.SENSOR_PREFIX + (i + 1), TSDataType.INT64, TSEncoding.TS_2DIFF);
+        schema.registerTimeseries(
+            new Path(Constant.DEVICE_1, Constant.SENSOR_PREFIX + (i + 1)), measurementSchema);
         schemaList.add(measurementSchema);
       }
 
       for (int i = 2; i < sensorNum; i++) {
-        MeasurementSchema measurementSchema = new MeasurementSchema(
-            Constant.SENSOR_PREFIX + (i + 1), TSDataType.DOUBLE,
-            TSEncoding.TS_2DIFF);
-        schema.registerTimeseries(new Path(Constant.DEVICE_1, Constant.SENSOR_PREFIX + (i + 1)),
-            measurementSchema);
+        MeasurementSchema measurementSchema =
+            new MeasurementSchema(
+                Constant.SENSOR_PREFIX + (i + 1), TSDataType.DOUBLE, TSEncoding.TS_2DIFF);
+        schema.registerTimeseries(
+            new Path(Constant.DEVICE_1, Constant.SENSOR_PREFIX + (i + 1)), measurementSchema);
         schemaList.add(measurementSchema);
       }
 

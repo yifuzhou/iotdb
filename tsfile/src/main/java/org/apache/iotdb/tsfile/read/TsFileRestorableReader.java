@@ -53,16 +53,14 @@ public class TsFileRestorableReader extends TsFileSequenceReader {
     }
   }
 
-  /**
-   * Checks if the file is incomplete, and if so, tries to repair it.
-   */
+  /** Checks if the file is incomplete, and if so, tries to repair it. */
   private void checkAndRepair() throws IOException {
     // Check if file is damaged
     if (!isComplete()) {
       // Try to close it
       logger.info("File {} has no correct tail magic, try to repair...", file);
-      RestorableTsFileIOWriter rWriter = new RestorableTsFileIOWriter(
-          FSFactoryProducer.getFSFactory().getFile(file));
+      RestorableTsFileIOWriter rWriter =
+          new RestorableTsFileIOWriter(FSFactoryProducer.getFSFactory().getFile(file));
       TsFileWriter writer = new TsFileWriter(rWriter);
       // This writes the right magic string
       writer.close();

@@ -19,7 +19,6 @@
 package org.apache.iotdb.db.metadata.mnode;
 
 import java.io.IOException;
-
 import org.apache.iotdb.db.metadata.logfile.MLogWriter;
 import org.apache.iotdb.db.qp.physical.sys.StorageGroupMNodePlan;
 

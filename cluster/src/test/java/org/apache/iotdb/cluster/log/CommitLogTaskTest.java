@@ -22,10 +22,10 @@ package org.apache.iotdb.cluster.log;
 import static org.junit.Assert.*;
 
 import java.util.concurrent.atomic.AtomicBoolean;
-import org.apache.iotdb.db.utils.EnvironmentUtils;
 import org.apache.iotdb.cluster.common.TestLogManager;
 import org.apache.iotdb.cluster.common.TestUtils;
 import org.apache.iotdb.cluster.log.manage.RaftLogManager;
+import org.apache.iotdb.db.utils.EnvironmentUtils;
 import org.apache.thrift.async.AsyncMethodCallback;
 import org.junit.After;
 import org.junit.Test;
@@ -45,17 +45,18 @@ public class CommitLogTaskTest {
 
       AtomicBoolean complete = new AtomicBoolean(false);
       CommitLogTask task = new CommitLogTask(manager, 9, 9);
-      AsyncMethodCallback<Void> callback = new AsyncMethodCallback<Void>() {
-        @Override
-        public void onComplete(Void unused) {
-          complete.set(true);
-        }
+      AsyncMethodCallback<Void> callback =
+          new AsyncMethodCallback<Void>() {
+            @Override
+            public void onComplete(Void unused) {
+              complete.set(true);
+            }
 
-        @Override
-        public void onError(Exception e) {
-          fail(e.getMessage());
-        }
-      };
+            @Override
+            public void onError(Exception e) {
+              fail(e.getMessage());
+            }
+          };
       task.registerCallback(callback);
 
       task.run();

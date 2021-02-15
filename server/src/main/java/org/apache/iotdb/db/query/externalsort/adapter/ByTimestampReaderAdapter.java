@@ -23,9 +23,7 @@ import org.apache.iotdb.db.query.reader.series.IReaderByTimestamp;
 import org.apache.iotdb.tsfile.read.TimeValuePair;
 import org.apache.iotdb.tsfile.read.reader.IPointReader;
 
-/**
- * This class is an adapter which makes IPointReader implement IReaderByTimestamp interface.
- */
+/** This class is an adapter which makes IPointReader implement IReaderByTimestamp interface. */
 public class ByTimestampReaderAdapter implements IReaderByTimestamp {
 
   private IPointReader pointReader;

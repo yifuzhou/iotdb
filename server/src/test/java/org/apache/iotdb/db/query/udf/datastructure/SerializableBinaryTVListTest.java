@@ -41,8 +41,9 @@ public class SerializableBinaryTVListTest extends SerializableTVListTest {
   public void setUp() throws Exception {
     super.setUp();
     originalList = new ArrayList<>();
-    testList = (SerializableBinaryTVList) SerializableTVList
-        .newSerializableTVList(TSDataType.TEXT, QUERY_ID);
+    testList =
+        (SerializableBinaryTVList)
+            SerializableTVList.newSerializableTVList(TSDataType.TEXT, QUERY_ID);
   }
 
   @Override

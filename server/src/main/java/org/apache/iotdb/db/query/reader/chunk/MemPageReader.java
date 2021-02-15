@@ -35,8 +35,8 @@ public class MemPageReader implements IPageReader {
   private final ChunkMetadata chunkMetadata;
   private Filter valueFilter;
 
-  public MemPageReader(IPointReader timeValuePairIterator, ChunkMetadata chunkMetadata,
-      Filter filter) {
+  public MemPageReader(
+      IPointReader timeValuePairIterator, ChunkMetadata chunkMetadata, Filter filter) {
     this.timeValuePairIterator = timeValuePairIterator;
     this.chunkMetadata = chunkMetadata;
     this.valueFilter = filter;
@@ -44,12 +44,13 @@ public class MemPageReader implements IPageReader {
 
   @Override
   public BatchData getAllSatisfiedPageData(boolean ascending) throws IOException {
-    BatchData batchData = BatchDataFactory
-        .createBatchData(chunkMetadata.getDataType(), ascending, false);
+    BatchData batchData =
+        BatchDataFactory.createBatchData(chunkMetadata.getDataType(), ascending, false);
     while (timeValuePairIterator.hasNextTimeValuePair()) {
       TimeValuePair timeValuePair = timeValuePairIterator.nextTimeValuePair();
-      if (valueFilter == null || valueFilter
-          .satisfy(timeValuePair.getTimestamp(), timeValuePair.getValue().getValue())) {
+      if (valueFilter == null
+          || valueFilter.satisfy(
+              timeValuePair.getTimestamp(), timeValuePair.getValue().getValue())) {
         batchData.putAnObject(timeValuePair.getTimestamp(), timeValuePair.getValue().getValue());
       }
     }

@@ -44,7 +44,8 @@ public class ShowPlan extends PhysicalPlan {
     this.path = path;
   }
 
-  public ShowPlan(ShowContentType showContentType, PartialPath path, int limit, int offset, int fetchSize) {
+  public ShowPlan(
+      ShowContentType showContentType, PartialPath path, int limit, int offset, int fetchSize) {
     this(showContentType, path);
     this.limit = limit;
     this.offset = offset;
@@ -99,8 +100,20 @@ public class ShowPlan extends PhysicalPlan {
   }
 
   public enum ShowContentType {
-    FLUSH_TASK_INFO, TTL, VERSION, TIMESERIES, STORAGE_GROUP, CHILD_PATH, DEVICES,
-    COUNT_TIMESERIES, COUNT_NODE_TIMESERIES, COUNT_NODES, MERGE_STATUS, FUNCTIONS, COUNT_DEVICES,
-    COUNT_STORAGE_GROUP, QUERY_PROCESSLIST
+    FLUSH_TASK_INFO,
+    TTL,
+    VERSION,
+    TIMESERIES,
+    STORAGE_GROUP,
+    CHILD_PATH,
+    DEVICES,
+    COUNT_TIMESERIES,
+    COUNT_NODE_TIMESERIES,
+    COUNT_NODES,
+    MERGE_STATUS,
+    FUNCTIONS,
+    COUNT_DEVICES,
+    COUNT_STORAGE_GROUP,
+    QUERY_PROCESSLIST
   }
 }

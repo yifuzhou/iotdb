@@ -45,8 +45,11 @@ public class SyncMetaClient extends Client {
 
   public SyncMetaClient(TProtocolFactory protocolFactory, Node node, SyncClientPool pool)
       throws TTransportException {
-    super(protocolFactory.getProtocol(RpcTransportFactory.INSTANCE.getTransport(
-        new TSocket(node.getIp(), node.getMetaPort(), RaftServer.getConnectionTimeoutInMS()))));
+    super(
+        protocolFactory.getProtocol(
+            RpcTransportFactory.INSTANCE.getTransport(
+                new TSocket(
+                    node.getIp(), node.getMetaPort(), RaftServer.getConnectionTimeoutInMS()))));
     this.node = node;
     this.pool = pool;
     getInputProtocol().getTransport().open();

@@ -40,9 +40,7 @@ import org.apache.iotdb.db.sync.conf.SyncConstant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * This class is to manage all FileLoader.
- */
+/** This class is to manage all FileLoader. */
 public class FileLoaderManager {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(FileLoaderManager.class);
@@ -66,7 +64,8 @@ public class FileLoaderManager {
     try {
       recoverDeviceOwnerMap();
     } catch (IOException | ClassNotFoundException e) {
-      LOGGER.error("Can not recover device owner map from file {}",
+      LOGGER.error(
+          "Can not recover device owner map from file {}",
           new File(syncSystemDir, SyncConstant.DEVICE_OWNER_FILE_NAME).getAbsolutePath());
     }
   }
@@ -93,8 +92,8 @@ public class FileLoaderManager {
    */
   public synchronized void checkAndUpdateDeviceOwner(TsFileResource tsFileResource)
       throws SyncDeviceOwnerConflictException, IOException {
-    String curOwner = tsFileResource.getTsFile().getParentFile().getParentFile().getParentFile()
-        .getName();
+    String curOwner =
+        tsFileResource.getTsFile().getParentFile().getParentFile().getParentFile().getName();
     Set<String> deviceSet = tsFileResource.getDevices();
     checkDeviceConflict(curOwner, deviceSet);
     updateDeviceOwner(curOwner, deviceSet);
@@ -139,7 +138,7 @@ public class FileLoaderManager {
   private void deSerializeDeviceOwnerMap(File deviceOwnerFile)
       throws IOException, ClassNotFoundException {
     try (FileInputStream fis = new FileInputStream(deviceOwnerFile);
-         ObjectInputStream deviceOwnerInput = new ObjectInputStream(fis)) {
+        ObjectInputStream deviceOwnerInput = new ObjectInputStream(fis)) {
       deviceOwnerMap = (Map<String, String>) deviceOwnerInput.readObject();
     }
   }
@@ -182,8 +181,8 @@ public class FileLoaderManager {
       fileLoaderMap = new ConcurrentHashMap<>();
     }
     if (loadTaskRunnerPool == null) {
-      loadTaskRunnerPool = IoTDBThreadPoolFactory
-          .newCachedThreadPool(ThreadName.LOAD_TSFILE.getName());
+      loadTaskRunnerPool =
+          IoTDBThreadPoolFactory.newCachedThreadPool(ThreadName.LOAD_TSFILE.getName());
     }
   }
 
@@ -194,8 +193,7 @@ public class FileLoaderManager {
     while (!loadTaskRunnerPool.isTerminated()) {
       try {
         if (!loadTaskRunnerPool.awaitTermination(WAIT_TIMEOUT, TimeUnit.MILLISECONDS)) {
-          LOGGER.info("File load manager thread pool doesn't exit after {}ms.",
-              +totalWaitTime);
+          LOGGER.info("File load manager thread pool doesn't exit after {}ms.", +totalWaitTime);
         }
         totalWaitTime += WAIT_TIMEOUT;
       } catch (InterruptedException e) {

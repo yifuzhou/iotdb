@@ -76,7 +76,6 @@ public class MultiFileLogNodeManager implements WriteLogNodeManager, IService {
     return InstanceHolder.instance;
   }
 
-
   @Override
   public WriteLogNode getNode(String identifier, Supplier<ByteBuffer[]> supplier) {
     WriteLogNode node = nodeMap.get(identifier);
@@ -122,8 +121,11 @@ public class MultiFileLogNodeManager implements WriteLogNodeManager, IService {
       }
       if (config.getForceWalPeriodInMs() > 0) {
         executorService = Executors.newSingleThreadScheduledExecutor();
-        executorService.scheduleWithFixedDelay(this::forceTask, config.getForceWalPeriodInMs(),
-            config.getForceWalPeriodInMs(), TimeUnit.MILLISECONDS);
+        executorService.scheduleWithFixedDelay(
+            this::forceTask,
+            config.getForceWalPeriodInMs(),
+            config.getForceWalPeriodInMs(),
+            TimeUnit.MILLISECONDS);
       }
     } catch (Exception e) {
       throw new StartupException(this.getID().getName(), e.getMessage());
@@ -154,10 +156,8 @@ public class MultiFileLogNodeManager implements WriteLogNodeManager, IService {
 
   private static class InstanceHolder {
 
-    private InstanceHolder() {
-    }
+    private InstanceHolder() {}
 
     private static final MultiFileLogNodeManager instance = new MultiFileLogNodeManager();
   }
-
 }

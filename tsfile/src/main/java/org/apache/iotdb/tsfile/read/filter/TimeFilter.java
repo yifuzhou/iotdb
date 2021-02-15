@@ -32,8 +32,7 @@ import org.apache.iotdb.tsfile.read.filter.operator.NotFilter;
 
 public class TimeFilter {
 
-  private TimeFilter() {
-  }
+  private TimeFilter() {}
 
   public static TimeEq eq(long value) {
     return new TimeEq(value);
@@ -70,7 +69,7 @@ public class TimeFilter {
   public static class TimeIn extends In {
 
     private TimeIn(Set<Long> values, boolean not) {
-      super(values, FilterType.TIME_FILTER,not);
+      super(values, FilterType.TIME_FILTER, not);
     }
   }
 
@@ -122,5 +121,4 @@ public class TimeFilter {
       super(filter);
     }
   }
-
 }

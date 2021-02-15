@@ -28,7 +28,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import org.apache.iotdb.cluster.log.Snapshot;
-import org.apache.iotdb.cluster.log.snapshot.FileSnapshot.Factory;
 import org.apache.iotdb.cluster.server.member.MetaGroupMember;
 import org.apache.iotdb.cluster.server.member.RaftMember;
 import org.apache.iotdb.db.auth.AuthException;
@@ -47,9 +46,7 @@ import org.apache.iotdb.db.utils.SerializeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * MetaSimpleSnapshot also records all storage groups.
- */
+/** MetaSimpleSnapshot also records all storage groups. */
 public class MetaSimpleSnapshot extends Snapshot {
 
   private static final Logger logger = LoggerFactory.getLogger(MetaSimpleSnapshot.class);
@@ -134,8 +131,8 @@ public class MetaSimpleSnapshot extends Snapshot {
     storageGroupTTLMap = new HashMap<>(storageGroupTTLMapSize);
     for (int i = 0; i < storageGroupTTLMapSize; i++) {
       try {
-        storageGroupTTLMap.put(new PartialPath(SerializeUtils.deserializeString(buffer)),
-            buffer.getLong());
+        storageGroupTTLMap.put(
+            new PartialPath(SerializeUtils.deserializeString(buffer)), buffer.getLong());
       } catch (IllegalPathException e) {
         // ignore
       }
@@ -203,9 +200,11 @@ public class MetaSimpleSnapshot extends Snapshot {
           } catch (StorageGroupAlreadySetException e) {
             // ignore
           } catch (MetadataException e) {
-            logger.error("{}: Cannot add storage group {} in snapshot, errMessage:{}",
+            logger.error(
+                "{}: Cannot add storage group {} in snapshot, errMessage:{}",
                 metaGroupMember.getName(),
-                entry.getKey(), e.getMessage());
+                entry.getKey(),
+                e.getMessage());
           }
 
           // 2. register ttl in the snapshot
@@ -213,10 +212,11 @@ public class MetaSimpleSnapshot extends Snapshot {
             IoTDB.metaManager.setTTL(sgPath, entry.getValue());
             StorageEngine.getInstance().setTTL(sgPath, entry.getValue());
           } catch (MetadataException | StorageEngineException | IOException e) {
-            logger
-                .error("{}: Cannot set ttl in storage group {} , errMessage: {}",
-                    metaGroupMember.getName(),
-                    entry.getKey(), e.getMessage());
+            logger.error(
+                "{}: Cannot set ttl in storage group {} , errMessage: {}",
+                metaGroupMember.getName(),
+                entry.getKey(),
+                e.getMessage());
           }
         }
 
@@ -226,8 +226,8 @@ public class MetaSimpleSnapshot extends Snapshot {
           installSnapshotUsers(authorizer, snapshot);
           installSnapshotRoles(authorizer, snapshot);
         } catch (AuthException e) {
-          logger.error("{}: Cannot get authorizer instance, error is: ", metaGroupMember.getName(),
-              e);
+          logger.error(
+              "{}: Cannot get authorizer instance, error is: ", metaGroupMember.getName(), e);
         }
 
         // 4. accept partition table
@@ -265,10 +265,10 @@ public class MetaSimpleSnapshot extends Snapshot {
       return false;
     }
     MetaSimpleSnapshot that = (MetaSimpleSnapshot) o;
-    return Objects.equals(storageGroupTTLMap, that.storageGroupTTLMap) &&
-        Objects.equals(userMap, that.userMap) &&
-        Objects.equals(roleMap, that.roleMap) &&
-        Objects.equals(partitionTableBuffer, that.partitionTableBuffer);
+    return Objects.equals(storageGroupTTLMap, that.storageGroupTTLMap)
+        && Objects.equals(userMap, that.userMap)
+        && Objects.equals(roleMap, that.roleMap)
+        && Objects.equals(partitionTableBuffer, that.partitionTableBuffer);
   }
 
   @Override

@@ -95,13 +95,11 @@ public class IoTPrinter {
     return sb;
   }
 
-  /**
-   * compute the number of Chinese characters included in the String
-   */
+  /** compute the number of Chinese characters included in the String */
   public static int computeHANCount(String s) {
-    return (int) s.codePoints()
-        .filter(codePoint -> UnicodeScript.of(codePoint) == UnicodeScript.HAN)
-        .count();
+    return (int)
+        s.codePoints()
+            .filter(codePoint -> UnicodeScript.of(codePoint) == UnicodeScript.HAN)
+            .count();
   }
-
 }

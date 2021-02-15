@@ -42,14 +42,16 @@ public class ClusterQueryManager {
   private Map<Long, IAggregateReader> aggrReaderMap = new ConcurrentHashMap<>();
   private Map<Long, GroupByExecutor> groupByExecutorMap = new ConcurrentHashMap<>();
 
-
-  public synchronized RemoteQueryContext getQueryContext(Node node, long queryId, int fetchSize,
-      int deduplicatedPathNum) {
-    Map<Long, RemoteQueryContext> nodeContextMap = queryContextMap.computeIfAbsent(node,
-        n -> new HashMap<>());
-    return nodeContextMap.computeIfAbsent(queryId,
-        qId -> new RemoteQueryContext(QueryResourceManager.getInstance().assignQueryId(true,
-            fetchSize, deduplicatedPathNum)));
+  public synchronized RemoteQueryContext getQueryContext(
+      Node node, long queryId, int fetchSize, int deduplicatedPathNum) {
+    Map<Long, RemoteQueryContext> nodeContextMap =
+        queryContextMap.computeIfAbsent(node, n -> new HashMap<>());
+    return nodeContextMap.computeIfAbsent(
+        queryId,
+        qId ->
+            new RemoteQueryContext(
+                QueryResourceManager.getInstance()
+                    .assignQueryId(true, fetchSize, deduplicatedPathNum)));
   }
 
   public long registerReader(IBatchReader reader) {

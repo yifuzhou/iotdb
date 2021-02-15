@@ -38,7 +38,6 @@ public class QueryCoordinator {
 
   private final Comparator<Node> nodeComparator = Comparator.comparing(this::getNodeStatus);
 
-
   private QueryCoordinator() {
     // singleton class
   }

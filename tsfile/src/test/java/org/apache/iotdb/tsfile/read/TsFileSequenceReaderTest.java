@@ -72,8 +72,9 @@ public class TsFileSequenceReaderTest {
           ChunkHeader header = reader.readChunkHeader(marker);
           int dataSize = header.getDataSize();
           while (dataSize > 0) {
-            PageHeader pageHeader = reader.readPageHeader(header.getDataType(),
-                header.getChunkType() == MetaMarker.CHUNK_HEADER);
+            PageHeader pageHeader =
+                reader.readPageHeader(
+                    header.getDataType(), header.getChunkType() == MetaMarker.CHUNK_HEADER);
             ByteBuffer pageData = reader.readPage(pageHeader, header.getCompressionType());
             dataSize -= pageHeader.getSerializedPageSize();
           }
@@ -82,9 +83,10 @@ public class TsFileSequenceReaderTest {
           ChunkGroupHeader chunkGroupHeader = reader.readChunkGroupHeader();
           long endOffset = reader.position();
           Pair<Long, Long> pair = new Pair<>(startOffset, endOffset);
-          deviceChunkGroupMetadataOffsets.putIfAbsent(chunkGroupHeader.getDeviceID(), new ArrayList<>());
-          List<Pair<Long, Long>> metadatas = deviceChunkGroupMetadataOffsets
-              .get(chunkGroupHeader.getDeviceID());
+          deviceChunkGroupMetadataOffsets.putIfAbsent(
+              chunkGroupHeader.getDeviceID(), new ArrayList<>());
+          List<Pair<Long, Long>> metadatas =
+              deviceChunkGroupMetadataOffsets.get(chunkGroupHeader.getDeviceID());
           metadatas.add(pair);
           startOffset = endOffset;
           break;
@@ -103,9 +105,8 @@ public class TsFileSequenceReaderTest {
     TsFileSequenceReader reader = new TsFileSequenceReader(FILE_PATH);
 
     // test for exist device "d2"
-    Map<String, List<ChunkMetadata>> chunkMetadataMap = reader
-        .readChunkMetadataInDevice("d2");
-    int[] res = new int[]{20, 75, 100, 13};
+    Map<String, List<ChunkMetadata>> chunkMetadataMap = reader.readChunkMetadataInDevice("d2");
+    int[] res = new int[] {20, 75, 100, 13};
 
     Assert.assertEquals(4, chunkMetadataMap.size());
     for (int i = 0; i < chunkMetadataMap.size(); i++) {

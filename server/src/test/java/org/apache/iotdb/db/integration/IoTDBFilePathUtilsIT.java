@@ -53,8 +53,8 @@ public class IoTDBFilePathUtilsIT {
 
   private void insertData() throws ClassNotFoundException, SQLException {
     Class.forName(Config.JDBC_DRIVER_NAME);
-    connection = DriverManager
-        .getConnection(Config.IOTDB_URL_PREFIX + "127.0.0.1:6667/", "root", "root");
+    connection =
+        DriverManager.getConnection(Config.IOTDB_URL_PREFIX + "127.0.0.1:6667/", "root", "root");
     Statement statement = connection.createStatement();
 
     statement.execute("insert into root.sg1.wf01.wt01(timestamp, status) values (1000, true)");
@@ -63,7 +63,6 @@ public class IoTDBFilePathUtilsIT {
     statement.execute("flush");
     statement.close();
   }
-
 
   @Test
   public void splitTsFilePathTest()
@@ -77,16 +76,16 @@ public class IoTDBFilePathUtilsIT {
       Assert.fail(e.getMessage());
     }
     Assert.assertNotNull(sgPath);
-    List<TsFileResource> tsFileResources = StorageEngine.getInstance().getProcessor(sgPath)
-        .getSequenceFileTreeSet();
+    List<TsFileResource> tsFileResources =
+        StorageEngine.getInstance().getProcessor(sgPath).getSequenceFileTreeSet();
     Assert.assertNotNull(tsFileResources);
 
     for (TsFileResource tsFileResource : tsFileResources) {
       String sgName = FilePathUtils.getLogicalStorageGroupName(tsFileResource);
       Assert.assertEquals(storageGroupName, sgName);
 
-      Pair<String, Long> logicalSgNameAndTimePartitionIdPair = FilePathUtils
-          .getLogicalSgNameAndTimePartitionIdPair(tsFileResource);
+      Pair<String, Long> logicalSgNameAndTimePartitionIdPair =
+          FilePathUtils.getLogicalSgNameAndTimePartitionIdPair(tsFileResource);
       Assert.assertEquals(storageGroupName, logicalSgNameAndTimePartitionIdPair.left);
     }
   }

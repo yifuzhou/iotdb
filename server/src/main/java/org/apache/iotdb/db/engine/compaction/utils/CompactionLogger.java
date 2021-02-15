@@ -38,9 +38,12 @@ public class CompactionLogger {
   private BufferedWriter logStream;
 
   public CompactionLogger(String storageGroupDir, String storageGroupName) throws IOException {
-    logStream = new BufferedWriter(
-        new FileWriter(SystemFileFactory.INSTANCE.getFile(storageGroupDir,
-            storageGroupName + COMPACTION_LOG_NAME), true));
+    logStream =
+        new BufferedWriter(
+            new FileWriter(
+                SystemFileFactory.INSTANCE.getFile(
+                    storageGroupDir, storageGroupName + COMPACTION_LOG_NAME),
+                true));
   }
 
   public void close() throws IOException {

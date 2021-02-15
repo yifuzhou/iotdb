@@ -26,7 +26,6 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.apache.iotdb.cluster.common.TestException;
 import org.apache.iotdb.cluster.common.TestUtils;
 import org.apache.iotdb.cluster.rpc.thrift.Node;
-import org.apache.iotdb.cluster.server.handlers.caller.GenericHandler;
 import org.junit.Test;
 
 public class GenericHandlerTest {

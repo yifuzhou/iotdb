@@ -42,5 +42,4 @@ public class BatchExecutionException extends StatementExecutionException {
   public List<TSStatus> getStatusList() {
     return statusList;
   }
-
 }

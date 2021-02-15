@@ -34,13 +34,9 @@ import org.apache.iotdb.tsfile.write.chunk.IChunkWriter;
  */
 public abstract class DataPoint {
 
-  /**
-   * value type of this DataPoint.
-   **/
+  /** value type of this DataPoint. */
   protected final TSDataType type;
-  /**
-   * measurementId of this DataPoint.
-   **/
+  /** measurementId of this DataPoint. */
   protected final String measurementId;
 
   /**
@@ -90,8 +86,8 @@ public abstract class DataPoint {
       }
     } catch (Exception e) {
       throw new UnSupportedDataTypeException(
-          String.format("Data type of %s is %s, but input value is %s", measurementId, dataType,
-              value));
+          String.format(
+              "Data type of %s is %s, but input value is %s", measurementId, dataType, value));
     }
 
     return dataPoint;

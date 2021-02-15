@@ -26,7 +26,6 @@ import org.apache.thrift.async.AsyncMethodCallback;
 
 public class NodeStatusHandler implements AsyncMethodCallback<Node> {
 
-
   private Map<Node, Boolean> nodeStatusMap;
 
   private AtomicInteger countResponse;
@@ -41,7 +40,7 @@ public class NodeStatusHandler implements AsyncMethodCallback<Node> {
     synchronized (nodeStatusMap) {
       nodeStatusMap.put(response, true);
       // except for this node itself
-      if(countResponse.incrementAndGet() == nodeStatusMap.size() - 1){
+      if (countResponse.incrementAndGet() == nodeStatusMap.size() - 1) {
         nodeStatusMap.notifyAll();
       }
     }

@@ -28,8 +28,7 @@ public class FlushOperator extends RootOperator {
     return storageGroupList;
   }
 
-  public void setStorageGroupList(
-      List<PartialPath> storageGroupList) {
+  public void setStorageGroupList(List<PartialPath> storageGroupList) {
     this.storageGroupList = storageGroupList;
   }
 

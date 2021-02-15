@@ -42,20 +42,28 @@ import org.apache.iotdb.cluster.utils.nodetool.ClusterMonitorMBean;
 @SuppressWarnings("squid:S2068")
 public abstract class NodeToolCmd implements Runnable {
 
-  @Option(type = OptionType.GLOBAL, name = {"-h",
-      "--host"}, description = "Node hostname or ip address")
+  @Option(
+      type = OptionType.GLOBAL,
+      name = {"-h", "--host"},
+      description = "Node hostname or ip address")
   private String host = "127.0.0.1";
 
-  @Option(type = OptionType.GLOBAL, name = {"-p",
-      "--port"}, description = "Remote jmx agent port number")
+  @Option(
+      type = OptionType.GLOBAL,
+      name = {"-p", "--port"},
+      description = "Remote jmx agent port number")
   private String port = "31999";
 
-  @Option(type = OptionType.GLOBAL, name = {"-u",
-      "--user"}, description = "The username to access the remote jmx")
+  @Option(
+      type = OptionType.GLOBAL,
+      name = {"-u", "--user"},
+      description = "The username to access the remote jmx")
   private String user = "iotdb";
 
-  @Option(type = OptionType.GLOBAL, name = {"-pw",
-      "--password"}, description = "The password to access the remote jmx")
+  @Option(
+      type = OptionType.GLOBAL,
+      name = {"-pw", "--password"},
+      description = "The password to access the remote jmx")
   private String password = "passw!d";
 
   private static final String JMX_URL_FORMAT = "service:jmx:rmi:///jndi/rmi://%s:%s/jmxrmi";
@@ -67,8 +75,8 @@ public abstract class NodeToolCmd implements Runnable {
     try {
       MBeanServerConnection mbsc = connect();
       ObjectName name = new ObjectName(ClusterMonitor.INSTANCE.getMbeanName());
-      ClusterMonitorMBean clusterMonitorProxy = JMX
-          .newMBeanProxy(mbsc, name, ClusterMonitorMBean.class);
+      ClusterMonitorMBean clusterMonitorProxy =
+          JMX.newMBeanProxy(mbsc, name, ClusterMonitorMBean.class);
       execute(clusterMonitorProxy);
     } catch (MalformedObjectNameException e) {
       errPrintln(e.getMessage());
@@ -83,14 +91,16 @@ public abstract class NodeToolCmd implements Runnable {
     try {
       String jmxURL = String.format(JMX_URL_FORMAT, host, port);
       JMXServiceURL serviceURL = new JMXServiceURL(jmxURL);
-      Map<String, Object> environment = Collections
-          .singletonMap(JMXConnector.CREDENTIALS, new String[]{user, password});
+      Map<String, Object> environment =
+          Collections.singletonMap(JMXConnector.CREDENTIALS, new String[] {user, password});
       JMXConnector connector = JMXConnectorFactory.connect(serviceURL, environment);
       mbsc = connector.getMBeanServerConnection();
     } catch (IOException e) {
       Throwable rootCause = Throwables.getRootCause(e);
-      errPrintln(format("nodetool: Failed to connect to '%s:%s' - %s: '%s'.", host, port,
-          rootCause.getClass().getSimpleName(), rootCause.getMessage()));
+      errPrintln(
+          format(
+              "nodetool: Failed to connect to '%s:%s' - %s: '%s'.",
+              host, port, rootCause.getClass().getSimpleName(), rootCause.getMessage()));
       System.exit(1);
     }
 
@@ -98,8 +108,8 @@ public abstract class NodeToolCmd implements Runnable {
   }
 
   String nodeToString(Node node) {
-    return String.format("%s:%d:%d:%d", node.getIp(), node.getMetaPort(), node.getDataPort(),
-        node.getClientPort());
+    return String.format(
+        "%s:%d:%d:%d", node.getIp(), node.getMetaPort(), node.getDataPort(), node.getClientPort());
   }
 
   String partitionGroupToString(PartitionGroup group) {

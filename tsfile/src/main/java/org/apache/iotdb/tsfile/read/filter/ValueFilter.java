@@ -32,8 +32,7 @@ import org.apache.iotdb.tsfile.read.filter.operator.NotFilter;
 
 public class ValueFilter {
 
-  private ValueFilter() {
-  }
+  private ValueFilter() {}
 
   public static <T extends Comparable<T>> ValueEq<T> eq(T value) {
     return new ValueEq(value);
@@ -55,7 +54,7 @@ public class ValueFilter {
     return new ValueLtEq(value);
   }
 
-  public static <T extends  Comparable<T>> ValueIn<T> in(Set<T> values, boolean not){
+  public static <T extends Comparable<T>> ValueIn<T> in(Set<T> values, boolean not) {
     return new ValueIn(values, not);
   }
 

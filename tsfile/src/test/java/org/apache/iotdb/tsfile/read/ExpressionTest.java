@@ -30,8 +30,8 @@ public class ExpressionTest {
   public void testGlobalTime() {
     GlobalTimeExpression globalTimeExpression = new GlobalTimeExpression(TimeFilter.eq(10L));
     globalTimeExpression.setFilter(TimeFilter.eq(100L));
-    Assert.assertEquals(TimeFilter.eq(100L),
-        ((GlobalTimeExpression) globalTimeExpression.clone()).getFilter());
+    Assert.assertEquals(
+        TimeFilter.eq(100L), ((GlobalTimeExpression) globalTimeExpression.clone()).getFilter());
   }
 
   @Test

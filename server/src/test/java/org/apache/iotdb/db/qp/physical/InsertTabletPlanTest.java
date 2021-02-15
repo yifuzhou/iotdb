@@ -40,7 +40,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-
 public class InsertTabletPlanTest {
 
   private final Planner processor = new Planner();
@@ -57,8 +56,9 @@ public class InsertTabletPlanTest {
 
   @Test
   public void testInsertTabletPlan()
-      throws QueryProcessException, MetadataException, InterruptedException, QueryFilterOptimizationException, StorageEngineException, IOException {
-    long[] times = new long[]{110L, 111L, 112L, 113L};
+      throws QueryProcessException, MetadataException, InterruptedException,
+          QueryFilterOptimizationException, StorageEngineException, IOException {
+    long[] times = new long[] {110L, 111L, 112L, 113L};
     List<Integer> dataTypes = new ArrayList<>();
     dataTypes.add(TSDataType.DOUBLE.ordinal());
     dataTypes.add(TSDataType.FLOAT.ordinal());
@@ -84,8 +84,11 @@ public class InsertTabletPlanTest {
       ((Binary[]) columns[5])[r] = new Binary("hh" + r);
     }
 
-    InsertTabletPlan tabletPlan = new InsertTabletPlan(new PartialPath("root.isp.d1"),
-        new String[]{"s1", "s2", "s3", "s4", "s5", "s6"}, dataTypes);
+    InsertTabletPlan tabletPlan =
+        new InsertTabletPlan(
+            new PartialPath("root.isp.d1"),
+            new String[] {"s1", "s2", "s3", "s4", "s5", "s6"},
+            dataTypes);
     tabletPlan.setTimes(times);
     tabletPlan.setColumns(columns);
     tabletPlan.setRowCount(times.length);
@@ -93,8 +96,7 @@ public class InsertTabletPlanTest {
     PlanExecutor executor = new PlanExecutor();
     executor.insertTablet(tabletPlan);
 
-    QueryPlan queryPlan = (QueryPlan) processor
-        .parseSQLToPhysicalPlan("select * from root.isp.d1");
+    QueryPlan queryPlan = (QueryPlan) processor.parseSQLToPhysicalPlan("select * from root.isp.d1");
     QueryDataSet dataSet = executor.processQuery(queryPlan, EnvironmentUtils.TEST_QUERY_CONTEXT);
     Assert.assertEquals(6, dataSet.getPaths().size());
     while (dataSet.hasNext()) {

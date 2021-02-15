@@ -66,12 +66,13 @@ public class RemoteSeriesReaderByTimestamp implements IReaderByTimestamp {
     synchronized (fetchResult) {
       fetchResult.set(null);
       try {
-        sourceInfo.getCurAsyncClient(RaftServer.getReadOperationTimeoutMS())
-            .fetchSingleSeriesByTimestamp(sourceInfo.getHeader(),
-                sourceInfo.getReaderId(), timestamp, handler);
+        sourceInfo
+            .getCurAsyncClient(RaftServer.getReadOperationTimeoutMS())
+            .fetchSingleSeriesByTimestamp(
+                sourceInfo.getHeader(), sourceInfo.getReaderId(), timestamp, handler);
         fetchResult.wait(RaftServer.getReadOperationTimeoutMS());
       } catch (TException e) {
-        //try other node
+        // try other node
         if (!sourceInfo.switchNode(true, timestamp)) {
           return null;
         }
@@ -87,15 +88,15 @@ public class RemoteSeriesReaderByTimestamp implements IReaderByTimestamp {
 
   private ByteBuffer fetchResultSync(long timestamp) throws IOException {
     try {
-      SyncDataClient curSyncClient = sourceInfo
-          .getCurSyncClient(RaftServer.getReadOperationTimeoutMS());
-      ByteBuffer buffer = curSyncClient
-          .fetchSingleSeriesByTimestamp(sourceInfo.getHeader(),
-              sourceInfo.getReaderId(), timestamp);
+      SyncDataClient curSyncClient =
+          sourceInfo.getCurSyncClient(RaftServer.getReadOperationTimeoutMS());
+      ByteBuffer buffer =
+          curSyncClient.fetchSingleSeriesByTimestamp(
+              sourceInfo.getHeader(), sourceInfo.getReaderId(), timestamp);
       curSyncClient.putBack();
       return buffer;
     } catch (TException e) {
-      //try other node
+      // try other node
       if (!sourceInfo.switchNode(true, timestamp)) {
         return null;
       }

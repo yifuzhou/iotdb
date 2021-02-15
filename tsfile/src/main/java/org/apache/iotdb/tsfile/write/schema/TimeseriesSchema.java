@@ -48,27 +48,29 @@ public class TimeseriesSchema implements Comparable<TimeseriesSchema>, Serializa
   private CompressionType compressor;
   private Map<String, String> props = new HashMap<>();
 
-  public TimeseriesSchema() {
-  }
+  public TimeseriesSchema() {}
 
   public TimeseriesSchema(String fullPath, TSDataType tsDataType) {
-    this(fullPath, tsDataType,
+    this(
+        fullPath,
+        tsDataType,
         TSEncoding.valueOf(TSFileDescriptor.getInstance().getConfig().getValueEncoder()),
         TSFileDescriptor.getInstance().getConfig().getCompressor(),
         Collections.emptyMap());
   }
 
-  /**
-   * set properties as an empty Map.
-   */
+  /** set properties as an empty Map. */
   public TimeseriesSchema(String fullPath, TSDataType type, TSEncoding encoding) {
-    this(fullPath, type, encoding,
+    this(
+        fullPath,
+        type,
+        encoding,
         TSFileDescriptor.getInstance().getConfig().getCompressor(),
         Collections.emptyMap());
   }
 
-  public TimeseriesSchema(String fullPath, TSDataType type, TSEncoding encoding,
-      CompressionType compressionType) {
+  public TimeseriesSchema(
+      String fullPath, TSDataType type, TSEncoding encoding, CompressionType compressionType) {
     this(fullPath, type, encoding, compressionType, Collections.emptyMap());
   }
 
@@ -78,8 +80,12 @@ public class TimeseriesSchema implements Comparable<TimeseriesSchema>, Serializa
    * <p>props - information in encoding method. For RLE, Encoder.MAX_POINT_NUMBER For PLAIN,
    * Encoder.maxStringLength
    */
-  public TimeseriesSchema(String fullPath, TSDataType type, TSEncoding encoding,
-      CompressionType compressionType, Map<String, String> props) {
+  public TimeseriesSchema(
+      String fullPath,
+      TSDataType type,
+      TSEncoding encoding,
+      CompressionType compressionType,
+      Map<String, String> props) {
     this.type = type;
     this.fullPath = fullPath;
     this.encoding = encoding;
@@ -87,9 +93,7 @@ public class TimeseriesSchema implements Comparable<TimeseriesSchema>, Serializa
     this.compressor = compressionType;
   }
 
-  /**
-   * function for deserializing data from byte buffer.
-   */
+  /** function for deserializing data from byte buffer. */
   public static TimeseriesSchema deserializeFrom(ByteBuffer buffer) {
     TimeseriesSchema timeseriesSchema = new TimeseriesSchema();
 
@@ -140,21 +144,22 @@ public class TimeseriesSchema implements Comparable<TimeseriesSchema>, Serializa
     this.props = props;
   }
 
-  /**
-   * function for getting time encoder.
-   */
+  /** function for getting time encoder. */
   public Encoder getTimeEncoder() {
-    TSEncoding timeEncoding = TSEncoding.valueOf(TSFileDescriptor.getInstance().getConfig().getTimeEncoder());
-    TSDataType timeType = TSDataType.valueOf(TSFileDescriptor.getInstance().getConfig().getTimeSeriesDataType());
+    TSEncoding timeEncoding =
+        TSEncoding.valueOf(TSFileDescriptor.getInstance().getConfig().getTimeEncoder());
+    TSDataType timeType =
+        TSDataType.valueOf(TSFileDescriptor.getInstance().getConfig().getTimeSeriesDataType());
     return TSEncodingBuilder.getEncodingBuilder(timeEncoding).getEncoder(timeType);
   }
 
   /**
    * get Encoder of value from encodingConverter by measurementID and data type.
+   *
    * @return Encoder for value
    */
   public Encoder getValueEncoder() {
-    //it is ok even if encodingConverter is constructed two instances for concurrent scenario
+    // it is ok even if encodingConverter is constructed two instances for concurrent scenario
     if (encodingConverter == null) {
       // initialize TSEncoding. e.g. set max error for PLA and SDT
       encodingConverter = TSEncodingBuilder.getEncodingBuilder(encoding);
@@ -167,9 +172,7 @@ public class TimeseriesSchema implements Comparable<TimeseriesSchema>, Serializa
     return compressor;
   }
 
-  /**
-   * function for serializing data to output stream.
-   */
+  /** function for serializing data to output stream. */
   public int serializeTo(OutputStream outputStream) throws IOException {
     int byteLen = 0;
 
@@ -194,9 +197,7 @@ public class TimeseriesSchema implements Comparable<TimeseriesSchema>, Serializa
     return byteLen;
   }
 
-  /**
-   * function for serializing data to byte buffer.
-   */
+  /** function for serializing data to byte buffer. */
   public int serializeTo(ByteBuffer buffer) {
     int byteLen = 0;
 
@@ -230,8 +231,9 @@ public class TimeseriesSchema implements Comparable<TimeseriesSchema>, Serializa
       return false;
     }
     TimeseriesSchema that = (TimeseriesSchema) o;
-    return type == that.type && encoding == that.encoding && Objects
-        .equals(fullPath, that.fullPath)
+    return type == that.type
+        && encoding == that.encoding
+        && Objects.equals(fullPath, that.fullPath)
         && Objects.equals(compressor, that.compressor);
   }
 
@@ -240,9 +242,7 @@ public class TimeseriesSchema implements Comparable<TimeseriesSchema>, Serializa
     return Objects.hash(type, encoding, fullPath, compressor);
   }
 
-  /**
-   * compare by full path.
-   */
+  /** compare by full path. */
   @Override
   public int compareTo(TimeseriesSchema o) {
     if (equals(o)) {
@@ -255,11 +255,18 @@ public class TimeseriesSchema implements Comparable<TimeseriesSchema>, Serializa
   @Override
   public String toString() {
     StringContainer sc = new StringContainer("");
-    sc.addTail("[", fullPath, ",", type.toString(), ",", encoding.toString(), ",",
-        props.toString(), ",",
+    sc.addTail(
+        "[",
+        fullPath,
+        ",",
+        type.toString(),
+        ",",
+        encoding.toString(),
+        ",",
+        props.toString(),
+        ",",
         compressor.toString());
     sc.addTail("]");
     return sc.toString();
   }
-
 }

@@ -28,9 +28,7 @@ import org.apache.iotdb.cluster.log.Log;
 import org.apache.iotdb.cluster.rpc.thrift.Node;
 import org.apache.iotdb.db.utils.SerializeUtils;
 
-/**
- * AddNodeLog records the operation of adding a node into this cluster.
- */
+/** AddNodeLog records the operation of adding a node into this cluster. */
 public class AddNodeLog extends Log {
 
   private Node newNode;

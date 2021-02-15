@@ -67,15 +67,16 @@ public class ClusterGroupByNoVFilterDataSetTest extends BaseQueryTest {
       groupByPlan.setSlidingStep(5);
       groupByPlan.setInterval(5);
 
-      ClusterGroupByNoVFilterDataSet dataSet = new ClusterGroupByNoVFilterDataSet(queryContext,
-          groupByPlan, testMetaMember);
+      ClusterGroupByNoVFilterDataSet dataSet =
+          new ClusterGroupByNoVFilterDataSet(queryContext, groupByPlan, testMetaMember);
 
-      Object[][] answers = new Object[][] {
-          new Object[] {5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0},
-          new Object[] {5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0},
-          new Object[] {5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0},
-          new Object[] {5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0},
-      };
+      Object[][] answers =
+          new Object[][] {
+            new Object[] {5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0},
+            new Object[] {5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0},
+            new Object[] {5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0},
+            new Object[] {5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0},
+          };
       for (Object[] answer : answers) {
         checkDoubleDataset(dataSet, answer);
       }

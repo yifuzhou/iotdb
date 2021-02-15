@@ -33,7 +33,12 @@ import org.apache.iotdb.db.engine.merge.task.MergeTask;
 public class MergeThreadPool extends ThreadPoolExecutor {
 
   public MergeThreadPool(int corePoolSize, ThreadFactory threadFactory) {
-    super(corePoolSize, corePoolSize, 0, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>(),
+    super(
+        corePoolSize,
+        corePoolSize,
+        0,
+        TimeUnit.MILLISECONDS,
+        new LinkedBlockingQueue<>(),
         threadFactory);
   }
 

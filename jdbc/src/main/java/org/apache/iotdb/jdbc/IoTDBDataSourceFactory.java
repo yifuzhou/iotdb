@@ -16,17 +16,16 @@
  */
 package org.apache.iotdb.jdbc;
 
+import java.sql.Driver;
+import java.sql.SQLException;
+import java.util.Properties;
+import javax.sql.ConnectionPoolDataSource;
+import javax.sql.DataSource;
+import javax.sql.XADataSource;
 import org.ops4j.pax.jdbc.common.BeanConfig;
 import org.osgi.service.jdbc.DataSourceFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.sql.ConnectionPoolDataSource;
-import javax.sql.DataSource;
-import javax.sql.XADataSource;
-import java.sql.Driver;
-import java.sql.SQLException;
-import java.util.Properties;
 
 public class IoTDBDataSourceFactory implements DataSourceFactory {
 
@@ -63,7 +62,8 @@ public class IoTDBDataSourceFactory implements DataSourceFactory {
   }
 
   @Override
-  public ConnectionPoolDataSource createConnectionPoolDataSource(Properties properties) throws SQLException {
+  public ConnectionPoolDataSource createConnectionPoolDataSource(Properties properties)
+      throws SQLException {
     return null;
   }
 

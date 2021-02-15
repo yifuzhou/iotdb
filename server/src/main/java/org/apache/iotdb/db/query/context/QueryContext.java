@@ -29,9 +29,7 @@ import org.apache.iotdb.db.engine.modification.ModificationFile;
 import org.apache.iotdb.db.metadata.PartialPath;
 import org.apache.iotdb.tsfile.file.metadata.ChunkMetadata;
 
-/**
- * QueryContext contains the shared information with in a query.
- */
+/** QueryContext contains the shared information with in a query. */
 public class QueryContext {
 
   /**
@@ -50,8 +48,7 @@ public class QueryContext {
 
   private long queryTimeLowerBound = Long.MIN_VALUE;
 
-  public QueryContext() {
-  }
+  public QueryContext() {}
 
   public QueryContext(long queryId) {
     this.queryId = queryId;
@@ -64,22 +61,25 @@ public class QueryContext {
   public List<Modification> getPathModifications(ModificationFile modFile, PartialPath path) {
     Map<String, List<Modification>> fileModifications =
         filePathModCache.computeIfAbsent(modFile.getFilePath(), k -> new ConcurrentHashMap<>());
-    return fileModifications.computeIfAbsent(path.getFullPath(), k -> {
-      List<Modification> allModifications = fileModCache.get(modFile.getFilePath());
-      if (allModifications == null) {
-        allModifications = (List<Modification>) modFile.getModifications();
-        fileModCache.put(modFile.getFilePath(), allModifications);
-      }
-      List<Modification> finalPathModifications = new ArrayList<>();
-      if (!allModifications.isEmpty()) {
-        allModifications.forEach(modification -> {
-          if (modification.getPath().matchFullPath(path)) {
-            finalPathModifications.add(modification);
+    return fileModifications.computeIfAbsent(
+        path.getFullPath(),
+        k -> {
+          List<Modification> allModifications = fileModCache.get(modFile.getFilePath());
+          if (allModifications == null) {
+            allModifications = (List<Modification>) modFile.getModifications();
+            fileModCache.put(modFile.getFilePath(), allModifications);
           }
+          List<Modification> finalPathModifications = new ArrayList<>();
+          if (!allModifications.isEmpty()) {
+            allModifications.forEach(
+                modification -> {
+                  if (modification.getPath().matchFullPath(path)) {
+                    finalPathModifications.add(modification);
+                  }
+                });
+          }
+          return finalPathModifications;
         });
-      }
-      return finalPathModifications;
-    });
   }
 
   public long getQueryId() {

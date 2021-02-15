@@ -19,6 +19,9 @@
 
 package org.apache.iotdb.db.engine.merge;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 import org.apache.commons.io.FileUtils;
 import org.apache.iotdb.db.conf.IoTDBDescriptor;
 import org.apache.iotdb.db.constant.TestConstant;
@@ -27,11 +30,7 @@ import org.apache.iotdb.db.engine.merge.task.MergeTask;
 import org.apache.iotdb.db.service.IoTDB;
 import org.apache.iotdb.tsfile.file.metadata.enums.TSEncoding;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-
-public class MergePerfTest extends MergeTest{
+public class MergePerfTest extends MergeTest {
 
   private long timeConsumption;
   private boolean fullMerge;
@@ -46,8 +45,8 @@ public class MergePerfTest extends MergeTest{
     MergeResource resource = new MergeResource(seqResources, unseqResources);
     resource.setCacheDeviceMeta(true);
     MergeTask mergeTask =
-        new MergeTask(resource, tempSGDir.getPath(), (k, v, l) -> {
-        }, "test", fullMerge, 100, MERGE_TEST_SG);
+        new MergeTask(
+            resource, tempSGDir.getPath(), (k, v, l) -> {}, "test", fullMerge, 100, MERGE_TEST_SG);
     mergeTask.call();
     timeConsumption = System.currentTimeMillis() - timeConsumption;
     tearDown();
@@ -74,33 +73,33 @@ public class MergePerfTest extends MergeTest{
       perfTest.test();
     }
 
-//    int[] intParameters = new int[10];
-//    for (int i = 1; i <= 10; i++) {
-//      intParameters[i-1] = i;
-//    }
-//    for (int param : intParameters) {
-//      perfTest.unseqFileNum = param;
-//      perfTest.test();
-//      timeConsumptions.add(perfTest.timeConsumption);
-//    }
-//    long[] longParameters = new long[10];
-//    for (int i = 1; i <= 10; i++) {
-//      longParameters[i-1] = i * 200;
-//    }
-//    for (long param : longParameters) {
-//      perfTest.flushInterval = param;
-//      perfTest.test();
-//      timeConsumptions.add(perfTest.timeConsumption);
-//    }
-//    double[] doubleParameters = new double[10];
-//    for (int i = 1; i <= 10; i++) {
-//      doubleParameters[i-1] = 0.1 * i;
-//    }
-//    for (double param : doubleParameters) {
-//      perfTest.unseqRatio = param;
-//      perfTest.test();
-//      timeConsumptions.add(perfTest.timeConsumption);
-//    }
+    //    int[] intParameters = new int[10];
+    //    for (int i = 1; i <= 10; i++) {
+    //      intParameters[i-1] = i;
+    //    }
+    //    for (int param : intParameters) {
+    //      perfTest.unseqFileNum = param;
+    //      perfTest.test();
+    //      timeConsumptions.add(perfTest.timeConsumption);
+    //    }
+    //    long[] longParameters = new long[10];
+    //    for (int i = 1; i <= 10; i++) {
+    //      longParameters[i-1] = i * 200;
+    //    }
+    //    for (long param : longParameters) {
+    //      perfTest.flushInterval = param;
+    //      perfTest.test();
+    //      timeConsumptions.add(perfTest.timeConsumption);
+    //    }
+    //    double[] doubleParameters = new double[10];
+    //    for (int i = 1; i <= 10; i++) {
+    //      doubleParameters[i-1] = 0.1 * i;
+    //    }
+    //    for (double param : doubleParameters) {
+    //      perfTest.unseqRatio = param;
+    //      perfTest.test();
+    //      timeConsumptions.add(perfTest.timeConsumption);
+    //    }
 
     System.out.println(timeConsumptions);
   }

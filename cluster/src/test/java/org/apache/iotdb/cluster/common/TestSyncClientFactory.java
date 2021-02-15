@@ -32,40 +32,42 @@ public class TestSyncClientFactory implements SyncClientFactory {
   private AtomicInteger clientSerialNum = new AtomicInteger();
   private TProtocolFactory protocolFactory = new Factory();
 
-  public TestSyncClientFactory() {
-
-  }
+  public TestSyncClientFactory() {}
 
   @Override
   public Client getSyncClient(Node node, SyncClientPool pool) {
-    TTransport dummyTransport = new TTransport() {
-      boolean closed = false;
-      @Override
-      public boolean isOpen() {
-        return !closed;
-      }
+    TTransport dummyTransport =
+        new TTransport() {
+          boolean closed = false;
 
-      @Override
-      public void open() {
-        closed = false;
-      }
+          @Override
+          public boolean isOpen() {
+            return !closed;
+          }
 
-      @Override
-      public void close() {
-        closed = true;
-      }
+          @Override
+          public void open() {
+            closed = false;
+          }
 
-      @Override
-      public int read(byte[] bytes, int i, int i1) {
-        return 0;
-      }
+          @Override
+          public void close() {
+            closed = true;
+          }
 
-      @Override
-      public void write(byte[] bytes, int i, int i1) {
-        // do nothing
-      }
-    };
-    return new TestSyncClient(protocolFactory.getProtocol(dummyTransport),
-        protocolFactory.getProtocol(dummyTransport), clientSerialNum.getAndIncrement());
+          @Override
+          public int read(byte[] bytes, int i, int i1) {
+            return 0;
+          }
+
+          @Override
+          public void write(byte[] bytes, int i, int i1) {
+            // do nothing
+          }
+        };
+    return new TestSyncClient(
+        protocolFactory.getProtocol(dummyTransport),
+        protocolFactory.getProtocol(dummyTransport),
+        clientSerialNum.getAndIncrement());
   }
 }

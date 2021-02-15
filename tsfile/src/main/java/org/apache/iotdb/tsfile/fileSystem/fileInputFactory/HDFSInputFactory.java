@@ -21,11 +21,9 @@ package org.apache.iotdb.tsfile.fileSystem.fileInputFactory;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-
+import org.apache.iotdb.tsfile.read.reader.TsFileInput;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import org.apache.iotdb.tsfile.read.reader.TsFileInput;
 
 public class HDFSInputFactory implements FileInputFactory {
 

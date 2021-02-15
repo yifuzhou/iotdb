@@ -50,8 +50,8 @@ public class TsFileSketchTool {
     System.out.println("Sketch save path:" + outFile);
     try (PrintWriter pw = new PrintWriter(new FileWriter(outFile))) {
       long length = FSFactoryProducer.getFSFactory().getFile(filename).length();
-      printlnBoth(pw,
-          "-------------------------------- TsFile Sketch --------------------------------");
+      printlnBoth(
+          pw, "-------------------------------- TsFile Sketch --------------------------------");
       printlnBoth(pw, "file path: " + filename);
       printlnBoth(pw, "file length: " + length);
 
@@ -71,110 +71,158 @@ public class TsFileSketchTool {
         printlnBoth(pw, String.format("%20s", "POSITION") + "|\tCONTENT");
         printlnBoth(pw, String.format("%20s", "--------") + " \t-------");
         printlnBoth(pw, String.format("%20d", 0) + "|\t[magic head] " + reader.readHeadMagic());
-        printlnBoth(pw,
-                String.format("%20d", TSFileConfig.MAGIC_STRING.getBytes().length)
-                        + "|\t[version number] "
-                        + reader.readVersionNumber());
-        long nextChunkGroupHeaderPos = (long) TSFileConfig.MAGIC_STRING.getBytes().length 
-            + Byte.BYTES;
+        printlnBoth(
+            pw,
+            String.format("%20d", TSFileConfig.MAGIC_STRING.getBytes().length)
+                + "|\t[version number] "
+                + reader.readVersionNumber());
+        long nextChunkGroupHeaderPos =
+            (long) TSFileConfig.MAGIC_STRING.getBytes().length + Byte.BYTES;
         // ChunkGroup begins
         for (ChunkGroupMetadata chunkGroupMetadata : allChunkGroupMetadata) {
-          printlnBoth(pw, str1.toString() + "\t[Chunk Group] of " + chunkGroupMetadata.getDevice() +
-                  ", num of Chunks:" + chunkGroupMetadata.getChunkMetadataList().size());
+          printlnBoth(
+              pw,
+              str1.toString()
+                  + "\t[Chunk Group] of "
+                  + chunkGroupMetadata.getDevice()
+                  + ", num of Chunks:"
+                  + chunkGroupMetadata.getChunkMetadataList().size());
           // chunkGroupHeader begins
-          printlnBoth(pw, String.format("%20s", nextChunkGroupHeaderPos) + "|\t[Chunk Group Header]");
-          ChunkGroupHeader chunkGroupHeader = reader.readChunkGroupHeader(nextChunkGroupHeaderPos, false);
+          printlnBoth(
+              pw, String.format("%20s", nextChunkGroupHeaderPos) + "|\t[Chunk Group Header]");
+          ChunkGroupHeader chunkGroupHeader =
+              reader.readChunkGroupHeader(nextChunkGroupHeaderPos, false);
           printlnBoth(pw, String.format("%20s", "") + "|\t\t[marker] 0");
-          printlnBoth(pw,
-                  String.format("%20s", "") + "|\t\t[deviceID] " + chunkGroupHeader.getDeviceID());
+          printlnBoth(
+              pw, String.format("%20s", "") + "|\t\t[deviceID] " + chunkGroupHeader.getDeviceID());
           // chunk begins
           for (ChunkMetadata chunkMetadata : chunkGroupMetadata.getChunkMetadataList()) {
             Chunk chunk = reader.readMemChunk(chunkMetadata);
-            printlnBoth(pw,
-                    String.format("%20d", chunkMetadata.getOffsetOfChunkHeader()) + "|\t[Chunk] of "
-                            + chunkMetadata.getMeasurementUid() + ", numOfPoints:" + chunkMetadata
-                            .getNumOfPoints() + ", time range:[" + chunkMetadata.getStartTime() + ","
-                            + chunkMetadata.getEndTime() + "], tsDataType:" + chunkMetadata.getDataType()
-                            + ", \n" + String.format("%20s", "") + " \t" + chunkMetadata.getStatistics());
+            printlnBoth(
+                pw,
+                String.format("%20d", chunkMetadata.getOffsetOfChunkHeader())
+                    + "|\t[Chunk] of "
+                    + chunkMetadata.getMeasurementUid()
+                    + ", numOfPoints:"
+                    + chunkMetadata.getNumOfPoints()
+                    + ", time range:["
+                    + chunkMetadata.getStartTime()
+                    + ","
+                    + chunkMetadata.getEndTime()
+                    + "], tsDataType:"
+                    + chunkMetadata.getDataType()
+                    + ", \n"
+                    + String.format("%20s", "")
+                    + " \t"
+                    + chunkMetadata.getStatistics());
             printlnBoth(pw, String.format("%20s", "") + "|\t\t[marker] 1");
             nextChunkGroupHeaderPos =
-                    chunkMetadata.getOffsetOfChunkHeader() + chunk.getHeader().getSerializedSize()
-                            + chunk.getHeader().getDataSize() - 1;
+                chunkMetadata.getOffsetOfChunkHeader()
+                    + chunk.getHeader().getSerializedSize()
+                    + chunk.getHeader().getDataSize()
+                    - 1;
           }
 
-          printlnBoth(pw, str1.toString() + "\t[Chunk Group] of "
-                  + chunkGroupMetadata.getDevice() + " ends");
+          printlnBoth(
+              pw,
+              str1.toString() + "\t[Chunk Group] of " + chunkGroupMetadata.getDevice() + " ends");
         }
 
         // metadata begins
         if (tsFileMetaData.getMetadataIndex().getChildren().isEmpty()) {
           printlnBoth(pw, String.format("%20s", reader.getFileMetadataPos() - 1) + "|\t[marker] 2");
         } else {
-          printlnBoth(pw,
-                  String.format("%20s", reader.readFileMetadata().getMetaOffset()) + "|\t[marker] 2");
+          printlnBoth(
+              pw,
+              String.format("%20s", reader.readFileMetadata().getMetaOffset()) + "|\t[marker] 2");
         }
 
-        Map<String, List<TimeseriesMetadata>> allTimeseriesMetadata = reader.getAllTimeseriesMetadata();
+        Map<String, List<TimeseriesMetadata>> allTimeseriesMetadata =
+            reader.getAllTimeseriesMetadata();
         Map<Long, Pair<Path, TimeseriesMetadata>> timeseriesMetadataMap = new TreeMap<>();
 
         for (Map.Entry<String, List<TimeseriesMetadata>> entry : allTimeseriesMetadata.entrySet()) {
           String device = entry.getKey();
           List<TimeseriesMetadata> seriesMetadataList = entry.getValue();
           for (TimeseriesMetadata seriesMetadata : seriesMetadataList) {
-            timeseriesMetadataMap.put(seriesMetadata.getOffsetOfChunkMetaDataList(),
-                    new Pair<>(new Path(device, seriesMetadata.getMeasurementId()), seriesMetadata));
+            timeseriesMetadataMap.put(
+                seriesMetadata.getOffsetOfChunkMetaDataList(),
+                new Pair<>(new Path(device, seriesMetadata.getMeasurementId()), seriesMetadata));
           }
         }
-        for (Map.Entry<Long, Pair<Path, TimeseriesMetadata>> entry : timeseriesMetadataMap.entrySet()) {
+        for (Map.Entry<Long, Pair<Path, TimeseriesMetadata>> entry :
+            timeseriesMetadataMap.entrySet()) {
           printlnBoth(
-                  pw, String.format("%20s", entry.getKey())
-                          + "|\t[ChunkMetadataList] of " + entry.getValue().left
-                          + ", tsDataType:" + entry.getValue().right.getTSDataType());
-          printlnBoth(pw,
-                  String.format("%20s", "") + "|\t[" + entry.getValue().right.getStatistics() + "] ");
+              pw,
+              String.format("%20s", entry.getKey())
+                  + "|\t[ChunkMetadataList] of "
+                  + entry.getValue().left
+                  + ", tsDataType:"
+                  + entry.getValue().right.getTSDataType());
+          printlnBoth(
+              pw,
+              String.format("%20s", "") + "|\t[" + entry.getValue().right.getStatistics() + "] ");
         }
 
         for (MetadataIndexEntry metadataIndex : tsFileMetaData.getMetadataIndex().getChildren()) {
-          printlnBoth(pw, String.format("%20s", metadataIndex.getOffset())
-                  + "|\t[MetadataIndex] of " + metadataIndex.getName());
+          printlnBoth(
+              pw,
+              String.format("%20s", metadataIndex.getOffset())
+                  + "|\t[MetadataIndex] of "
+                  + metadataIndex.getName());
         }
 
         printlnBoth(pw, String.format("%20s", reader.getFileMetadataPos()) + "|\t[TsFileMetadata]");
-        printlnBoth(pw, String.format("%20s", "") + "|\t\t[num of devices] " + tsFileMetaData
-                .getMetadataIndex().getChildren().size());
-        printlnBoth(pw,
-                String.format("%20s", "") + "|\t\t" + tsFileMetaData.getMetadataIndex().getChildren()
-                        .size() + " key&TsMetadataIndex");
+        printlnBoth(
+            pw,
+            String.format("%20s", "")
+                + "|\t\t[num of devices] "
+                + tsFileMetaData.getMetadataIndex().getChildren().size());
+        printlnBoth(
+            pw,
+            String.format("%20s", "")
+                + "|\t\t"
+                + tsFileMetaData.getMetadataIndex().getChildren().size()
+                + " key&TsMetadataIndex");
 
         // bloom filter
         BloomFilter bloomFilter = tsFileMetaData.getBloomFilter();
-        printlnBoth(pw,
-                String.format("%20s", "") + "|\t\t[bloom filter bit vector byte array length] "
-                        + bloomFilter.serialize().length);
-        printlnBoth(pw,
-                String.format("%20s", "") + "|\t\t[bloom filter bit vector byte array] ");
-        printlnBoth(pw,
-                String.format("%20s", "") + "|\t\t[bloom filter number of bits] "
-                        + bloomFilter.getSize());
-        printlnBoth(pw,
-                String.format("%20s", "") + "|\t\t[bloom filter number of hash functions] "
-                        + bloomFilter.getHashFunctionSize());
+        printlnBoth(
+            pw,
+            String.format("%20s", "")
+                + "|\t\t[bloom filter bit vector byte array length] "
+                + bloomFilter.serialize().length);
+        printlnBoth(pw, String.format("%20s", "") + "|\t\t[bloom filter bit vector byte array] ");
+        printlnBoth(
+            pw,
+            String.format("%20s", "")
+                + "|\t\t[bloom filter number of bits] "
+                + bloomFilter.getSize());
+        printlnBoth(
+            pw,
+            String.format("%20s", "")
+                + "|\t\t[bloom filter number of hash functions] "
+                + bloomFilter.getHashFunctionSize());
 
-        printlnBoth(pw,
-                String.format("%20s", (reader.getFileMetadataPos() + reader.getFileMetadataSize()))
-                        + "|\t[TsFileMetadataSize] " + reader.getFileMetadataSize());
+        printlnBoth(
+            pw,
+            String.format("%20s", (reader.getFileMetadataPos() + reader.getFileMetadataSize()))
+                + "|\t[TsFileMetadataSize] "
+                + reader.getFileMetadataSize());
 
-        printlnBoth(pw,
-                String.format("%20s", reader.getFileMetadataPos() + reader.getFileMetadataSize() + 4)
-                        + "|\t[magic tail] " + reader.readTailMagic());
+        printlnBoth(
+            pw,
+            String.format("%20s", reader.getFileMetadataPos() + reader.getFileMetadataSize() + 4)
+                + "|\t[magic tail] "
+                + reader.readTailMagic());
 
-        printlnBoth(pw,
-                String.format("%20s", length) + "|\tEND of TsFile");
+        printlnBoth(pw, String.format("%20s", length) + "|\tEND of TsFile");
 
         printlnBoth(pw, "");
 
-        printlnBoth(pw,
-                "---------------------------------- TsFile Sketch End ----------------------------------");
+        printlnBoth(
+            pw,
+            "---------------------------------- TsFile Sketch End ----------------------------------");
       }
     }
   }
@@ -195,5 +243,4 @@ public class TsFileSketchTool {
     }
     return new Pair<>(filename, outFile);
   }
-
 }

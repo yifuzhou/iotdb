@@ -46,8 +46,8 @@ import org.apache.iotdb.tsfile.utils.ReadWriteIOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class RawQueryDataSetWithoutValueFilter extends QueryDataSet implements
-    DirectAlignByTimeDataSet, UDFInputDataSet {
+public class RawQueryDataSetWithoutValueFilter extends QueryDataSet
+    implements DirectAlignByTimeDataSet, UDFInputDataSet {
 
   private class ReadTask extends WrappedRunnable {
 
@@ -55,8 +55,8 @@ public class RawQueryDataSetWithoutValueFilter extends QueryDataSet implements
     private final String pathName;
     private BlockingQueue<BatchData> blockingQueue;
 
-    public ReadTask(ManagedSeriesReader reader, BlockingQueue<BatchData> blockingQueue,
-        String pathName) {
+    public ReadTask(
+        ManagedSeriesReader reader, BlockingQueue<BatchData> blockingQueue, String pathName) {
       this.reader = reader;
       this.blockingQueue = blockingQueue;
       this.pathName = pathName;
@@ -104,8 +104,10 @@ public class RawQueryDataSetWithoutValueFilter extends QueryDataSet implements
         Thread.currentThread().interrupt();
         reader.setHasRemaining(false);
       } catch (IOException e) {
-        putExceptionBatchData(e, String
-            .format("Something gets wrong while reading from the series reader %s: ", pathName));
+        putExceptionBatchData(
+            e,
+            String.format(
+                "Something gets wrong while reading from the series reader %s: ", pathName));
       } catch (Exception e) {
         putExceptionBatchData(e, "Something gets wrong: ");
       }
@@ -147,18 +149,22 @@ public class RawQueryDataSetWithoutValueFilter extends QueryDataSet implements
 
   private static final QueryTaskPoolManager TASK_POOL_MANAGER = QueryTaskPoolManager.getInstance();
 
-  private static final Logger LOGGER = LoggerFactory
-      .getLogger(RawQueryDataSetWithoutValueFilter.class);
+  private static final Logger LOGGER =
+      LoggerFactory.getLogger(RawQueryDataSetWithoutValueFilter.class);
 
   /**
    * constructor of EngineDataSetWithoutValueFilter.
    *
-   * @param paths     paths in List structure
+   * @param paths paths in List structure
    * @param dataTypes time series data type
-   * @param readers   readers in List(IPointReader) structure
+   * @param readers readers in List(IPointReader) structure
    */
-  public RawQueryDataSetWithoutValueFilter(long queryId, List<PartialPath> paths,
-      List<TSDataType> dataTypes, List<ManagedSeriesReader> readers, boolean ascending)
+  public RawQueryDataSetWithoutValueFilter(
+      long queryId,
+      List<PartialPath> paths,
+      List<TSDataType> dataTypes,
+      List<ManagedSeriesReader> readers,
+      boolean ascending)
       throws IOException, InterruptedException {
     super(new ArrayList<>(paths), dataTypes, ascending);
     this.queryId = queryId;
@@ -178,8 +184,8 @@ public class RawQueryDataSetWithoutValueFilter extends QueryDataSet implements
       ManagedSeriesReader reader = seriesReaderList.get(i);
       reader.setHasRemaining(true);
       reader.setManagedByQueryManager(true);
-      TASK_POOL_MANAGER
-          .submit(new ReadTask(reader, blockingQueueArray[i], paths.get(i).getFullPath()));
+      TASK_POOL_MANAGER.submit(
+          new ReadTask(reader, blockingQueueArray[i], paths.get(i).getFullPath()));
     }
     for (int i = 0; i < seriesReaderList.size(); i++) {
       // check the interrupted status of query before taking next batch
@@ -272,13 +278,12 @@ public class RawQueryDataSetWithoutValueFilter extends QueryDataSet implements
                 ReadWriteIOUtils.write(doubleValue, valueBAOSList[seriesIndex]);
                 break;
               case BOOLEAN:
-                ReadWriteIOUtils.write(cachedBatchDataArray[seriesIndex].getBoolean(),
-                    valueBAOSList[seriesIndex]);
+                ReadWriteIOUtils.write(
+                    cachedBatchDataArray[seriesIndex].getBoolean(), valueBAOSList[seriesIndex]);
                 break;
               case TEXT:
-                ReadWriteIOUtils
-                    .write(cachedBatchDataArray[seriesIndex].getBinary(),
-                        valueBAOSList[seriesIndex]);
+                ReadWriteIOUtils.write(
+                    cachedBatchDataArray[seriesIndex].getBinary(), valueBAOSList[seriesIndex]);
                 break;
               default:
                 throw new UnSupportedDataTypeException(
@@ -309,8 +314,8 @@ public class RawQueryDataSetWithoutValueFilter extends QueryDataSet implements
         rowCount++;
         if (rowCount % 8 == 0) {
           for (int seriesIndex = 0; seriesIndex < seriesNum; seriesIndex++) {
-            ReadWriteIOUtils
-                .write((byte) currentBitmapList[seriesIndex], bitmapBAOSList[seriesIndex]);
+            ReadWriteIOUtils.write(
+                (byte) currentBitmapList[seriesIndex], bitmapBAOSList[seriesIndex]);
             // we should clear the bitmap every 8 row record
             currentBitmapList[seriesIndex] = 0;
           }
@@ -331,7 +336,8 @@ public class RawQueryDataSetWithoutValueFilter extends QueryDataSet implements
       int remaining = rowCount % 8;
       if (remaining != 0) {
         for (int seriesIndex = 0; seriesIndex < seriesNum; seriesIndex++) {
-          ReadWriteIOUtils.write((byte) (currentBitmapList[seriesIndex] << (8 - remaining)),
+          ReadWriteIOUtils.write(
+              (byte) (currentBitmapList[seriesIndex] << (8 - remaining)),
               bitmapBAOSList[seriesIndex]);
         }
       }
@@ -377,7 +383,7 @@ public class RawQueryDataSetWithoutValueFilter extends QueryDataSet implements
         throw (RuntimeException) exceptionBatchData.getException();
       }
 
-    } else {   // there are more batch data in this time series queue
+    } else { // there are more batch data in this time series queue
       cachedBatchDataArray[seriesIndex] = batchData;
 
       synchronized (seriesReaderList.get(seriesIndex)) {
@@ -389,33 +395,30 @@ public class RawQueryDataSetWithoutValueFilter extends QueryDataSet implements
           // now we should submit it again
           if (!reader.isManagedByQueryManager() && reader.hasRemaining()) {
             reader.setManagedByQueryManager(true);
-            TASK_POOL_MANAGER.submit(new ReadTask(reader, blockingQueueArray[seriesIndex],
-                paths.get(seriesIndex).getFullPath()));
+            TASK_POOL_MANAGER.submit(
+                new ReadTask(
+                    reader, blockingQueueArray[seriesIndex], paths.get(seriesIndex).getFullPath()));
           }
         }
       }
     }
   }
 
-  private void putPBOSToBuffer(PublicBAOS[] bitmapBAOSList, List<ByteBuffer> bitmapBufferList,
-      int tsIndex) {
+  private void putPBOSToBuffer(
+      PublicBAOS[] bitmapBAOSList, List<ByteBuffer> bitmapBufferList, int tsIndex) {
     ByteBuffer bitmapBuffer = ByteBuffer.allocate(bitmapBAOSList[tsIndex].size());
     bitmapBuffer.put(bitmapBAOSList[tsIndex].getBuf(), 0, bitmapBAOSList[tsIndex].size());
     bitmapBuffer.flip();
     bitmapBufferList.add(bitmapBuffer);
   }
 
-  /**
-   * for spark/hadoop/hive integration and test
-   */
+  /** for spark/hadoop/hive integration and test */
   @Override
   public boolean hasNextWithoutConstraint() {
     return !timeHeap.isEmpty();
   }
 
-  /**
-   * for spark/hadoop/hive integration and test
-   */
+  /** for spark/hadoop/hive integration and test */
   @Override
   public RowRecord nextWithoutConstraint() throws IOException {
     long minTime = timeHeap.pollFirst();
@@ -470,8 +473,7 @@ public class RawQueryDataSetWithoutValueFilter extends QueryDataSet implements
     QueryTimeManager.checkQueryAlive(queryId);
 
     // get next batch if current batch is empty and still have remaining batch data in queue
-    if (!cachedBatchDataArray[seriesIndex].hasCurrent()
-        && !noMoreDataInQueueArray[seriesIndex]) {
+    if (!cachedBatchDataArray[seriesIndex].hasCurrent() && !noMoreDataInQueueArray[seriesIndex]) {
       try {
         fillCache(seriesIndex);
       } catch (InterruptedException e) {

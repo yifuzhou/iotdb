@@ -22,9 +22,7 @@ package org.apache.iotdb.cluster.server.monitor;
 import java.util.Objects;
 import org.apache.iotdb.cluster.rpc.thrift.TNodeStatus;
 
-/**
- * NodeStatus contains the last-known spec and load of a node in the cluster.
- */
+/** NodeStatus contains the last-known spec and load of a node in the cluster. */
 @SuppressWarnings("java:S1135")
 public class NodeStatus implements Comparable<NodeStatus> {
 
@@ -54,7 +52,7 @@ public class NodeStatus implements Comparable<NodeStatus> {
   // its lastDeactivatedTime is too old.
   private long lastDeactivatedTime;
 
-  //TODO-Cluster: decide what should be contained in NodeStatus and how two compare two NodeStatus
+  // TODO-Cluster: decide what should be contained in NodeStatus and how two compare two NodeStatus
   @Override
   public int compareTo(NodeStatus o) {
     return Long.compare(this.lastResponseLatency, o.lastResponseLatency);
@@ -69,9 +67,9 @@ public class NodeStatus implements Comparable<NodeStatus> {
       return false;
     }
     NodeStatus that = (NodeStatus) o;
-    return lastUpdateTime == that.lastUpdateTime &&
-        lastResponseLatency == that.lastResponseLatency &&
-        Objects.equals(status, that.status);
+    return lastUpdateTime == that.lastUpdateTime
+        && lastResponseLatency == that.lastResponseLatency
+        && Objects.equals(status, that.status);
   }
 
   @Override
@@ -113,6 +111,7 @@ public class NodeStatus implements Comparable<NodeStatus> {
   }
 
   public boolean isActivated() {
-    return isActivated || (System.currentTimeMillis() - lastDeactivatedTime) > DEACTIVATION_VALID_INTERVAL_MS;
+    return isActivated
+        || (System.currentTimeMillis() - lastDeactivatedTime) > DEACTIVATION_VALID_INTERVAL_MS;
   }
 }

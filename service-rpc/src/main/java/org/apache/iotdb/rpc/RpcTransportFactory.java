@@ -34,9 +34,10 @@ public class RpcTransportFactory extends TTransportFactory {
   private static int maxLength = RpcUtils.DEFAULT_MAX_LENGTH;
 
   static {
-    INSTANCE = USE_SNAPPY ?
-        new RpcTransportFactory(new TimeoutChangeableTSnappyFramedTransport.Factory()) :
-        new RpcTransportFactory(new Factory(initialBufferCapacity, maxLength));
+    INSTANCE =
+        USE_SNAPPY
+            ? new RpcTransportFactory(new TimeoutChangeableTSnappyFramedTransport.Factory())
+            : new RpcTransportFactory(new Factory(initialBufferCapacity, maxLength));
   }
 
   private TTransportFactory inner;

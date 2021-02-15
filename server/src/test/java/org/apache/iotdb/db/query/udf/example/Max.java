@@ -40,9 +40,7 @@ public class Max implements UDTF {
 
   @Override
   public void validate(UDFParameterValidator validator) throws Exception {
-    validator
-        .validateInputSeriesNumber(1)
-        .validateInputSeriesDataType(0, TSDataType.INT32);
+    validator.validateInputSeriesNumber(1).validateInputSeriesDataType(0, TSDataType.INT32);
   }
 
   @Override

@@ -82,7 +82,6 @@ public class IoTDBSessionComplexIT {
     queryByDevice("root.sg1.d1");
 
     session.close();
-
   }
 
   private void insertByStr() throws IoTDBConnectionException, StatementExecutionException {
@@ -131,8 +130,7 @@ public class IoTDBSessionComplexIT {
   }
 
   @Test
-  public void testAlignByDevice() throws IoTDBConnectionException,
-      StatementExecutionException {
+  public void testAlignByDevice() throws IoTDBConnectionException, StatementExecutionException {
     session = new Session("127.0.0.1", 6667, "root", "root");
     session.open();
 
@@ -142,8 +140,8 @@ public class IoTDBSessionComplexIT {
 
     insertTablet("root.sg1.d1");
 
-    SessionDataSet sessionDataSet = session
-        .executeQueryStatement("select '11', s1, '11' from root.sg1.d1 align by device");
+    SessionDataSet sessionDataSet =
+        session.executeQueryStatement("select '11', s1, '11' from root.sg1.d1 align by device");
     sessionDataSet.setFetchSize(1024);
     int count = 0;
     while (sessionDataSet.hasNext()) {
@@ -162,8 +160,9 @@ public class IoTDBSessionComplexIT {
   }
 
   @Test
-  public void testBatchInsertSeqAndUnseq() throws SQLException, ClassNotFoundException,
-      IoTDBConnectionException, StatementExecutionException {
+  public void testBatchInsertSeqAndUnseq()
+      throws SQLException, ClassNotFoundException, IoTDBConnectionException,
+          StatementExecutionException {
     session = new Session("127.0.0.1", 6667, "root", "root");
     session.open();
 
@@ -184,8 +183,9 @@ public class IoTDBSessionComplexIT {
   }
 
   @Test
-  public void testBatchInsert() throws StatementExecutionException, SQLException,
-      ClassNotFoundException, IoTDBConnectionException {
+  public void testBatchInsert()
+      throws StatementExecutionException, SQLException, ClassNotFoundException,
+          IoTDBConnectionException {
     session = new Session("127.0.0.1", 6667, "root", "root");
     session.open();
 
@@ -201,8 +201,7 @@ public class IoTDBSessionComplexIT {
   }
 
   @Test
-  public void testTestMethod()
-      throws StatementExecutionException, IoTDBConnectionException {
+  public void testTestMethod() throws StatementExecutionException, IoTDBConnectionException {
 
     session = new Session("127.0.0.1", 6667, "root", "root");
     session.open();
@@ -287,20 +286,32 @@ public class IoTDBSessionComplexIT {
   }
 
   @Test
-  public void test() throws ClassNotFoundException, SQLException,
-      IoTDBConnectionException, StatementExecutionException {
+  public void test()
+      throws ClassNotFoundException, SQLException, IoTDBConnectionException,
+          StatementExecutionException {
     session = new Session("127.0.0.1", 6667, "root", "root");
     try {
       session.open();
     } catch (IoTDBConnectionException e) {
       e.printStackTrace();
     }
-    List<String> standard = Arrays.asList(
-        "Time", "root.sg1.d1.s1", "root.sg1.d1.s2", "root.sg1.d1.s3", "root.sg1.d2.s1",
-        "root.sg1.d2.s2", "root.sg1.d2.s3");
-    List<String> standardAfterDelete = Arrays.asList(
-        "Time", "root.sg1.d1.s2", "root.sg1.d1.s3", "root.sg1.d2.s1", "root.sg1.d2.s2",
-        "root.sg1.d2.s3");
+    List<String> standard =
+        Arrays.asList(
+            "Time",
+            "root.sg1.d1.s1",
+            "root.sg1.d1.s2",
+            "root.sg1.d1.s3",
+            "root.sg1.d2.s1",
+            "root.sg1.d2.s2",
+            "root.sg1.d2.s3");
+    List<String> standardAfterDelete =
+        Arrays.asList(
+            "Time",
+            "root.sg1.d1.s2",
+            "root.sg1.d1.s3",
+            "root.sg1.d2.s1",
+            "root.sg1.d2.s2",
+            "root.sg1.d2.s3");
 
     session.setStorageGroup("root.sg1");
 
@@ -383,35 +394,35 @@ public class IoTDBSessionComplexIT {
 
     queryByDevice("root.sg1.d2");
 
-    session.createTimeseries("root.sg1.d1.1_2", TSDataType.INT64, TSEncoding.RLE,
-        CompressionType.SNAPPY);
-    session.createTimeseries("root.sg1.d1.\"1.2.3\"", TSDataType.INT64, TSEncoding.RLE,
-        CompressionType.SNAPPY);
-    session.createTimeseries("root.sg1.d1.\"1.2.4\"", TSDataType.INT64, TSEncoding.RLE,
-        CompressionType.SNAPPY);
+    session.createTimeseries(
+        "root.sg1.d1.1_2", TSDataType.INT64, TSEncoding.RLE, CompressionType.SNAPPY);
+    session.createTimeseries(
+        "root.sg1.d1.\"1.2.3\"", TSDataType.INT64, TSEncoding.RLE, CompressionType.SNAPPY);
+    session.createTimeseries(
+        "root.sg1.d1.\"1.2.4\"", TSDataType.INT64, TSEncoding.RLE, CompressionType.SNAPPY);
 
     Assert.assertTrue(session.checkTimeseriesExists("root.sg1.d1.1_2"));
     Assert.assertTrue(session.checkTimeseriesExists("root.sg1.d1.\"1.2.3\""));
     Assert.assertTrue(session.checkTimeseriesExists("root.sg1.d1.\"1.2.4\""));
 
     session.setStorageGroup("root.1");
-    session.createTimeseries("root.1.2.3", TSDataType.INT64, TSEncoding.RLE,
-        CompressionType.SNAPPY);
+    session.createTimeseries(
+        "root.1.2.3", TSDataType.INT64, TSEncoding.RLE, CompressionType.SNAPPY);
     session.setStorageGroup("root.sg2");
-    session.createTimeseries("root.sg2.d1.s1", TSDataType.INT64, TSEncoding.RLE,
-        CompressionType.SNAPPY);
+    session.createTimeseries(
+        "root.sg2.d1.s1", TSDataType.INT64, TSEncoding.RLE, CompressionType.SNAPPY);
 
     deleteStorageGroupTest();
 
     session.setStorageGroup("root.sg3");
     insertTablet("root.sg3.d1");
 
-    session.createTimeseries("root.sg4.d1.s1", TSDataType.INT64, TSEncoding.RLE,
-        CompressionType.SNAPPY);
-    session.createTimeseries("root.sg4.d1.s2", TSDataType.INT64, TSEncoding.RLE,
-        CompressionType.SNAPPY);
-    session.createTimeseries("root.sg4.d1.s3", TSDataType.INT64, TSEncoding.RLE,
-        CompressionType.SNAPPY);
+    session.createTimeseries(
+        "root.sg4.d1.s1", TSDataType.INT64, TSEncoding.RLE, CompressionType.SNAPPY);
+    session.createTimeseries(
+        "root.sg4.d1.s2", TSDataType.INT64, TSEncoding.RLE, CompressionType.SNAPPY);
+    session.createTimeseries(
+        "root.sg4.d1.s3", TSDataType.INT64, TSEncoding.RLE, CompressionType.SNAPPY);
     insertTablet("root.sg4.d1");
 
     insertTablet("root.sg5.d1");
@@ -501,18 +512,18 @@ public class IoTDBSessionComplexIT {
   }
 
   private void createTimeseries() throws StatementExecutionException, IoTDBConnectionException {
-    session.createTimeseries("root.sg1.d1.s1", TSDataType.INT64, TSEncoding.RLE,
-        CompressionType.SNAPPY);
-    session.createTimeseries("root.sg1.d1.s2", TSDataType.INT64, TSEncoding.RLE,
-        CompressionType.SNAPPY);
-    session.createTimeseries("root.sg1.d1.s3", TSDataType.INT64, TSEncoding.RLE,
-        CompressionType.SNAPPY);
-    session.createTimeseries("root.sg1.d2.s1", TSDataType.INT64, TSEncoding.RLE,
-        CompressionType.SNAPPY);
-    session.createTimeseries("root.sg1.d2.s2", TSDataType.INT64, TSEncoding.RLE,
-        CompressionType.SNAPPY);
-    session.createTimeseries("root.sg1.d2.s3", TSDataType.INT64, TSEncoding.RLE,
-        CompressionType.SNAPPY);
+    session.createTimeseries(
+        "root.sg1.d1.s1", TSDataType.INT64, TSEncoding.RLE, CompressionType.SNAPPY);
+    session.createTimeseries(
+        "root.sg1.d1.s2", TSDataType.INT64, TSEncoding.RLE, CompressionType.SNAPPY);
+    session.createTimeseries(
+        "root.sg1.d1.s3", TSDataType.INT64, TSEncoding.RLE, CompressionType.SNAPPY);
+    session.createTimeseries(
+        "root.sg1.d2.s1", TSDataType.INT64, TSEncoding.RLE, CompressionType.SNAPPY);
+    session.createTimeseries(
+        "root.sg1.d2.s2", TSDataType.INT64, TSEncoding.RLE, CompressionType.SNAPPY);
+    session.createTimeseries(
+        "root.sg1.d2.s3", TSDataType.INT64, TSEncoding.RLE, CompressionType.SNAPPY);
   }
 
   private void insertRecords() throws IoTDBConnectionException, StatementExecutionException {
@@ -554,15 +565,13 @@ public class IoTDBSessionComplexIT {
     session.insertRecords(deviceIds, timestamps, measurementsList, typesList, valuesList);
   }
 
-  private void rawDataQuery()
-      throws StatementExecutionException, IoTDBConnectionException {
+  private void rawDataQuery() throws StatementExecutionException, IoTDBConnectionException {
     List<String> paths = new ArrayList<>();
     paths.add("root.sg1.d2.*");
     paths.add("root.sg1.d2.s1");
     paths.add("root.sg1.d2.s2");
 
-    SessionDataSet sessionDataSet = session
-        .executeRawDataQuery(paths, 450L, 600L);
+    SessionDataSet sessionDataSet = session.executeRawDataQuery(paths, 450L, 600L);
     sessionDataSet.setFetchSize(1024);
 
     int count = 0;
@@ -661,8 +670,9 @@ public class IoTDBSessionComplexIT {
 
   private void queryAll(List<String> standard) throws ClassNotFoundException, SQLException {
     Class.forName(Config.JDBC_DRIVER_NAME);
-    try (Connection connection = DriverManager
-        .getConnection(Config.IOTDB_URL_PREFIX + "127.0.0.1:6667/", "root", "root");
+    try (Connection connection =
+            DriverManager.getConnection(
+                Config.IOTDB_URL_PREFIX + "127.0.0.1:6667/", "root", "root");
         Statement statement = connection.createStatement()) {
       ResultSet resultSet = statement.executeQuery("SELECT * FROM root");
       final ResultSetMetaData metaData = resultSet.getMetaData();
@@ -676,8 +686,9 @@ public class IoTDBSessionComplexIT {
     }
   }
 
-  private void deleteStorageGroupTest() throws ClassNotFoundException, SQLException,
-      IoTDBConnectionException, StatementExecutionException {
+  private void deleteStorageGroupTest()
+      throws ClassNotFoundException, SQLException, IoTDBConnectionException,
+          StatementExecutionException {
     try {
       session.deleteStorageGroup("root.sg1.d1.s1");
     } catch (StatementExecutionException e) {
@@ -687,14 +698,15 @@ public class IoTDBSessionComplexIT {
     File folder = new File("data/system/storage_groups/root.sg1/");
     assertFalse(folder.exists());
     session.setStorageGroup("root.sg1.d1");
-    session.createTimeseries("root.sg1.d1.s1", TSDataType.INT64, TSEncoding.RLE,
-        CompressionType.SNAPPY);
+    session.createTimeseries(
+        "root.sg1.d1.s1", TSDataType.INT64, TSEncoding.RLE, CompressionType.SNAPPY);
 
     Class.forName(Config.JDBC_DRIVER_NAME);
-    List<String> standards = Arrays
-        .asList("Time", "root.1.2.3", "root.sg2.d1.s1", "root.sg1.d1.s1");
-    try (Connection connection = DriverManager
-        .getConnection(Config.IOTDB_URL_PREFIX + "127.0.0.1:6667/", "root", "root");
+    List<String> standards =
+        Arrays.asList("Time", "root.1.2.3", "root.sg2.d1.s1", "root.sg1.d1.s1");
+    try (Connection connection =
+            DriverManager.getConnection(
+                Config.IOTDB_URL_PREFIX + "127.0.0.1:6667/", "root", "root");
         Statement statement = connection.createStatement()) {
       ResultSet resultSet = statement.executeQuery("SELECT * FROM root");
       final ResultSetMetaData metaData = resultSet.getMetaData();
@@ -757,10 +769,18 @@ public class IoTDBSessionComplexIT {
 
   private void queryForBatch() throws ClassNotFoundException, SQLException {
     Class.forName(Config.JDBC_DRIVER_NAME);
-    List<String> standards = Arrays.asList("Time", "root.sg1.d1.s1", "root.sg1.d1.s2",
-        "root.sg1.d1.s3", "root.sg1.d2.s1", "root.sg1.d2.s2", "root.sg1.d2.s3");
-    try (Connection connection = DriverManager
-        .getConnection(Config.IOTDB_URL_PREFIX + "127.0.0.1:6667/", "root", "root");
+    List<String> standards =
+        Arrays.asList(
+            "Time",
+            "root.sg1.d1.s1",
+            "root.sg1.d1.s2",
+            "root.sg1.d1.s3",
+            "root.sg1.d2.s1",
+            "root.sg1.d2.s2",
+            "root.sg1.d2.s3");
+    try (Connection connection =
+            DriverManager.getConnection(
+                Config.IOTDB_URL_PREFIX + "127.0.0.1:6667/", "root", "root");
         Statement statement = connection.createStatement()) {
       ResultSet resultSet = statement.executeQuery("SELECT * FROM root");
       final ResultSetMetaData metaData = resultSet.getMetaData();

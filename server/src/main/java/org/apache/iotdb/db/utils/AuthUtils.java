@@ -42,9 +42,7 @@ public class AuthUtils {
   private static final String ENCRYPT_ALGORITHM = "MD5";
   private static final String STRING_ENCODING = "utf-8";
 
-  private AuthUtils() {
-
-  }
+  private AuthUtils() {}
 
   /**
    * validate password size.
@@ -106,8 +104,8 @@ public class AuthUtils {
   public static void validatePath(String path) throws AuthException {
     if (!path.startsWith(ROOT_PREFIX)) {
       throw new AuthException(
-          String.format("Illegal seriesPath %s, seriesPath should start with \"%s\"", path,
-              ROOT_PREFIX));
+          String.format(
+              "Illegal seriesPath %s, seriesPath should start with \"%s\"", path, ROOT_PREFIX));
     }
   }
 
@@ -174,12 +172,12 @@ public class AuthUtils {
    * @param pathA sub-path
    * @param pathB path
    * @return True if pathA == pathB, or pathA is an extension of pathB, e.g. pathA = "root.a.b.c"
-   * and pathB = "root.a"
+   *     and pathB = "root.a"
    */
   public static boolean pathBelongsTo(String pathA, String pathB) {
     return pathA.equals(pathB)
         || (pathA.startsWith(pathB)
-        && pathA.charAt(pathB.length()) == IoTDBConstant.PATH_SEPARATOR);
+            && pathA.charAt(pathB.length()) == IoTDBConstant.PATH_SEPARATOR);
   }
 
   /**
@@ -190,20 +188,21 @@ public class AuthUtils {
    * @param privilegeList privileges in List structure
    * @return True if privilege-check passed
    */
-  public static boolean checkPrivilege(String path, int privilegeId,
-      List<PathPrivilege> privilegeList) {
+  public static boolean checkPrivilege(
+      String path, int privilegeId, List<PathPrivilege> privilegeList) {
     if (privilegeList == null) {
       return false;
     }
     for (PathPrivilege pathPrivilege : privilegeList) {
       if (path != null) {
-        if (pathPrivilege.getPath() != null &&
-                AuthUtils.pathBelongsTo(path, pathPrivilege.getPath()) &&
-                pathPrivilege.getPrivileges().contains(privilegeId)) {
+        if (pathPrivilege.getPath() != null
+            && AuthUtils.pathBelongsTo(path, pathPrivilege.getPath())
+            && pathPrivilege.getPrivileges().contains(privilegeId)) {
           return true;
         }
       } else {
-        if (pathPrivilege.getPath() == null && pathPrivilege.getPrivileges().contains(privilegeId)) {
+        if (pathPrivilege.getPath() == null
+            && pathPrivilege.getPrivileges().contains(privilegeId)) {
           return true;
         }
       }
@@ -215,7 +214,7 @@ public class AuthUtils {
    * get privileges.
    *
    * @param path The seriesPath on which the privileges take effect. If seriesPath-free privileges
-   * are desired, this should be null.
+   *     are desired, this should be null.
    * @return The privileges granted to the role.
    */
   public static Set<Integer> getPrivileges(String path, List<PathPrivilege> privilegeList) {
@@ -225,7 +224,8 @@ public class AuthUtils {
     Set<Integer> privileges = new HashSet<>();
     for (PathPrivilege pathPrivilege : privilegeList) {
       if (path != null) {
-        if (pathPrivilege.getPath() != null && AuthUtils.pathBelongsTo(path, pathPrivilege.getPath())) {
+        if (pathPrivilege.getPath() != null
+            && AuthUtils.pathBelongsTo(path, pathPrivilege.getPath())) {
           privileges.addAll(pathPrivilege.getPrivileges());
         }
       } else {
@@ -245,10 +245,11 @@ public class AuthUtils {
    * @param privilegeList privileges in List structure
    * @return True if series path has this privilege
    */
-  public static boolean hasPrivilege(String path, int privilegeId,
-      List<PathPrivilege> privilegeList) {
+  public static boolean hasPrivilege(
+      String path, int privilegeId, List<PathPrivilege> privilegeList) {
     for (PathPrivilege pathPrivilege : privilegeList) {
-      if (pathPrivilege.getPath().equals(path) && pathPrivilege.getPrivileges().contains(privilegeId)) {
+      if (pathPrivilege.getPath().equals(path)
+          && pathPrivilege.getPrivileges().contains(privilegeId)) {
         pathPrivilege.getReferenceCnt().incrementAndGet();
         return true;
       }
@@ -294,8 +295,8 @@ public class AuthUtils {
    * @param privilegeId privilege Id
    * @param privilegeList privileges in List structure
    */
-  public static void removePrivilege(String path, int privilegeId,
-      List<PathPrivilege> privilegeList) {
+  public static void removePrivilege(
+      String path, int privilegeId, List<PathPrivilege> privilegeList) {
     PathPrivilege emptyPrivilege = null;
     for (PathPrivilege pathPrivilege : privilegeList) {
       if (pathPrivilege.getPath().equals(path)) {
@@ -315,5 +316,4 @@ public class AuthUtils {
       privilegeList.remove(emptyPrivilege);
     }
   }
-
 }

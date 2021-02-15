@@ -19,6 +19,12 @@
 
 package org.apache.iotdb.db.writelog.recover;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertSame;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.Collections;
 import org.apache.commons.io.FileUtils;
 import org.apache.iotdb.db.constant.TestConstant;
 import org.apache.iotdb.db.engine.fileSystem.SystemFileFactory;
@@ -44,14 +50,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.Collections;
-
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
-
 public class DeviceStringTest {
 
   private File tsF;
@@ -68,20 +66,33 @@ public class DeviceStringTest {
     tsF.getParentFile().mkdirs();
 
     schema = new Schema();
-    schema.registerTimeseries(new Path(("root.sg.device99"), ("sensor4")),
+    schema.registerTimeseries(
+        new Path(("root.sg.device99"), ("sensor4")),
         new MeasurementSchema("sensor4", TSDataType.INT64, TSEncoding.PLAIN));
-    mManager.createTimeseries(new PartialPath("root.sg.device99.sensor4"), TSDataType.INT64, TSEncoding.PLAIN,
-            TSFileDescriptor.getInstance().getConfig().getCompressor(), Collections.emptyMap());
-    schema.registerTimeseries(new Path(("root.sg.device99"), ("sensor2")),
+    mManager.createTimeseries(
+        new PartialPath("root.sg.device99.sensor4"),
+        TSDataType.INT64,
+        TSEncoding.PLAIN,
+        TSFileDescriptor.getInstance().getConfig().getCompressor(),
+        Collections.emptyMap());
+    schema.registerTimeseries(
+        new Path(("root.sg.device99"), ("sensor2")),
         new MeasurementSchema("sensor2", TSDataType.INT64, TSEncoding.PLAIN));
-    mManager
-        .createTimeseries(new PartialPath("root.sg.device99.sensor2"), TSDataType.INT64, TSEncoding.PLAIN,
-            TSFileDescriptor.getInstance().getConfig().getCompressor(), Collections.emptyMap());
-    schema.registerTimeseries(new Path(("root.sg.device99"), ("sensor1")),
+    mManager.createTimeseries(
+        new PartialPath("root.sg.device99.sensor2"),
+        TSDataType.INT64,
+        TSEncoding.PLAIN,
+        TSFileDescriptor.getInstance().getConfig().getCompressor(),
+        Collections.emptyMap());
+    schema.registerTimeseries(
+        new Path(("root.sg.device99"), ("sensor1")),
         new MeasurementSchema("sensor1", TSDataType.INT64, TSEncoding.PLAIN));
-    mManager
-        .createTimeseries(new PartialPath("root.sg.device99.sensor1"), TSDataType.INT64, TSEncoding.PLAIN,
-            TSFileDescriptor.getInstance().getConfig().getCompressor(), Collections.emptyMap());
+    mManager.createTimeseries(
+        new PartialPath("root.sg.device99.sensor1"),
+        TSDataType.INT64,
+        TSEncoding.PLAIN,
+        TSFileDescriptor.getInstance().getConfig().getCompressor(),
+        Collections.emptyMap());
     writer = new TsFileWriter(tsF, schema);
 
     resource = new TsFileResource(tsF);

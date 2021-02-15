@@ -95,9 +95,7 @@ public class ClientServer extends TSServiceImpl {
     this.coordinator = coordinator;
   }
 
-  /**
-   * The single thread pool that runs poolServer to unblock the main thread.
-   */
+  /** The single thread pool that runs poolServer to unblock the main thread. */
   private ExecutorService serverService;
 
   /**
@@ -106,9 +104,7 @@ public class ClientServer extends TSServiceImpl {
    */
   private TServer poolServer;
 
-  /**
-   * The socket poolServer will listen to. Async service requires nonblocking socket
-   */
+  /** The socket poolServer will listen to. Async service requires nonblocking socket */
   private TServerTransport serverTransport;
 
   /**
@@ -134,8 +130,7 @@ public class ClientServer extends TSServiceImpl {
       return;
     }
 
-    serverService = Executors.newSingleThreadExecutor(r -> new Thread(r,
-        "ClusterClientServer"));
+    serverService = Executors.newSingleThreadExecutor(r -> new Thread(r, "ClusterClientServer"));
     ClusterConfig config = ClusterDescriptor.getInstance().getConfig();
 
     // this defines how thrift parse the requests bytes to a request
@@ -145,25 +140,32 @@ public class ClientServer extends TSServiceImpl {
     } else {
       protocolFactory = new TBinaryProtocol.Factory();
     }
-    serverTransport = new TServerSocket(new InetSocketAddress(config.getClusterRpcIp(),
-        config.getClusterRpcPort()));
+    serverTransport =
+        new TServerSocket(
+            new InetSocketAddress(config.getClusterRpcIp(), config.getClusterRpcPort()));
     // async service also requires nonblocking server, and HsHaServer is basically more efficient a
     // nonblocking server
-    int maxConcurrentClientNum = Math.max(CommonUtils.getCpuCores(),
-        config.getMaxConcurrentClientNum());
+    int maxConcurrentClientNum =
+        Math.max(CommonUtils.getCpuCores(), config.getMaxConcurrentClientNum());
     TThreadPoolServer.Args poolArgs =
-        new TThreadPoolServer.Args(serverTransport).maxWorkerThreads(maxConcurrentClientNum)
+        new TThreadPoolServer.Args(serverTransport)
+            .maxWorkerThreads(maxConcurrentClientNum)
             .minWorkerThreads(CommonUtils.getCpuCores());
-    poolArgs.executorService(new ThreadPoolExecutor(poolArgs.minWorkerThreads,
-        poolArgs.maxWorkerThreads, poolArgs.stopTimeoutVal, poolArgs.stopTimeoutUnit,
-        new SynchronousQueue<>(), new ThreadFactory() {
-      private AtomicLong threadIndex = new AtomicLong(0);
+    poolArgs.executorService(
+        new ThreadPoolExecutor(
+            poolArgs.minWorkerThreads,
+            poolArgs.maxWorkerThreads,
+            poolArgs.stopTimeoutVal,
+            poolArgs.stopTimeoutUnit,
+            new SynchronousQueue<>(),
+            new ThreadFactory() {
+              private AtomicLong threadIndex = new AtomicLong(0);
 
-      @Override
-      public Thread newThread(Runnable r) {
-        return new Thread(r, "ClusterClient" + threadIndex.incrementAndGet());
-      }
-    }));
+              @Override
+              public Thread newThread(Runnable r) {
+                return new Thread(r, "ClusterClient" + threadIndex.incrementAndGet());
+              }
+            }));
     // ClientServer will do the following processing when the HsHaServer has parsed a request
     poolArgs.processor(new Processor<>(this));
     poolArgs.protocolFactory(protocolFactory);
@@ -192,7 +194,6 @@ public class ClientServer extends TSServiceImpl {
     serverTransport.close();
   }
 
-
   /**
    * Redirect the plan to the local Coordinator so that it will be processed cluster-wide.
    *
@@ -209,7 +210,6 @@ public class ClientServer extends TSServiceImpl {
     }
     return coordinator.executeNonQueryPlan(plan);
   }
-
 
   /**
    * EventHandler handles the preprocess and postprocess of the thrift requests, but it currently
@@ -233,8 +233,8 @@ public class ClientServer extends TSServiceImpl {
     }
 
     @Override
-    public void processContext(ServerContext serverContext, TTransport inputTransport,
-        TTransport outputTransport) {
+    public void processContext(
+        ServerContext serverContext, TTransport inputTransport, TTransport outputTransport) {
       // do nothing
     }
   }
@@ -244,15 +244,14 @@ public class ClientServer extends TSServiceImpl {
    * corresponding to "paths" one to one and the data type will be the type of the aggregation over
    * the corresponding path.
    *
-   * @param paths        full timeseries paths
+   * @param paths full timeseries paths
    * @param aggregations if not null, it should be the same size as "paths"
    * @return the data types of "paths" (using the aggregations)
    * @throws MetadataException
    */
   @Override
-  protected List<TSDataType> getSeriesTypesByPaths(List<PartialPath> paths,
-      List<String> aggregations)
-      throws MetadataException {
+  protected List<TSDataType> getSeriesTypesByPaths(
+      List<PartialPath> paths, List<String> aggregations) throws MetadataException {
     return ((CMManager) IoTDB.metaManager).getSeriesTypesByPath(paths, aggregations).left;
   }
 
@@ -260,7 +259,7 @@ public class ClientServer extends TSServiceImpl {
    * Get the data types of each path in “paths”. If "aggregation" is not null, all "paths" will use
    * this aggregation.
    *
-   * @param paths       full timeseries paths
+   * @param paths full timeseries paths
    * @param aggregation if not null, it means "paths" all use this aggregation
    * @return the data types of "paths" (using the aggregation)
    * @throws MetadataException
@@ -306,12 +305,14 @@ public class ClientServer extends TSServiceImpl {
           GenericHandler<Void> handler = new GenericHandler<>(queriedNode, new AtomicReference<>());
           try {
             if (ClusterDescriptor.getInstance().getConfig().isUseAsyncServer()) {
-              AsyncDataClient client = coordinator.getAsyncDataClient(queriedNode,
-                  RaftServer.getReadOperationTimeoutMS());
+              AsyncDataClient client =
+                  coordinator.getAsyncDataClient(
+                      queriedNode, RaftServer.getReadOperationTimeoutMS());
               client.endQuery(header, coordinator.getThisNode(), queryId, handler);
             } else {
-              SyncDataClient syncDataClient = coordinator.getSyncDataClient(queriedNode,
-                  RaftServer.getReadOperationTimeoutMS());
+              SyncDataClient syncDataClient =
+                  coordinator.getSyncDataClient(
+                      queriedNode, RaftServer.getReadOperationTimeoutMS());
               syncDataClient.endQuery(header, coordinator.getThisNode(), queryId);
             }
           } catch (IOException | TException e) {

@@ -44,8 +44,10 @@ public class NaivePathSelector implements IMergePathSelector {
     if (!hasNext()) {
       throw new NoSuchElementException();
     }
-    List<PartialPath> ret = idx + maxSeriesNum <= paths.size() ? paths.subList(idx, idx + maxSeriesNum) :
-        paths.subList(idx, paths.size());
+    List<PartialPath> ret =
+        idx + maxSeriesNum <= paths.size()
+            ? paths.subList(idx, idx + maxSeriesNum)
+            : paths.subList(idx, paths.size());
     idx += maxSeriesNum;
     return ret;
   }

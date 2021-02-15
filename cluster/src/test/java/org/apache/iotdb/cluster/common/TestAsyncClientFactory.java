@@ -44,7 +44,10 @@ public class TestAsyncClientFactory extends AsyncClientFactory {
 
   @Override
   public AsyncClient getAsyncClient(Node node, AsyncClientPool pool) throws IOException {
-    return new TestAsyncClient(protocolFactory, clientManager, new TNonblockingSocket(node.getIp(),
-        node.getMetaPort()), clientSerialNum.getAndIncrement());
+    return new TestAsyncClient(
+        protocolFactory,
+        clientManager,
+        new TNonblockingSocket(node.getIp(), node.getMetaPort()),
+        clientSerialNum.getAndIncrement());
   }
 }

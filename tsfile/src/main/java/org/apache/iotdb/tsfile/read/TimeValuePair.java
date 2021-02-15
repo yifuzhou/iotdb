@@ -18,9 +18,8 @@
  */
 package org.apache.iotdb.tsfile.read;
 
-import org.apache.iotdb.tsfile.utils.TsPrimitiveType;
-
 import java.io.Serializable;
+import org.apache.iotdb.tsfile.utils.TsPrimitiveType;
 
 public class TimeValuePair implements Serializable, Comparable<TimeValuePair> {
 
@@ -66,8 +65,8 @@ public class TimeValuePair implements Serializable, Comparable<TimeValuePair> {
   }
 
   @Override
-  public int hashCode(){
-    return ((Long)timestamp).hashCode() + value.hashCode();
+  public int hashCode() {
+    return ((Long) timestamp).hashCode() + value.hashCode();
   }
 
   public int getSize() {

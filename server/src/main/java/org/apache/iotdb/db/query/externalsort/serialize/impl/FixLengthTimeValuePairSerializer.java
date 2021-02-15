@@ -31,12 +31,12 @@ import org.apache.iotdb.tsfile.utils.ReadWriteIOUtils;
 
 /**
  * IMPORTANT: One instance of this class should used with same type of TimeValuePair.
- * <p>
- * FileFormat: [Header][Body]
- * <p>
- * [Header] = [DataTypeLength] + [DataTypeInStringBytes]
- * <p>
- * [DataTypeLength] = 4 bytes
+ *
+ * <p>FileFormat: [Header][Body]
+ *
+ * <p>[Header] = [DataTypeLength] + [DataTypeInStringBytes]
+ *
+ * <p>[DataTypeLength] = 4 bytes
  */
 public class FixLengthTimeValuePairSerializer implements IExternalSortFileSerializer {
 
@@ -100,8 +100,8 @@ public class FixLengthTimeValuePairSerializer implements IExternalSortFileSerial
         this.writer = new TimeValuePairWriter.BinaryWriter();
         break;
       default:
-        throw new RuntimeException("Unknown TSDataType in FixLengthTimeValuePairSerializer:"
-            + type);
+        throw new RuntimeException(
+            "Unknown TSDataType in FixLengthTimeValuePairSerializer:" + type);
     }
   }
 
@@ -160,8 +160,8 @@ public class FixLengthTimeValuePairSerializer implements IExternalSortFileSerial
       public void write(TimeValuePair tvPair, OutputStream outputStream) throws IOException {
         outputStream.write(BytesUtils.longToBytes(tvPair.getTimestamp()));
         outputStream.write(BytesUtils.intToBytes(tvPair.getValue().getBinary().getLength()));
-        outputStream.write(BytesUtils.stringToBytes(tvPair.getValue()
-            .getBinary().getStringValue()));
+        outputStream.write(
+            BytesUtils.stringToBytes(tvPair.getValue().getBinary().getStringValue()));
       }
     }
   }

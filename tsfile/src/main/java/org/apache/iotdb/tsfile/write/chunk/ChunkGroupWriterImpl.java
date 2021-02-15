@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.apache.iotdb.tsfile.exception.write.NoMeasurementException;
 import org.apache.iotdb.tsfile.exception.write.UnSupportedDataTypeException;
 import org.apache.iotdb.tsfile.exception.write.WriteProcessException;
@@ -35,18 +34,14 @@ import org.apache.iotdb.tsfile.write.writer.TsFileIOWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * a implementation of IChunkGroupWriter.
- */
+/** a implementation of IChunkGroupWriter. */
 public class ChunkGroupWriterImpl implements IChunkGroupWriter {
 
   private static final Logger LOG = LoggerFactory.getLogger(ChunkGroupWriterImpl.class);
 
   private final String deviceId;
 
-  /**
-   * Map(measurementID, ChunkWriterImpl).
-   */
+  /** Map(measurementID, ChunkWriterImpl). */
   private Map<String, IChunkWriter> chunkWriters = new HashMap<>();
 
   public ChunkGroupWriterImpl(String deviceId) {
@@ -70,7 +65,6 @@ public class ChunkGroupWriterImpl implements IChunkGroupWriter {
             "time " + time + ", measurement id " + measurementId + " not found!");
       }
       point.writeTo(time, chunkWriters.get(measurementId));
-
     }
   }
 
@@ -87,31 +81,43 @@ public class ChunkGroupWriterImpl implements IChunkGroupWriter {
     }
   }
 
-  private void writeByDataType(
-          Tablet tablet, String measurementId, TSDataType dataType, int index) throws IOException {
+  private void writeByDataType(Tablet tablet, String measurementId, TSDataType dataType, int index)
+      throws IOException {
     int batchSize = tablet.rowSize;
     switch (dataType) {
       case INT32:
-        chunkWriters.get(measurementId).write(tablet.timestamps, (int[]) tablet.values[index], batchSize);
+        chunkWriters
+            .get(measurementId)
+            .write(tablet.timestamps, (int[]) tablet.values[index], batchSize);
         break;
       case INT64:
-        chunkWriters.get(measurementId).write(tablet.timestamps, (long[]) tablet.values[index], batchSize);
+        chunkWriters
+            .get(measurementId)
+            .write(tablet.timestamps, (long[]) tablet.values[index], batchSize);
         break;
       case FLOAT:
-        chunkWriters.get(measurementId).write(tablet.timestamps, (float[]) tablet.values[index], batchSize);
+        chunkWriters
+            .get(measurementId)
+            .write(tablet.timestamps, (float[]) tablet.values[index], batchSize);
         break;
       case DOUBLE:
-        chunkWriters.get(measurementId).write(tablet.timestamps, (double[]) tablet.values[index], batchSize);
+        chunkWriters
+            .get(measurementId)
+            .write(tablet.timestamps, (double[]) tablet.values[index], batchSize);
         break;
       case BOOLEAN:
-        chunkWriters.get(measurementId).write(tablet.timestamps, (boolean[]) tablet.values[index], batchSize);
+        chunkWriters
+            .get(measurementId)
+            .write(tablet.timestamps, (boolean[]) tablet.values[index], batchSize);
         break;
       case TEXT:
-        chunkWriters.get(measurementId).write(tablet.timestamps, (Binary[]) tablet.values[index], batchSize);
+        chunkWriters
+            .get(measurementId)
+            .write(tablet.timestamps, (Binary[]) tablet.values[index], batchSize);
         break;
       default:
         throw new UnSupportedDataTypeException(
-                String.format("Data type %s is not supported.", dataType));
+            String.format("Data type %s is not supported.", dataType));
     }
   }
 
@@ -146,9 +152,7 @@ public class ChunkGroupWriterImpl implements IChunkGroupWriter {
     return size;
   }
 
-  /**
-   * seal all the chunks which may has un-sealed pages in force.
-   */
+  /** seal all the chunks which may has un-sealed pages in force. */
   private void sealAllChunks() {
     for (IChunkWriter writer : chunkWriters.values()) {
       writer.sealCurrentPage();

@@ -48,10 +48,7 @@ import org.apache.iotdb.tsfile.read.expression.IExpression;
 import org.apache.iotdb.tsfile.read.query.dataset.QueryDataSet;
 import org.apache.iotdb.tsfile.utils.Binary;
 
-
-/**
- * This QueryDataSet is used for ALIGN_BY_DEVICE query result.
- */
+/** This QueryDataSet is used for ALIGN_BY_DEVICE query result. */
 public class AlignByDeviceDataSet extends QueryDataSet {
 
   private DataSetType dataSetType;
@@ -78,8 +75,8 @@ public class AlignByDeviceDataSet extends QueryDataSet {
   private List<String> executeColumns;
   private int pathsNum = 0;
 
-  public AlignByDeviceDataSet(AlignByDevicePlan alignByDevicePlan, QueryContext context,
-      IQueryRouter queryRouter) {
+  public AlignByDeviceDataSet(
+      AlignByDevicePlan alignByDevicePlan, QueryContext context, IQueryRouter queryRouter) {
     super(null, alignByDevicePlan.getDataTypes());
 
     this.measurements = alignByDevicePlan.getMeasurements();
@@ -194,7 +191,9 @@ public class AlignByDeviceDataSet extends QueryDataSet {
           default:
             throw new IOException("unsupported DataSetType");
         }
-      } catch (QueryProcessException | QueryFilterOptimizationException | StorageEngineException e) {
+      } catch (QueryProcessException
+          | QueryFilterOptimizationException
+          | StorageEngineException e) {
         throw new IOException(e);
       }
 
@@ -255,7 +254,9 @@ public class AlignByDeviceDataSet extends QueryDataSet {
   }
 
   private enum DataSetType {
-    GROUPBYTIME, AGGREGATE, FILL, QUERY
+    GROUPBYTIME,
+    AGGREGATE,
+    FILL,
+    QUERY
   }
-
 }

@@ -19,14 +19,13 @@
 
 package org.apache.iotdb.db.metadata.logfile;
 
+import java.io.File;
+import java.io.IOException;
 import org.apache.iotdb.db.engine.fileSystem.SystemFileFactory;
 import org.apache.iotdb.db.qp.physical.PhysicalPlan;
 import org.apache.iotdb.db.writelog.io.SingleFileLogReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.File;
-import java.io.IOException;
 
 public class MLogReader implements AutoCloseable {
   private static final Logger logger = LoggerFactory.getLogger(MLogReader.class);

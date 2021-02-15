@@ -31,12 +31,17 @@ import org.apache.iotdb.cluster.utils.nodetool.Printer;
 @Command(name = "log", description = "Print raft logs from a log file")
 public class LogView implements Runnable {
 
-  @Option(title = "detailed information", name = {"-d",
-      "--detail"}, description = "Show detail information of logs")
+  @Option(
+      title = "detailed information",
+      name = {"-d", "--detail"},
+      description = "Show detail information of logs")
   private boolean detail = false;
 
-  @Option(title = "path", required = true, name = {"-path",
-      "--path"}, description = "Specify a path for accurate hosts information")
+  @Option(
+      title = "path",
+      required = true,
+      name = {"-path", "--path"},
+      description = "Specify a path for accurate hosts information")
   private String path = null;
 
   @Override
@@ -74,8 +79,7 @@ public class LogView implements Runnable {
       if (detail) {
         Printer.msgPrintln(log.toString());
       } else {
-        Printer.msgPrintln(
-            log.getClass().getSimpleName());
+        Printer.msgPrintln(log.getClass().getSimpleName());
       }
     }
   }

@@ -26,7 +26,6 @@ import static org.junit.Assert.fail;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.apache.iotdb.tsfile.constant.TestConstant;
 import org.apache.iotdb.tsfile.file.metadata.enums.TSDataType;
 import org.apache.iotdb.tsfile.file.metadata.enums.TSEncoding;
@@ -63,14 +62,18 @@ public class ForceAppendTsFileWriterTest {
     }
 
     TsFileWriter writer = new TsFileWriter(file);
-    writer.registerTimeseries(new Path("d1", "s1"),
-        new MeasurementSchema("s1", TSDataType.FLOAT, TSEncoding.RLE));
-    writer.registerTimeseries(new Path("d1", "s2"),
-        new MeasurementSchema("s2", TSDataType.FLOAT, TSEncoding.RLE));
-    writer.write(new TSRecord(1, "d1").addTuple(new FloatDataPoint("s1", 5))
-        .addTuple(new FloatDataPoint("s2", 4)));
-    writer.write(new TSRecord(2, "d1").addTuple(new FloatDataPoint("s1", 5))
-        .addTuple(new FloatDataPoint("s2", 4)));
+    writer.registerTimeseries(
+        new Path("d1", "s1"), new MeasurementSchema("s1", TSDataType.FLOAT, TSEncoding.RLE));
+    writer.registerTimeseries(
+        new Path("d1", "s2"), new MeasurementSchema("s2", TSDataType.FLOAT, TSEncoding.RLE));
+    writer.write(
+        new TSRecord(1, "d1")
+            .addTuple(new FloatDataPoint("s1", 5))
+            .addTuple(new FloatDataPoint("s2", 4)));
+    writer.write(
+        new TSRecord(2, "d1")
+            .addTuple(new FloatDataPoint("s1", 5))
+            .addTuple(new FloatDataPoint("s2", 4)));
     writer.flushAllChunkGroups();
 
     long firstMetadataPosition = writer.getIOWriter().getPos();
@@ -81,12 +84,14 @@ public class ForceAppendTsFileWriterTest {
 
     // write more data into this TsFile
     writer = new TsFileWriter(fwriter);
-    writer.registerTimeseries(new Path("d1", "s1"),
-        new MeasurementSchema("s1", TSDataType.FLOAT, TSEncoding.RLE));
-    writer.registerTimeseries(new Path("d1", "s2"),
-        new MeasurementSchema("s2", TSDataType.FLOAT, TSEncoding.RLE));
-    writer.write(new TSRecord(3, "d1").addTuple(new FloatDataPoint("s1", 5))
-        .addTuple(new FloatDataPoint("s2", 4)));
+    writer.registerTimeseries(
+        new Path("d1", "s1"), new MeasurementSchema("s1", TSDataType.FLOAT, TSEncoding.RLE));
+    writer.registerTimeseries(
+        new Path("d1", "s2"), new MeasurementSchema("s2", TSDataType.FLOAT, TSEncoding.RLE));
+    writer.write(
+        new TSRecord(3, "d1")
+            .addTuple(new FloatDataPoint("s1", 5))
+            .addTuple(new FloatDataPoint("s2", 4)));
     writer.close();
     ReadOnlyTsFile readOnlyTsFile = new ReadOnlyTsFile(new TsFileSequenceReader(file.getPath()));
     List<Path> pathList = new ArrayList<>();
@@ -111,5 +116,4 @@ public class ForceAppendTsFileWriterTest {
 
     assertTrue(file.delete());
   }
-
 }

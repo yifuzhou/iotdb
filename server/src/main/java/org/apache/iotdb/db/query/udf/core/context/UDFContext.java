@@ -87,9 +87,7 @@ public class UDFContext {
     return dataTypes;
   }
 
-  /**
-   * Generates the column name of the udf query.
-   */
+  /** Generates the column name of the udf query. */
   public String getColumnName() {
     if (column == null) {
       column = name + "(" + getColumnNameParameterPart() + ")";
@@ -99,10 +97,10 @@ public class UDFContext {
 
   /**
    * Generates the parameter part of the udf column name.
-   * <p>
-   * Example:
-   * <br>Full column name   -> udf(root.sg.d.s1, root.sg.d.s1, 'key1'='value1', 'key2'='value2')
-   * <br>The parameter part -> root.sg.d.s1, root.sg.d.s1, 'key1'='value1', 'key2'='value2'
+   *
+   * <p>Example: <br>
+   * Full column name -> udf(root.sg.d.s1, root.sg.d.s1, 'key1'='value1', 'key2'='value2') <br>
+   * The parameter part -> root.sg.d.s1, root.sg.d.s1, 'key1'='value1', 'key2'='value2'
    */
   private String getColumnNameParameterPart() {
     if (columnParameterPart == null) {
@@ -119,12 +117,21 @@ public class UDFContext {
         }
         Iterator<Entry<String, String>> iterator = attributes.entrySet().iterator();
         Entry<String, String> entry = iterator.next();
-        builder.append("\"").append(entry.getKey()).append("\"=\"").append(entry.getValue())
+        builder
+            .append("\"")
+            .append(entry.getKey())
+            .append("\"=\"")
+            .append(entry.getValue())
             .append("\"");
         while (iterator.hasNext()) {
           entry = iterator.next();
-          builder.append(", ").append("\"").append(entry.getKey()).append("\"=\"")
-              .append(entry.getValue()).append("\"");
+          builder
+              .append(", ")
+              .append("\"")
+              .append(entry.getKey())
+              .append("\"=\"")
+              .append(entry.getValue())
+              .append("\"");
         }
       }
       columnParameterPart = builder.toString();

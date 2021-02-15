@@ -28,9 +28,7 @@ import org.apache.iotdb.tsfile.read.filter.basic.Filter;
 import org.apache.iotdb.tsfile.read.reader.IBatchReader;
 import org.apache.iotdb.tsfile.read.reader.chunk.ChunkReader;
 
-/**
- * Series reader is used to query one series of one tsfile.
- */
+/** Series reader is used to query one series of one tsfile. */
 public abstract class AbstractFileSeriesReader implements IBatchReader {
 
   protected IChunkLoader chunkLoader;
@@ -40,11 +38,9 @@ public abstract class AbstractFileSeriesReader implements IBatchReader {
 
   protected Filter filter;
 
-  /**
-   * constructor of FileSeriesReader.
-   */
-  public AbstractFileSeriesReader(IChunkLoader chunkLoader, List<ChunkMetadata> chunkMetadataList,
-      Filter filter) {
+  /** constructor of FileSeriesReader. */
+  public AbstractFileSeriesReader(
+      IChunkLoader chunkLoader, List<ChunkMetadata> chunkMetadataList, Filter filter) {
     this.chunkLoader = chunkLoader;
     this.chunkMetadataList = chunkMetadataList;
     this.filter = filter;

@@ -18,11 +18,6 @@
  */
 package org.apache.iotdb.db.writelog.io;
 
-import org.apache.iotdb.db.engine.fileSystem.SystemFileFactory;
-import org.apache.iotdb.db.utils.TestOnly;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -31,10 +26,14 @@ import java.nio.ByteBuffer;
 import java.nio.channels.ClosedChannelException;
 import java.nio.channels.FileChannel;
 import java.util.zip.CRC32;
+import org.apache.iotdb.db.engine.fileSystem.SystemFileFactory;
+import org.apache.iotdb.db.utils.TestOnly;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * LogWriter writes the binary logs into a file using FileChannel together with check sums of
- * each log calculated using CRC32.
+ * LogWriter writes the binary logs into a file using FileChannel together with check sums of each
+ * log calculated using CRC32.
  */
 public class LogWriter implements ILogWriter {
   private static final Logger logger = LoggerFactory.getLogger(LogWriter.class);
@@ -127,8 +126,6 @@ public class LogWriter implements ILogWriter {
 
   @Override
   public String toString() {
-    return "LogWriter{" +
-        "logFile=" + logFile +
-        '}';
+    return "LogWriter{" + "logFile=" + logFile + '}';
   }
 }

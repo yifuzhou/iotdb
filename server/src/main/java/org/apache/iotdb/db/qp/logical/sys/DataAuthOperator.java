@@ -39,5 +39,4 @@ public class DataAuthOperator extends RootOperator {
   public List<String> getUsers() {
     return users;
   }
-
 }

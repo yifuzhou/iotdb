@@ -46,11 +46,10 @@ public class IoTDBSensorUpdateIT {
   }
 
   @Test
-  public void testMerge()
-      throws SQLException, InterruptedException {
-    try (Connection connection = DriverManager
-        .getConnection(Config.IOTDB_URL_PREFIX + "127.0.0.1:6667/", "root",
-            "root");
+  public void testMerge() throws SQLException, InterruptedException {
+    try (Connection connection =
+            DriverManager.getConnection(
+                Config.IOTDB_URL_PREFIX + "127.0.0.1:6667/", "root", "root");
         Statement statement = connection.createStatement()) {
       statement.execute("set storage group to root.demo");
       statement.execute("create timeseries root.demo.d1.s1 with datatype=INT64,encoding=RLE");

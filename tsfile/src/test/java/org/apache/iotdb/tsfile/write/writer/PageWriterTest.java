@@ -130,7 +130,7 @@ public class PageWriterTest {
   public void testWriteBoolean() {
     PageWriter writer = new PageWriter();
     writer.setTimeEncoder(new PlainEncoder(TSDataType.INT64, 0));
-    writer.setValueEncoder(new PlainEncoder( TSDataType.BOOLEAN, 0));
+    writer.setValueEncoder(new PlainEncoder(TSDataType.BOOLEAN, 0));
     writer.initStatistics(TSDataType.BOOLEAN);
     boolean value = false;
     int timeCount = 0;

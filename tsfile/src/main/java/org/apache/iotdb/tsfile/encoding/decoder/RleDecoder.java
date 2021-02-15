@@ -31,50 +31,33 @@ import org.apache.iotdb.tsfile.utils.ReadWriteForEncodingUtils;
 import org.apache.iotdb.tsfile.utils.ReadWriteIOUtils;
 
 /**
- * Abstract class for all rle decoder. Decoding values according to following
- * grammar: {@code
- * <length> <bitwidth> <encoded-data>}. For more information about rle format,
- * see RleEncoder
+ * Abstract class for all rle decoder. Decoding values according to following grammar: {@code
+ * <length> <bitwidth> <encoded-data>}. For more information about rle format, see RleEncoder
  */
 public abstract class RleDecoder extends Decoder {
 
   protected TSFileConfig config = TSFileDescriptor.getInstance().getConfig();
-  /**
-   * mode to indicate current encoding type 0 - RLE 1 - BIT_PACKED.
-   */
+  /** mode to indicate current encoding type 0 - RLE 1 - BIT_PACKED. */
   protected Mode mode;
-  /**
-   * bit width for bit-packing and rle to decode.
-   */
+  /** bit width for bit-packing and rle to decode. */
   protected int bitWidth;
-  /**
-   * number of data left for reading in current buffer.
-   */
+  /** number of data left for reading in current buffer. */
   protected int currentCount;
   /**
-   * how many bytes for all encoded data like [{@code <bitwidth> <encoded-data>}]
-   * in inputstream.
+   * how many bytes for all encoded data like [{@code <bitwidth> <encoded-data>}] in inputstream.
    */
   protected int length;
   /**
-   * a flag to indicate whether current pattern is end. false - need to start
-   * reading a new page true - current page isn't over.
+   * a flag to indicate whether current pattern is end. false - need to start reading a new page
+   * true - current page isn't over.
    */
   protected boolean isLengthAndBitWidthReaded;
-  /**
-   * buffer to save data format like [{@code <bitwidth> <encoded-data>}] for
-   * decoder.
-   */
+  /** buffer to save data format like [{@code <bitwidth> <encoded-data>}] for decoder. */
   protected ByteBuffer byteCache;
-  /**
-   * number of bit-packing group in which is saved in header.
-   */
+  /** number of bit-packing group in which is saved in header. */
   protected int bitPackingNum;
 
-  /**
-   * a constructor, init with endianType, default encoding is
-   * <code>TSEncoding.RLE</code>.
-   */
+  /** a constructor, init with endianType, default encoding is <code>TSEncoding.RLE</code>. */
   protected RleDecoder() {
     super(TSEncoding.RLE);
     reset();
@@ -89,8 +72,8 @@ public abstract class RleDecoder extends Decoder {
   }
 
   /**
-   * get header for both rle and bit-packing current encode mode which is saved in
-   * first bit of header.
+   * get header for both rle and bit-packing current encode mode which is saved in first bit of
+   * header.
    *
    * @return int value
    * @throws IOException cannot get header
@@ -109,15 +92,16 @@ public abstract class RleDecoder extends Decoder {
   protected void readNext() throws IOException {
     int header = getHeader();
     switch (mode) {
-    case RLE:
-      currentCount = header >> 1;
-      readNumberInRle();
-      break;
-    case BIT_PACKED:
-      callReadBitPackingBuffer(header);
-      break;
-    default:
-      throw new TsFileDecodingException(String.format("tsfile-encoding IntRleDecoder: unknown encoding mode %s", mode));
+      case RLE:
+        currentCount = header >> 1;
+        readNumberInRle();
+        break;
+      case BIT_PACKED:
+        callReadBitPackingBuffer(header);
+        break;
+      default:
+        throw new TsFileDecodingException(
+            String.format("tsfile-encoding IntRleDecoder: unknown encoding mode %s", mode));
     }
   }
 
@@ -128,11 +112,14 @@ public abstract class RleDecoder extends Decoder {
     int lastBitPackedNum = ReadWriteIOUtils.read(byteCache);
     if (bitPackedGroupCount > 0) {
 
-      currentCount = (bitPackedGroupCount - 1) * TSFileConfig.RLE_MIN_REPEATED_NUM + lastBitPackedNum;
+      currentCount =
+          (bitPackedGroupCount - 1) * TSFileConfig.RLE_MIN_REPEATED_NUM + lastBitPackedNum;
       bitPackingNum = currentCount;
     } else {
       throw new TsFileDecodingException(
-          String.format("tsfile-encoding IntRleDecoder: bitPackedGroupCount %d, smaller than 1", bitPackedGroupCount));
+          String.format(
+              "tsfile-encoding IntRleDecoder: bitPackedGroupCount %d, smaller than 1",
+              bitPackedGroupCount));
     }
     readBitPackingBuffer(bitPackedGroupCount, lastBitPackedNum);
   }
@@ -189,10 +176,11 @@ public abstract class RleDecoder extends Decoder {
    * Read bit-packing package and save them in buffer.
    *
    * @param bitPackedGroupCount number of group number
-   * @param lastBitPackedNum    number of useful value in last group
+   * @param lastBitPackedNum number of useful value in last group
    * @throws IOException cannot read bit pack
    */
-  protected abstract void readBitPackingBuffer(int bitPackedGroupCount, int lastBitPackedNum) throws IOException;
+  protected abstract void readBitPackingBuffer(int bitPackedGroupCount, int lastBitPackedNum)
+      throws IOException;
 
   @Override
   public boolean readBoolean(ByteBuffer buffer) {
@@ -235,6 +223,7 @@ public abstract class RleDecoder extends Decoder {
   }
 
   protected enum Mode {
-    RLE, BIT_PACKED
+    RLE,
+    BIT_PACKED
   }
 }

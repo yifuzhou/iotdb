@@ -29,5 +29,4 @@ public interface ISyncReceiverLogAnalyzer {
   boolean recover(String senderName) throws IOException;
 
   void scanLogger(IFileLoader loader, File syncLog, File loadLog);
-
 }

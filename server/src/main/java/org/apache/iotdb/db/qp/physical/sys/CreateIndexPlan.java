@@ -39,13 +39,13 @@ public class CreateIndexPlan extends PhysicalPlan {
   private long time;
   private IndexType indexType;
 
-  public CreateIndexPlan(){
+  public CreateIndexPlan() {
     super(false, OperatorType.CREATE_INDEX);
     canBeSplit = false;
   }
 
-  public CreateIndexPlan(List<PartialPath> paths, Map<String, String> props, long startTime,
-      IndexType indexType) {
+  public CreateIndexPlan(
+      List<PartialPath> paths, Map<String, String> props, long startTime, IndexType indexType) {
     super(false, OperatorType.CREATE_INDEX);
     this.paths = paths;
     this.props = props;
@@ -87,7 +87,6 @@ public class CreateIndexPlan extends PhysicalPlan {
   public List<PartialPath> getPaths() {
     return paths;
   }
-
 
   @Override
   public void serialize(DataOutputStream stream) throws IOException {
@@ -152,7 +151,6 @@ public class CreateIndexPlan extends PhysicalPlan {
     this.index = buffer.getLong();
   }
 
-
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -175,8 +173,7 @@ public class CreateIndexPlan extends PhysicalPlan {
 
   @Override
   public String toString() {
-    return String.format("paths: %s, index type: %s, start time: %s, props: %s",
-        paths, indexType, time, props);
+    return String.format(
+        "paths: %s, index type: %s, start time: %s, props: %s", paths, indexType, time, props);
   }
-
 }

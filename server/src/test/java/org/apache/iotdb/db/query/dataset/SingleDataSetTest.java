@@ -42,16 +42,16 @@ public class SingleDataSetTest {
   private final Planner processor = new Planner();
 
   private final String[] sqls = {
-      "SET STORAGE GROUP TO root.vehicle",
-      "SET STORAGE GROUP TO root.test",
-      "CREATE TIMESERIES root.vehicle.d0.s0 WITH DATATYPE=INT32, ENCODING=RLE",
-      "CREATE TIMESERIES root.vehicle.d0.s1 WITH DATATYPE=TEXT, ENCODING=PLAIN",
-      "CREATE TIMESERIES root.test.d0.s0 WITH DATATYPE=INT32, ENCODING=RLE",
-      "CREATE TIMESERIES root.test.d0.s1 WITH DATATYPE=TEXT, ENCODING=PLAIN",
-      "CREATE TIMESERIES root.test.d1.\"s3.xy\" WITH DATATYPE=TEXT, ENCODING=PLAIN"};
+    "SET STORAGE GROUP TO root.vehicle",
+    "SET STORAGE GROUP TO root.test",
+    "CREATE TIMESERIES root.vehicle.d0.s0 WITH DATATYPE=INT32, ENCODING=RLE",
+    "CREATE TIMESERIES root.vehicle.d0.s1 WITH DATATYPE=TEXT, ENCODING=PLAIN",
+    "CREATE TIMESERIES root.test.d0.s0 WITH DATATYPE=INT32, ENCODING=RLE",
+    "CREATE TIMESERIES root.test.d0.s1 WITH DATATYPE=TEXT, ENCODING=PLAIN",
+    "CREATE TIMESERIES root.test.d1.\"s3.xy\" WITH DATATYPE=TEXT, ENCODING=PLAIN"
+  };
 
-  public SingleDataSetTest() throws QueryProcessException {
-  }
+  public SingleDataSetTest() throws QueryProcessException {}
 
   @Before
   public void setUp() throws Exception {
@@ -68,12 +68,11 @@ public class SingleDataSetTest {
 
   @Test
   public void countDevice()
-      throws QueryProcessException, TException, StorageEngineException, QueryFilterOptimizationException, MetadataException, IOException, InterruptedException, SQLException {
-    PhysicalPlan plan = processor
-        .parseSQLToPhysicalPlan(
-            "count devices");
-    QueryDataSet dataSet = queryExecutor
-        .processQuery(plan, EnvironmentUtils.TEST_QUERY_CONTEXT);
+      throws QueryProcessException, TException, StorageEngineException,
+          QueryFilterOptimizationException, MetadataException, IOException, InterruptedException,
+          SQLException {
+    PhysicalPlan plan = processor.parseSQLToPhysicalPlan("count devices");
+    QueryDataSet dataSet = queryExecutor.processQuery(plan, EnvironmentUtils.TEST_QUERY_CONTEXT);
     Assert.assertTrue(dataSet instanceof SingleDataSet);
     Assert.assertEquals("[devices]", dataSet.getPaths().toString());
     while (dataSet.hasNext()) {
@@ -84,12 +83,11 @@ public class SingleDataSetTest {
 
   @Test
   public void countTimeSeries()
-      throws QueryProcessException, TException, StorageEngineException, QueryFilterOptimizationException, MetadataException, IOException, InterruptedException, SQLException {
-    PhysicalPlan plan = processor
-        .parseSQLToPhysicalPlan(
-            "count TimeSeries");
-    QueryDataSet dataSet = queryExecutor
-        .processQuery(plan, EnvironmentUtils.TEST_QUERY_CONTEXT);
+      throws QueryProcessException, TException, StorageEngineException,
+          QueryFilterOptimizationException, MetadataException, IOException, InterruptedException,
+          SQLException {
+    PhysicalPlan plan = processor.parseSQLToPhysicalPlan("count TimeSeries");
+    QueryDataSet dataSet = queryExecutor.processQuery(plan, EnvironmentUtils.TEST_QUERY_CONTEXT);
     Assert.assertTrue(dataSet instanceof SingleDataSet);
     Assert.assertEquals("[count]", dataSet.getPaths().toString());
     while (dataSet.hasNext()) {
@@ -100,12 +98,11 @@ public class SingleDataSetTest {
 
   @Test
   public void countStorageGroup()
-      throws TException, StorageEngineException, QueryFilterOptimizationException, MetadataException, IOException, InterruptedException, SQLException, QueryProcessException {
-    PhysicalPlan plan = processor
-        .parseSQLToPhysicalPlan(
-            "count storage group");
-    QueryDataSet dataSet = queryExecutor
-        .processQuery(plan, EnvironmentUtils.TEST_QUERY_CONTEXT);
+      throws TException, StorageEngineException, QueryFilterOptimizationException,
+          MetadataException, IOException, InterruptedException, SQLException,
+          QueryProcessException {
+    PhysicalPlan plan = processor.parseSQLToPhysicalPlan("count storage group");
+    QueryDataSet dataSet = queryExecutor.processQuery(plan, EnvironmentUtils.TEST_QUERY_CONTEXT);
     Assert.assertTrue(dataSet instanceof SingleDataSet);
     Assert.assertEquals("[storage group]", dataSet.getPaths().toString());
     while (dataSet.hasNext()) {
@@ -116,12 +113,11 @@ public class SingleDataSetTest {
 
   @Test
   public void countNodes()
-      throws QueryProcessException, TException, StorageEngineException, QueryFilterOptimizationException, MetadataException, IOException, InterruptedException, SQLException {
-    PhysicalPlan plan = processor
-        .parseSQLToPhysicalPlan(
-            "count nodes root.test level=2");
-    QueryDataSet dataSet = queryExecutor
-        .processQuery(plan, EnvironmentUtils.TEST_QUERY_CONTEXT);
+      throws QueryProcessException, TException, StorageEngineException,
+          QueryFilterOptimizationException, MetadataException, IOException, InterruptedException,
+          SQLException {
+    PhysicalPlan plan = processor.parseSQLToPhysicalPlan("count nodes root.test level=2");
+    QueryDataSet dataSet = queryExecutor.processQuery(plan, EnvironmentUtils.TEST_QUERY_CONTEXT);
     Assert.assertTrue(dataSet instanceof SingleDataSet);
     Assert.assertEquals("[count]", dataSet.getPaths().toString());
     while (dataSet.hasNext()) {
@@ -129,5 +125,4 @@ public class SingleDataSetTest {
       Assert.assertEquals("0\t2", record.toString());
     }
   }
-
 }

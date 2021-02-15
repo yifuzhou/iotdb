@@ -68,8 +68,8 @@ public class MinTimeAggrResult extends AggregateResult {
   }
 
   @Override
-  public void updateResultUsingTimestamps(long[] timestamps, int length,
-      IReaderByTimestamp dataReader) throws IOException {
+  public void updateResultUsingTimestamps(
+      long[] timestamps, int length, IReaderByTimestamp dataReader) throws IOException {
     if (hasFinalResult()) {
       return;
     }
@@ -94,17 +94,16 @@ public class MinTimeAggrResult extends AggregateResult {
       setLongValue(anotherMinTime.getResult());
       return;
     }
-    if (hasCandidateResult() && anotherMinTime.hasCandidateResult() && getResult() > anotherMinTime.getResult()) {
+    if (hasCandidateResult()
+        && anotherMinTime.hasCandidateResult()
+        && getResult() > anotherMinTime.getResult()) {
       setLongValue(anotherMinTime.getResult());
     }
   }
 
   @Override
-  protected void deserializeSpecificFields(ByteBuffer buffer) {
-  }
+  protected void deserializeSpecificFields(ByteBuffer buffer) {}
 
   @Override
-  protected void serializeSpecificFields(OutputStream outputStream) {
-  }
-
+  protected void serializeSpecificFields(OutputStream outputStream) {}
 }

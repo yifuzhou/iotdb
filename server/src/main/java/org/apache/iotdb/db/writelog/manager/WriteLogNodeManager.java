@@ -24,9 +24,7 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 import org.apache.iotdb.db.writelog.node.WriteLogNode;
 
-/**
- * This interface provides accesses to WriteLogNode.
- */
+/** This interface provides accesses to WriteLogNode. */
 public interface WriteLogNodeManager {
 
   /**
@@ -34,7 +32,7 @@ public interface WriteLogNodeManager {
    * nameOfTsFile}". The WriteLogNode will be automatically created if not exist.
    *
    * @param identifier -identifier, the format: "{storageGroupName}-{BufferWrite/Overflow}-{
-   * nameOfTsFile}"
+   *     nameOfTsFile}"
    */
   WriteLogNode getNode(String identifier, Supplier<ByteBuffer[]> supplier);
 
@@ -45,8 +43,6 @@ public interface WriteLogNodeManager {
    */
   void deleteNode(String identifier, Consumer<ByteBuffer[]> consumer) throws IOException;
 
-  /**
-   * Close all nodes.
-   */
+  /** Close all nodes. */
   void close();
 }

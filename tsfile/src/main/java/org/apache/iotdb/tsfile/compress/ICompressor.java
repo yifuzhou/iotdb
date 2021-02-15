@@ -19,6 +19,10 @@
 
 package org.apache.iotdb.tsfile.compress;
 
+import static org.apache.iotdb.tsfile.file.metadata.enums.CompressionType.GZIP;
+import static org.apache.iotdb.tsfile.file.metadata.enums.CompressionType.LZ4;
+import static org.apache.iotdb.tsfile.file.metadata.enums.CompressionType.SNAPPY;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -26,20 +30,13 @@ import java.io.Serializable;
 import java.nio.ByteBuffer;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
-
 import net.jpountz.lz4.LZ4Compressor;
 import net.jpountz.lz4.LZ4Factory;
 import org.apache.iotdb.tsfile.exception.compress.CompressionTypeNotSupportedException;
 import org.apache.iotdb.tsfile.file.metadata.enums.CompressionType;
 import org.xerial.snappy.Snappy;
 
-import static org.apache.iotdb.tsfile.file.metadata.enums.CompressionType.GZIP;
-import static org.apache.iotdb.tsfile.file.metadata.enums.CompressionType.LZ4;
-import static org.apache.iotdb.tsfile.file.metadata.enums.CompressionType.SNAPPY;
-
-/**
- * compress data according to type in schema.
- */
+/** compress data according to type in schema. */
 public interface ICompressor extends Serializable {
 
   static ICompressor getCompressor(String name) {
@@ -82,7 +79,7 @@ public interface ICompressor extends Serializable {
   /**
    * If the data is large, this function is better than byte[].
    *
-   * @param data       MUST be DirectByteBuffer for Snappy.
+   * @param data MUST be DirectByteBuffer for Snappy.
    * @param compressed MUST be DirectByteBuffer for Snappy.
    * @return byte length of compressed data.
    */
@@ -92,9 +89,7 @@ public interface ICompressor extends Serializable {
 
   CompressionType getType();
 
-  /**
-   * NoCompressor will do nothing for data and return the input data directly.
-   */
+  /** NoCompressor will do nothing for data and return the input data directly. */
   class NoCompressor implements ICompressor {
 
     @Override
@@ -157,7 +152,7 @@ public interface ICompressor extends Serializable {
   class IOTDBLZ4Compressor implements ICompressor {
     private LZ4Compressor compressor;
 
-    public IOTDBLZ4Compressor(){
+    public IOTDBLZ4Compressor() {
       super();
       LZ4Factory factory = LZ4Factory.fastestInstance();
       compressor = factory.fastCompressor();
@@ -251,7 +246,7 @@ public interface ICompressor extends Serializable {
 
     @Override
     public int getMaxBytesForCompression(int uncompressedDataSize) {
-      //hard to estimate
+      // hard to estimate
       return Math.max(40 + uncompressedDataSize / 2, uncompressedDataSize);
     }
 

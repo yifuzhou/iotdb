@@ -49,18 +49,24 @@ public class AuthorPlan extends PhysicalPlan {
   /**
    * AuthorPlan Constructor.
    *
-   * @param authorType        author type
-   * @param userName          user name
-   * @param roleName          role name
-   * @param password          password
-   * @param newPassword       new password
+   * @param authorType author type
+   * @param userName user name
+   * @param roleName role name
+   * @param password password
+   * @param newPassword new password
    * @param authorizationList authorization list in String[] structure
-   * @param nodeName          node name in Path structure
+   * @param nodeName node name in Path structure
    * @throws AuthException Authentication Exception
    */
-  public AuthorPlan(AuthorOperator.AuthorType authorType, String userName, String roleName,
+  public AuthorPlan(
+      AuthorOperator.AuthorType authorType,
+      String userName,
+      String roleName,
       String password,
-      String newPassword, String[] authorizationList, PartialPath nodeName) throws AuthException {
+      String newPassword,
+      String[] authorizationList,
+      PartialPath nodeName)
+      throws AuthException {
     super(false, Operator.OperatorType.AUTHOR);
     this.authorType = authorType;
     this.userName = userName;
@@ -239,17 +245,25 @@ public class AuthorPlan extends PhysicalPlan {
 
   @Override
   public String toString() {
-    return "userName: " + userName + "\nroleName: " + roleName + "\npassword: " + password
+    return "userName: "
+        + userName
+        + "\nroleName: "
+        + roleName
+        + "\npassword: "
+        + password
         + "\nnewPassword: "
-        + newPassword + "\npermissions: " + permissions + "\nnodeName: " + nodeName
+        + newPassword
+        + "\npermissions: "
+        + permissions
+        + "\nnodeName: "
+        + nodeName
         + "\nauthorType: "
         + authorType;
   }
 
   @Override
   public List<PartialPath> getPaths() {
-    return nodeName != null ? Collections.singletonList(nodeName)
-        : Collections.emptyList();
+    return nodeName != null ? Collections.singletonList(nodeName) : Collections.emptyList();
   }
 
   @Override
@@ -261,20 +275,25 @@ public class AuthorPlan extends PhysicalPlan {
       return false;
     }
     AuthorPlan that = (AuthorPlan) o;
-    return getAuthorType() == that.getAuthorType() &&
-        Objects.equals(getUserName(), that.getUserName()) &&
-        Objects.equals(getRoleName(), that.getRoleName()) &&
-        Objects.equals(getPassword(), that.getPassword()) &&
-        Objects.equals(getNewPassword(), that.getNewPassword()) &&
-        Objects.equals(getPermissions(), that.getPermissions()) &&
-        Objects.equals(getNodeName(), that.getNodeName());
+    return getAuthorType() == that.getAuthorType()
+        && Objects.equals(getUserName(), that.getUserName())
+        && Objects.equals(getRoleName(), that.getRoleName())
+        && Objects.equals(getPassword(), that.getPassword())
+        && Objects.equals(getNewPassword(), that.getNewPassword())
+        && Objects.equals(getPermissions(), that.getPermissions())
+        && Objects.equals(getNodeName(), that.getNodeName());
   }
 
   @Override
   public int hashCode() {
-    return Objects
-        .hash(getAuthorType(), getUserName(), getRoleName(), getPassword(), getNewPassword(),
-            getPermissions(), getNodeName());
+    return Objects.hash(
+        getAuthorType(),
+        getUserName(),
+        getRoleName(),
+        getPassword(),
+        getNewPassword(),
+        getPermissions(),
+        getNodeName());
   }
 
   @Override
@@ -303,7 +322,6 @@ public class AuthorPlan extends PhysicalPlan {
 
     stream.writeLong(index);
   }
-
 
   @Override
   public void serialize(ByteBuffer buffer) {

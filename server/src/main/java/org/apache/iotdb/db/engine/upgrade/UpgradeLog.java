@@ -37,9 +37,9 @@ public class UpgradeLog {
   private static final String UPGRADE_DIR = "upgrade";
   private static final String UPGRADE_LOG_NAME = "upgrade.txt";
   private static BufferedWriter upgradeLogWriter;
-  private static File upgradeLogPath = SystemFileFactory.INSTANCE
-      .getFile(SystemFileFactory.INSTANCE.getFile(config.getSystemDir(), UPGRADE_DIR),
-          UPGRADE_LOG_NAME);
+  private static File upgradeLogPath =
+      SystemFileFactory.INSTANCE.getFile(
+          SystemFileFactory.INSTANCE.getFile(config.getSystemDir(), UPGRADE_DIR), UPGRADE_LOG_NAME);
 
   public static boolean createUpgradeLog() {
     try {
@@ -50,8 +50,7 @@ public class UpgradeLog {
       upgradeLogWriter = new BufferedWriter(new FileWriter(getUpgradeLogPath(), true));
       return true;
     } catch (IOException e) {
-      logger.error("meet error when create upgrade log, file path:{}",
-          upgradeLogPath, e);
+      logger.error("meet error when create upgrade log, file path:{}", upgradeLogPath, e);
       return false;
     }
   }

@@ -50,6 +50,5 @@ public class FakedBatchReader implements IBatchReader {
   }
 
   @Override
-  public void close() {
-  }
+  public void close() {}
 }

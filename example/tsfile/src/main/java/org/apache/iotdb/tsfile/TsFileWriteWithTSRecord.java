@@ -48,12 +48,15 @@ public class TsFileWriteWithTSRecord {
         // add measurements into file schema
         for (int i = 0; i < 4; i++) {
           // add measurements into file schema
-          tsFileWriter.registerTimeseries(new Path(Constant.DEVICE_PREFIX + i, Constant.SENSOR_1),
-                  new MeasurementSchema(Constant.SENSOR_1, TSDataType.INT64, TSEncoding.RLE));
-          tsFileWriter.registerTimeseries(new Path(Constant.DEVICE_PREFIX + i, Constant.SENSOR_2),
-                  new MeasurementSchema(Constant.SENSOR_2, TSDataType.INT64, TSEncoding.RLE));
-          tsFileWriter.registerTimeseries(new Path(Constant.DEVICE_PREFIX + i, Constant.SENSOR_3),
-                  new MeasurementSchema(Constant.SENSOR_3, TSDataType.INT64, TSEncoding.RLE));
+          tsFileWriter.registerTimeseries(
+              new Path(Constant.DEVICE_PREFIX + i, Constant.SENSOR_1),
+              new MeasurementSchema(Constant.SENSOR_1, TSDataType.INT64, TSEncoding.RLE));
+          tsFileWriter.registerTimeseries(
+              new Path(Constant.DEVICE_PREFIX + i, Constant.SENSOR_2),
+              new MeasurementSchema(Constant.SENSOR_2, TSDataType.INT64, TSEncoding.RLE));
+          tsFileWriter.registerTimeseries(
+              new Path(Constant.DEVICE_PREFIX + i, Constant.SENSOR_3),
+              new MeasurementSchema(Constant.SENSOR_3, TSDataType.INT64, TSEncoding.RLE));
         }
 
         // construct TSRecord

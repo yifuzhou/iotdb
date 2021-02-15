@@ -31,9 +31,7 @@ import org.apache.iotdb.cluster.log.logtypes.RemoveNodeLog;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * LogParser transform a ByteBuffer into a Log.
- */
+/** LogParser transform a ByteBuffer into a Log. */
 public class LogParser {
 
   private static final Logger logger = LoggerFactory.getLogger(LogParser.class);

@@ -40,8 +40,9 @@ public class SerializableIntList implements SerializableList {
 
   public static int calculateCapacity(float memoryLimitInMB) throws QueryProcessException {
     float memoryLimitInB = memoryLimitInMB * MB / 2;
-    int size = ARRAY_CAPACITY_THRESHOLD *
-        (int) (memoryLimitInB / (ReadWriteIOUtils.INT_LEN * ARRAY_CAPACITY_THRESHOLD));
+    int size =
+        ARRAY_CAPACITY_THRESHOLD
+            * (int) (memoryLimitInB / (ReadWriteIOUtils.INT_LEN * ARRAY_CAPACITY_THRESHOLD));
     if (size <= 0) {
       throw new QueryProcessException("Memory is not enough for current query.");
     }

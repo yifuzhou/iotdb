@@ -41,9 +41,7 @@ public class MaxSeriesMergeFileSelector extends MaxFileMergeFileSelector {
   private List<TsFileResource> lastSelectedUnseqFiles = Collections.emptyList();
   private long lastTotalMemoryCost;
 
-  public MaxSeriesMergeFileSelector(
-      MergeResource mergeResource,
-      long memoryBudget) {
+  public MaxSeriesMergeFileSelector(MergeResource mergeResource, long memoryBudget) {
     super(mergeResource, memoryBudget);
   }
 
@@ -51,7 +49,9 @@ public class MaxSeriesMergeFileSelector extends MaxFileMergeFileSelector {
   public List[] select() throws MergeException {
     long startTime = System.currentTimeMillis();
     try {
-      logger.info("Selecting merge candidates from {} seqFile, {} unseqFiles", resource.getSeqFiles().size(),
+      logger.info(
+          "Selecting merge candidates from {} seqFile, {} unseqFiles",
+          resource.getSeqFiles().size(),
           resource.getUnseqFiles().size());
 
       searchMaxSeriesNum();
@@ -66,12 +66,17 @@ public class MaxSeriesMergeFileSelector extends MaxFileMergeFileSelector {
       throw new MergeException(e);
     }
     if (logger.isInfoEnabled()) {
-      logger.info("Selected merge candidates, {} seqFiles, {} unseqFiles, total memory cost {}, "
-              + "concurrent merge num {}" + "time consumption {}ms",
-          selectedSeqFiles.size(), selectedUnseqFiles.size(), totalCost, concurrentMergeNum,
+      logger.info(
+          "Selected merge candidates, {} seqFiles, {} unseqFiles, total memory cost {}, "
+              + "concurrent merge num {}"
+              + "time consumption {}ms",
+          selectedSeqFiles.size(),
+          selectedUnseqFiles.size(),
+          totalCost,
+          concurrentMergeNum,
           System.currentTimeMillis() - startTime);
     }
-    return new List[]{selectedSeqFiles, selectedUnseqFiles};
+    return new List[] {selectedSeqFiles, selectedUnseqFiles};
   }
 
   private void searchMaxSeriesNum() throws IOException {

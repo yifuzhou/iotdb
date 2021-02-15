@@ -53,9 +53,14 @@ public class MergeGroupByExecutor implements GroupByExecutor {
 
   private List<GroupByExecutor> groupByExecutors;
 
-  MergeGroupByExecutor(PartialPath path, Set<String> deviceMeasurements, TSDataType dataType,
-      QueryContext context, Filter timeFilter,
-      MetaGroupMember metaGroupMember, boolean ascending) {
+  MergeGroupByExecutor(
+      PartialPath path,
+      Set<String> deviceMeasurements,
+      TSDataType dataType,
+      QueryContext context,
+      Filter timeFilter,
+      MetaGroupMember metaGroupMember,
+      boolean ascending) {
     this.path = path;
     this.deviceMeasurements = deviceMeasurements;
     this.dataType = dataType;
@@ -85,14 +90,13 @@ public class MergeGroupByExecutor implements GroupByExecutor {
     }
     resetAggregateResults();
     for (GroupByExecutor groupByExecutor : groupByExecutors) {
-      List<AggregateResult> subResults = groupByExecutor
-          .calcResult(curStartTime, curEndTime);
+      List<AggregateResult> subResults = groupByExecutor.calcResult(curStartTime, curEndTime);
       for (int i = 0; i < subResults.size(); i++) {
         results.get(i).merge(subResults.get(i));
       }
     }
-    logger.debug("Aggregation result of {}@[{}, {}] is {}", path, curStartTime, curEndTime,
-        results);
+    logger.debug(
+        "Aggregation result of {}@[{}, {}] is {}", path, curStartTime, curEndTime, results);
     return results;
   }
 
@@ -109,8 +113,7 @@ public class MergeGroupByExecutor implements GroupByExecutor {
 
     Pair<Long, Object> result = null;
     for (GroupByExecutor groupByExecutor : groupByExecutors) {
-      Pair<Long, Object> pair = groupByExecutor
-          .peekNextNotNullValue(nextStartTime, nextEndTime);
+      Pair<Long, Object> pair = groupByExecutor.peekNextNotNullValue(nextStartTime, nextEndTime);
       if (pair == null) {
         continue;
       }
@@ -118,15 +121,20 @@ public class MergeGroupByExecutor implements GroupByExecutor {
         result = pair;
       }
     }
-    logger.debug("peekNextNotNullValue result of {}@[{}, {}] is {}", path, nextStartTime, nextEndTime,
+    logger.debug(
+        "peekNextNotNullValue result of {}@[{}, {}] is {}",
+        path,
+        nextStartTime,
+        nextEndTime,
         results);
     return result;
   }
 
   private void initExecutors() throws QueryProcessException {
     try {
-      groupByExecutors = readerFactory.getGroupByExecutors(path, deviceMeasurements, dataType,
-          context, timeFilter, aggregationTypes, ascending);
+      groupByExecutors =
+          readerFactory.getGroupByExecutors(
+              path, deviceMeasurements, dataType, context, timeFilter, aggregationTypes, ascending);
     } catch (StorageEngineException e) {
       throw new QueryProcessException(e);
     }

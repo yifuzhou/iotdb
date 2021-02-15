@@ -37,8 +37,7 @@ import org.apache.iotdb.tsfile.file.metadata.enums.TSEncoding;
 import org.apache.iotdb.tsfile.utils.ReadWriteIOUtils;
 
 /**
- * create multiple timeSeries, could be split to several sub Plans to execute in different
- * DataGroup
+ * create multiple timeSeries, could be split to several sub Plans to execute in different DataGroup
  */
 public class CreateMultiTimeSeriesPlan extends PhysicalPlan {
 
@@ -51,10 +50,9 @@ public class CreateMultiTimeSeriesPlan extends PhysicalPlan {
   private List<Map<String, String>> tags = null;
   private List<Map<String, String>> attributes = null;
 
-  /**
-   * record the result of creation of time series
-   */
+  /** record the result of creation of time series */
   private Map<Integer, TSStatus> results = new TreeMap<>();
+
   private List<Integer> indexes;
 
   public CreateMultiTimeSeriesPlan() {
@@ -309,8 +307,10 @@ public class CreateMultiTimeSeriesPlan extends PhysicalPlan {
       return false;
     }
     CreateMultiTimeSeriesPlan that = (CreateMultiTimeSeriesPlan) o;
-    return Objects.equals(paths, that.paths) && Objects.equals(dataTypes, that.dataTypes) && Objects
-        .equals(encodings, that.encodings) && Objects.equals(compressors, that.compressors);
+    return Objects.equals(paths, that.paths)
+        && Objects.equals(dataTypes, that.dataTypes)
+        && Objects.equals(encodings, that.encodings)
+        && Objects.equals(compressors, that.compressors);
   }
 
   @Override

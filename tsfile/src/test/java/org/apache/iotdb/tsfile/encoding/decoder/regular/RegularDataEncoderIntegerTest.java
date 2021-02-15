@@ -23,12 +23,10 @@ import static org.junit.Assert.assertEquals;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
-
-import org.junit.Before;
-import org.junit.Test;
-
 import org.apache.iotdb.tsfile.encoding.decoder.RegularDataDecoder;
 import org.apache.iotdb.tsfile.encoding.encoder.RegularDataEncoder;
+import org.junit.Before;
+import org.junit.Test;
 
 public class RegularDataEncoderIntegerTest {
 

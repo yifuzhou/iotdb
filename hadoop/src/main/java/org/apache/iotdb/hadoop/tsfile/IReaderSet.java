@@ -18,13 +18,12 @@
  */
 package org.apache.iotdb.hadoop.tsfile;
 
+import java.util.List;
 import org.apache.iotdb.tsfile.read.TsFileSequenceReader;
 
-import java.util.List;
-
 /**
- * Unified the interface in TSRecordReader and TSHiveRecordReader
- * used for set some reference attribute in the class
+ * Unified the interface in TSRecordReader and TSHiveRecordReader used for set some reference
+ * attribute in the class
  */
 public interface IReaderSet {
 

@@ -36,9 +36,5 @@ public class TestLogManager extends RaftLogManager {
   }
 
   @Override
-  public void takeSnapshot() throws IOException {
-
-  }
-
-
+  public void takeSnapshot() throws IOException {}
 }

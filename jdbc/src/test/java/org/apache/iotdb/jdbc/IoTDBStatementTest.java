@@ -37,16 +37,13 @@ import org.mockito.MockitoAnnotations;
 
 public class IoTDBStatementTest {
 
-  @Mock
-  private IoTDBConnection connection;
+  @Mock private IoTDBConnection connection;
 
-  @Mock
-  private Iface client;
+  @Mock private Iface client;
 
   private long sessionId;
 
-  @Mock
-  private TSFetchMetadataResp fetchMetadataResp;
+  @Mock private TSFetchMetadataResp fetchMetadataResp;
 
   private ZoneId zoneID = ZoneId.systemDefault();
 
@@ -61,9 +58,7 @@ public class IoTDBStatementTest {
   }
 
   @After
-  public void tearDown() throws Exception {
-  }
-
+  public void tearDown() throws Exception {}
 
   @SuppressWarnings("resource")
   @Test

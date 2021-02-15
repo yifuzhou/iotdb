@@ -20,12 +20,10 @@ package org.apache.iotdb.tsfile.encoding.decoder;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import org.apache.iotdb.tsfile.file.metadata.enums.TSEncoding;
 import org.apache.iotdb.tsfile.utils.ReadWriteIOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class GorillaDecoderV1 extends Decoder {
 
@@ -90,14 +88,13 @@ public abstract class GorillaDecoderV1 extends Decoder {
       this.buffer = EOF;
       numberLeftInBuffer = -1;
     }
-
   }
 
   /**
    * read some bits and convert them to an int value.
    *
    * @param buffer stream to read
-   * @param len    number of bit to read
+   * @param len number of bit to read
    * @return converted int value
    * @throws IOException cannot read from stream
    */
@@ -114,7 +111,7 @@ public abstract class GorillaDecoderV1 extends Decoder {
    * read some bits and convert them to a long value.
    *
    * @param buffer stream to read
-   * @param len    number of bit to read
+   * @param len number of bit to read
    * @return converted long value
    * @throws IOException cannot read from stream
    */

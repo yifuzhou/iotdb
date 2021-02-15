@@ -94,12 +94,12 @@ public class BooleanTVList extends TVList {
   @Override
   public void sort() {
     if (sortedTimestamps == null || sortedTimestamps.length < size) {
-      sortedTimestamps = (long[][]) PrimitiveArrayManager
-          .createDataListsByType(TSDataType.INT64, size);
+      sortedTimestamps =
+          (long[][]) PrimitiveArrayManager.createDataListsByType(TSDataType.INT64, size);
     }
     if (sortedValues == null || sortedValues.length < size) {
-      sortedValues = (boolean[][]) PrimitiveArrayManager
-          .createDataListsByType(TSDataType.BOOLEAN, size);
+      sortedValues =
+          (boolean[][]) PrimitiveArrayManager.createDataListsByType(TSDataType.BOOLEAN, size);
     }
     sort(0, size);
     clearSortedValue();
@@ -126,7 +126,9 @@ public class BooleanTVList extends TVList {
 
   @Override
   protected void setFromSorted(int src, int dest) {
-    set(dest, sortedTimestamps[src / ARRAY_SIZE][src % ARRAY_SIZE],
+    set(
+        dest,
+        sortedTimestamps[src / ARRAY_SIZE][src % ARRAY_SIZE],
         sortedValues[src / ARRAY_SIZE][src % ARRAY_SIZE]);
   }
 
@@ -174,15 +176,15 @@ public class BooleanTVList extends TVList {
 
   @Override
   public TimeValuePair getTimeValuePair(int index) {
-    return new TimeValuePair(getTime(index),
-        TsPrimitiveType.getByType(TSDataType.BOOLEAN, getBoolean(index)));
+    return new TimeValuePair(
+        getTime(index), TsPrimitiveType.getByType(TSDataType.BOOLEAN, getBoolean(index)));
   }
 
   @Override
-  protected TimeValuePair getTimeValuePair(int index, long time, Integer floatPrecision,
-      TSEncoding encoding) {
-    return new TimeValuePair(time,
-        TsPrimitiveType.getByType(TSDataType.BOOLEAN, getBoolean(index)));
+  protected TimeValuePair getTimeValuePair(
+      int index, long time, Integer floatPrecision, TSEncoding encoding) {
+    return new TimeValuePair(
+        time, TsPrimitiveType.getByType(TSDataType.BOOLEAN, getBoolean(index)));
   }
 
   @Override

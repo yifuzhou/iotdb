@@ -63,5 +63,4 @@ public class CopyOnReadLinkedListTest {
     Assert.assertEquals("bbb", clist.get(1));
     Assert.assertFalse(clist.isEmpty());
   }
-
 }

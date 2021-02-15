@@ -62,8 +62,9 @@ public class IoTDBSinkBatchTimerTest {
 
     Thread.sleep(2500);
 
-    verify(pool).insertRecords(any(List.class), any(List.class), any(List.class), any(List.class),
-        any(List.class));
+    verify(pool)
+        .insertRecords(
+            any(List.class), any(List.class), any(List.class), any(List.class), any(List.class));
 
     Thread.sleep(1000);
 

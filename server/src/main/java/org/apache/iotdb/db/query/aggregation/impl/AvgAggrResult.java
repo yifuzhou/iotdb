@@ -77,8 +77,9 @@ public class AvgAggrResult extends AggregateResult {
     } else {
       sum = statistics.getSumDoubleValue();
     }
-    avg = avg * ((double) preCnt / cnt) + ((double) statistics.getCount() / cnt)
-        * sum / statistics.getCount();
+    avg =
+        avg * ((double) preCnt / cnt)
+            + ((double) statistics.getCount() / cnt) * sum / statistics.getCount();
   }
 
   @Override
@@ -98,8 +99,8 @@ public class AvgAggrResult extends AggregateResult {
   }
 
   @Override
-  public void updateResultUsingTimestamps(long[] timestamps, int length,
-      IReaderByTimestamp dataReader) throws IOException {
+  public void updateResultUsingTimestamps(
+      long[] timestamps, int length, IReaderByTimestamp dataReader) throws IOException {
     for (int i = 0; i < length; i++) {
       Object value = dataReader.getValueInTimestamp(timestamps[i]);
       if (value != null) {
@@ -145,8 +146,9 @@ public class AvgAggrResult extends AggregateResult {
       // avoid two empty results producing an NaN
       return;
     }
-    avg = avg * ((double) cnt / (cnt + anotherAvg.cnt)) +
-        anotherAvg.avg * ((double) anotherAvg.cnt / (cnt + anotherAvg.cnt));
+    avg =
+        avg * ((double) cnt / (cnt + anotherAvg.cnt))
+            + anotherAvg.avg * ((double) anotherAvg.cnt / (cnt + anotherAvg.cnt));
     cnt += anotherAvg.cnt;
   }
 

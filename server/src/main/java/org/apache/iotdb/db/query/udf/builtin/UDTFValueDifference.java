@@ -34,9 +34,7 @@ public abstract class UDTFValueDifference extends UDTFValueTrend {
   public void beforeStart(UDFParameters parameters, UDTFConfigurations configurations)
       throws MetadataException {
     dataType = parameters.getDataType(0);
-    configurations
-        .setAccessStrategy(new RowByRowAccessStrategy())
-        .setOutputDataType(dataType);
+    configurations.setAccessStrategy(new RowByRowAccessStrategy()).setOutputDataType(dataType);
   }
 
   @Override

@@ -30,8 +30,8 @@ import org.apache.iotdb.tsfile.utils.PublicBAOS;
 
 public interface SerializableList {
 
-  int INITIAL_BYTE_ARRAY_LENGTH_FOR_MEMORY_CONTROL = IoTDBDescriptor.getInstance().getConfig()
-      .getUdfInitialByteArrayLengthForMemoryControl();
+  int INITIAL_BYTE_ARRAY_LENGTH_FOR_MEMORY_CONTROL =
+      IoTDBDescriptor.getInstance().getConfig().getUdfInitialByteArrayLengthForMemoryControl();
 
   void serialize(PublicBAOS outputStream) throws IOException;
 

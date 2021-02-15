@@ -28,9 +28,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * GenericHandler simply put the response into an AtomicReference and wake up the caller.
- * Notice: the caller should wait on "result" if it wants to get the result. Please refer to the
- * current usages before using this class.
+ * GenericHandler simply put the response into an AtomicReference and wake up the caller. Notice:
+ * the caller should wait on "result" if it wants to get the result. Please refer to the current
+ * usages before using this class.
+ *
  * @param <T>
  */
 public class GenericHandler<T> implements AsyncMethodCallback<T> {

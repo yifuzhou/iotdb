@@ -33,7 +33,6 @@ import org.apache.iotdb.cluster.common.TestSnapshot;
 import org.apache.iotdb.cluster.common.TestUtils;
 import org.apache.iotdb.cluster.rpc.thrift.Node;
 import org.apache.iotdb.cluster.rpc.thrift.PullSnapshotResp;
-import org.apache.iotdb.cluster.server.handlers.caller.PullSnapshotHandler;
 import org.junit.Test;
 
 public class PullSnapshotHandlerTest {
@@ -52,14 +51,16 @@ public class PullSnapshotHandlerTest {
       snapshotBufferMap.put(i, snapshot.serialize());
     }
 
-    PullSnapshotHandler<TestSnapshot> handler = new PullSnapshotHandler<>(result, owner, slots,
-        TestSnapshot.Factory.INSTANCE);
+    PullSnapshotHandler<TestSnapshot> handler =
+        new PullSnapshotHandler<>(result, owner, slots, TestSnapshot.Factory.INSTANCE);
     synchronized (result) {
-      new Thread(() -> {
-        PullSnapshotResp resp = new PullSnapshotResp();
-        resp.setSnapshotBytes(snapshotBufferMap);
-        handler.onComplete(resp);
-      }).start();
+      new Thread(
+              () -> {
+                PullSnapshotResp resp = new PullSnapshotResp();
+                resp.setSnapshotBytes(snapshotBufferMap);
+                handler.onComplete(resp);
+              })
+          .start();
       result.wait();
     }
     assertEquals(snapshotMap, result.get());
@@ -70,8 +71,8 @@ public class PullSnapshotHandlerTest {
     AtomicReference<Map<Integer, TestSnapshot>> result = new AtomicReference<>();
     Node owner = TestUtils.getNode(1);
     List<Integer> slots = new ArrayList<>();
-    PullSnapshotHandler<TestSnapshot> handler = new PullSnapshotHandler<>(result, owner, slots,
-        TestSnapshot.Factory.INSTANCE);
+    PullSnapshotHandler<TestSnapshot> handler =
+        new PullSnapshotHandler<>(result, owner, slots, TestSnapshot.Factory.INSTANCE);
     synchronized (result) {
       new Thread(() -> handler.onError(new TestException())).start();
       result.wait();

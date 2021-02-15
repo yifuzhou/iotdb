@@ -34,9 +34,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This class is used to monitor the executing time of each query.
- * </p>
- * Once one is over the threshold, it will be killed and return the time out exception.
+ * This class is used to monitor the executing time of each query. Once one is over the threshold,
+ * it will be killed and return the time out exception.
  */
 public class QueryTimeManager implements IService {
 
@@ -56,18 +55,22 @@ public class QueryTimeManager implements IService {
   private QueryTimeManager() {
     queryInfoMap = new ConcurrentHashMap<>();
     queryScheduledTaskMap = new ConcurrentHashMap<>();
-    executorService = IoTDBThreadPoolFactory.newScheduledThreadPool(1,
-        "query-time-manager");
+    executorService = IoTDBThreadPoolFactory.newScheduledThreadPool(1, "query-time-manager");
   }
 
   public void registerQuery(long queryId, long startTime, String sql, long timeout) {
     final long finalTimeout = timeout == 0 ? config.getQueryTimeThreshold() : timeout;
     queryInfoMap.put(queryId, new QueryInfo(startTime, sql));
     // submit a scheduled task to judge whether query is still running after timeout
-    ScheduledFuture<?> scheduledFuture = executorService.schedule(() -> {
-      killQuery(queryId);
-      logger.warn(String.format("Query is time out (%dms) with queryId %d", finalTimeout, queryId));
-    }, finalTimeout, TimeUnit.MILLISECONDS);
+    ScheduledFuture<?> scheduledFuture =
+        executorService.schedule(
+            () -> {
+              killQuery(queryId);
+              logger.warn(
+                  String.format("Query is time out (%dms) with queryId %d", finalTimeout, queryId));
+            },
+            finalTimeout,
+            TimeUnit.MILLISECONDS);
     queryScheduledTaskMap.put(queryId, scheduledFuture);
   }
 
@@ -81,20 +84,24 @@ public class QueryTimeManager implements IService {
   public AtomicBoolean unRegisterQuery(long queryId) {
     // This is used to make sure the QueryTimeoutRuntimeException is thrown once
     AtomicBoolean successRemoved = new AtomicBoolean(false);
-    queryInfoMap.computeIfPresent(queryId, (k, v) -> {
-      successRemoved.set(true);
-      return null;
-    });
-    queryScheduledTaskMap.computeIfPresent(queryId, (k, v) -> {
-      queryScheduledTaskMap.get(queryId).cancel(false);
-      return null;
-    });
+    queryInfoMap.computeIfPresent(
+        queryId,
+        (k, v) -> {
+          successRemoved.set(true);
+          return null;
+        });
+    queryScheduledTaskMap.computeIfPresent(
+        queryId,
+        (k, v) -> {
+          queryScheduledTaskMap.get(queryId).cancel(false);
+          return null;
+        });
     return successRemoved;
   }
 
   public static void checkQueryAlive(long queryId) {
-    if (getInstance().queryInfoMap.get(queryId) != null &&
-        getInstance().queryInfoMap.get(queryId).isInterrupted()) {
+    if (getInstance().queryInfoMap.get(queryId) != null
+        && getInstance().queryInfoMap.get(queryId).isInterrupted()) {
       if (getInstance().unRegisterQuery(queryId).get()) {
         throw new QueryTimeoutRuntimeException(
             QueryTimeoutRuntimeException.TIMEOUT_EXCEPTION_MESSAGE);
@@ -132,8 +139,7 @@ public class QueryTimeManager implements IService {
 
     private static final QueryTimeManager INSTANCE = new QueryTimeManager();
 
-    private QueryTimeManagerHelper() {
-    }
+    private QueryTimeManagerHelper() {}
   }
 
   public class QueryInfo {
@@ -154,8 +160,10 @@ public class QueryTimeManager implements IService {
       if (statement.length() <= 64) {
         this.statement = statement;
       } else {
-        this.statement = statement.substring(0, MAX_STATEMENT_LENGTH / 2) + "..." + statement
-            .substring(statement.length() - MAX_STATEMENT_LENGTH / 2);
+        this.statement =
+            statement.substring(0, MAX_STATEMENT_LENGTH / 2)
+                + "..."
+                + statement.substring(statement.length() - MAX_STATEMENT_LENGTH / 2);
       }
     }
 

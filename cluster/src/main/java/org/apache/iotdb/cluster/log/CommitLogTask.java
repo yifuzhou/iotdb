@@ -37,14 +37,10 @@ public class CommitLogTask implements Runnable {
     this.term = term;
   }
 
-  /**
-   * listener field
-   */
+  /** listener field */
   private AsyncMethodCallback<Void> callback;
 
-  /**
-   * @param callback the event listener
-   */
+  /** @param callback the event listener */
   public void registerCallback(AsyncMethodCallback<Void> callback) {
     this.callback = callback;
   }

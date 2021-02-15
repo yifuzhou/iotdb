@@ -43,12 +43,12 @@ import org.apache.iotdb.tsfile.read.query.timegenerator.TimeGenerator;
 
 public abstract class UDTFDataSet extends QueryDataSet {
 
-  protected static final float UDF_READER_MEMORY_BUDGET_IN_MB = IoTDBDescriptor.getInstance()
-      .getConfig().getUdfReaderMemoryBudgetInMB();
-  protected static final float UDF_TRANSFORMER_MEMORY_BUDGET_IN_MB = IoTDBDescriptor.getInstance()
-      .getConfig().getUdfTransformerMemoryBudgetInMB();
-  protected static final float UDF_COLLECTOR_MEMORY_BUDGET_IN_MB = IoTDBDescriptor.getInstance()
-      .getConfig().getUdfCollectorMemoryBudgetInMB();
+  protected static final float UDF_READER_MEMORY_BUDGET_IN_MB =
+      IoTDBDescriptor.getInstance().getConfig().getUdfReaderMemoryBudgetInMB();
+  protected static final float UDF_TRANSFORMER_MEMORY_BUDGET_IN_MB =
+      IoTDBDescriptor.getInstance().getConfig().getUdfTransformerMemoryBudgetInMB();
+  protected static final float UDF_COLLECTOR_MEMORY_BUDGET_IN_MB =
+      IoTDBDescriptor.getInstance().getConfig().getUdfCollectorMemoryBudgetInMB();
 
   protected final long queryId;
   protected final UDTFPlan udtfPlan;
@@ -56,34 +56,50 @@ public abstract class UDTFDataSet extends QueryDataSet {
 
   protected LayerPointReader[] transformers;
 
-  /**
-   * execute with value filters
-   */
-  protected UDTFDataSet(QueryContext queryContext, UDTFPlan udtfPlan,
-      List<PartialPath> deduplicatedPaths, List<TSDataType> deduplicatedDataTypes,
-      TimeGenerator timestampGenerator, List<IReaderByTimestamp> readersOfSelectedSeries,
-      List<Boolean> cached) throws QueryProcessException, IOException {
+  /** execute with value filters */
+  protected UDTFDataSet(
+      QueryContext queryContext,
+      UDTFPlan udtfPlan,
+      List<PartialPath> deduplicatedPaths,
+      List<TSDataType> deduplicatedDataTypes,
+      TimeGenerator timestampGenerator,
+      List<IReaderByTimestamp> readersOfSelectedSeries,
+      List<Boolean> cached)
+      throws QueryProcessException, IOException {
     super(new ArrayList<>(deduplicatedPaths), deduplicatedDataTypes);
     queryId = queryContext.getQueryId();
     this.udtfPlan = udtfPlan;
-    inputLayer = new InputLayer(queryId, UDF_READER_MEMORY_BUDGET_IN_MB, deduplicatedPaths,
-        deduplicatedDataTypes, timestampGenerator, readersOfSelectedSeries, cached);
+    inputLayer =
+        new InputLayer(
+            queryId,
+            UDF_READER_MEMORY_BUDGET_IN_MB,
+            deduplicatedPaths,
+            deduplicatedDataTypes,
+            timestampGenerator,
+            readersOfSelectedSeries,
+            cached);
     udtfPlan.initializeUdfExecutors(queryId, UDF_COLLECTOR_MEMORY_BUDGET_IN_MB);
     initTransformers(UDF_TRANSFORMER_MEMORY_BUDGET_IN_MB);
   }
 
-  /**
-   * execute without value filters
-   */
-  protected UDTFDataSet(QueryContext queryContext, UDTFPlan udtfPlan,
-      List<PartialPath> deduplicatedPaths, List<TSDataType> deduplicatedDataTypes,
+  /** execute without value filters */
+  protected UDTFDataSet(
+      QueryContext queryContext,
+      UDTFPlan udtfPlan,
+      List<PartialPath> deduplicatedPaths,
+      List<TSDataType> deduplicatedDataTypes,
       List<ManagedSeriesReader> readersOfSelectedSeries)
       throws QueryProcessException, IOException, InterruptedException {
     super(new ArrayList<>(deduplicatedPaths), deduplicatedDataTypes);
     queryId = queryContext.getQueryId();
     this.udtfPlan = udtfPlan;
-    inputLayer = new InputLayer(queryId, UDF_READER_MEMORY_BUDGET_IN_MB, deduplicatedPaths,
-        deduplicatedDataTypes, readersOfSelectedSeries);
+    inputLayer =
+        new InputLayer(
+            queryId,
+            UDF_READER_MEMORY_BUDGET_IN_MB,
+            deduplicatedPaths,
+            deduplicatedDataTypes,
+            readersOfSelectedSeries);
     udtfPlan.initializeUdfExecutors(queryId, UDF_COLLECTOR_MEMORY_BUDGET_IN_MB);
     initTransformers(UDF_TRANSFORMER_MEMORY_BUDGET_IN_MB);
   }
@@ -97,8 +113,11 @@ public abstract class UDTFDataSet extends QueryDataSet {
     int windowTransformerCount = 0;
     for (int i = 0; i < size; ++i) {
       if (udtfPlan.isUdfColumn(i)) {
-        AccessStrategy accessStrategy = udtfPlan.getExecutorByDataSetOutputColumnIndex(i)
-            .getConfigurations().getAccessStrategy();
+        AccessStrategy accessStrategy =
+            udtfPlan
+                .getExecutorByDataSetOutputColumnIndex(i)
+                .getConfigurations()
+                .getAccessStrategy();
         switch (accessStrategy.getAccessStrategyType()) {
           case SLIDING_SIZE_WINDOW:
           case SLIDING_TIME_WINDOW:
@@ -118,21 +137,26 @@ public abstract class UDTFDataSet extends QueryDataSet {
         AccessStrategy accessStrategy = executor.getConfigurations().getAccessStrategy();
         switch (accessStrategy.getAccessStrategyType()) {
           case ROW_BY_ROW:
-            transformers[i] = new UDFQueryRowTransformer(
-                inputLayer.constructRowReader(readerIndexes), executor);
+            transformers[i] =
+                new UDFQueryRowTransformer(inputLayer.constructRowReader(readerIndexes), executor);
             break;
           case SLIDING_SIZE_WINDOW:
           case SLIDING_TIME_WINDOW:
-            transformers[i] = new UDFQueryRowWindowTransformer(inputLayer
-                .constructRowWindowReader(readerIndexes, accessStrategy, memoryBudgetInMB),
-                executor);
+            transformers[i] =
+                new UDFQueryRowWindowTransformer(
+                    inputLayer.constructRowWindowReader(
+                        readerIndexes, accessStrategy, memoryBudgetInMB),
+                    executor);
             break;
           default:
             throw new UnsupportedOperationException("Unsupported transformer access strategy");
         }
       } else {
-        transformers[i] = new RawQueryPointTransformer(inputLayer.constructPointReader(
-            udtfPlan.getReaderIndex(udtfPlan.getRawQueryColumnNameByDatasetOutputColumnIndex(i))));
+        transformers[i] =
+            new RawQueryPointTransformer(
+                inputLayer.constructPointReader(
+                    udtfPlan.getReaderIndex(
+                        udtfPlan.getRawQueryColumnNameByDatasetOutputColumnIndex(i))));
       }
     }
   }

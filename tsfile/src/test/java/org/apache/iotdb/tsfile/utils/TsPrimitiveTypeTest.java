@@ -56,5 +56,4 @@ public class TsPrimitiveTypeTest {
     Assert.assertEquals(new TsBoolean(true), booleanValue);
     Assert.assertTrue(booleanValue.getBoolean());
   }
-
 }

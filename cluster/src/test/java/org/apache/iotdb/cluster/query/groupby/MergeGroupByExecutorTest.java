@@ -51,13 +51,19 @@ public class MergeGroupByExecutorTest extends BaseQueryTest {
     try {
       Filter timeFilter = null;
 
-      MergeGroupByExecutor groupByExecutor = new MergeGroupByExecutor(path,
-          Collections.singleton(path.getMeasurement()), dataType, context,
-          timeFilter, testMetaMember, true);
+      MergeGroupByExecutor groupByExecutor =
+          new MergeGroupByExecutor(
+              path,
+              Collections.singleton(path.getMeasurement()),
+              dataType,
+              context,
+              timeFilter,
+              testMetaMember,
+              true);
       AggregationType[] types = AggregationType.values();
       for (AggregationType type : types) {
-        groupByExecutor.addAggregateResult(AggregateResultFactory.getAggrResultByType(type,
-            TSDataType.DOUBLE, true));
+        groupByExecutor.addAggregateResult(
+            AggregateResultFactory.getAggrResultByType(type, TSDataType.DOUBLE, true));
       }
 
       Object[] answers;
@@ -84,13 +90,19 @@ public class MergeGroupByExecutorTest extends BaseQueryTest {
     try {
       Filter timeFilter = TimeFilter.gtEq(3);
 
-      MergeGroupByExecutor groupByExecutor = new MergeGroupByExecutor(path,
-          Collections.singleton(path.getMeasurement()), dataType, context,
-          timeFilter, testMetaMember, true);
+      MergeGroupByExecutor groupByExecutor =
+          new MergeGroupByExecutor(
+              path,
+              Collections.singleton(path.getMeasurement()),
+              dataType,
+              context,
+              timeFilter,
+              testMetaMember,
+              true);
       AggregationType[] types = AggregationType.values();
       for (AggregationType type : types) {
-        groupByExecutor.addAggregateResult(AggregateResultFactory.getAggrResultByType(type,
-            TSDataType.DOUBLE, true));
+        groupByExecutor.addAggregateResult(
+            AggregateResultFactory.getAggrResultByType(type, TSDataType.DOUBLE, true));
       }
 
       Object[] answers;

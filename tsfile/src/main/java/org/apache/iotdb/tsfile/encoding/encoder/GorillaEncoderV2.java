@@ -23,11 +23,13 @@ import java.io.ByteArrayOutputStream;
 import org.apache.iotdb.tsfile.file.metadata.enums.TSEncoding;
 
 /**
- * <p> This class includes code modified from Michael Burman's gorilla-tsc project.
+ * This class includes code modified from Michael Burman's gorilla-tsc project.
  *
- * <p> Copyright: 2016-2018 Michael Burman and/or other contributors
- * <p> Project page: https://github.com/burmanm/gorilla-tsc
- * <p> License: http://www.apache.org/licenses/LICENSE-2.0
+ * <p>Copyright: 2016-2018 Michael Burman and/or other contributors
+ *
+ * <p>Project page: https://github.com/burmanm/gorilla-tsc
+ *
+ * <p>License: http://www.apache.org/licenses/LICENSE-2.0
  */
 public abstract class GorillaEncoderV2 extends Encoder {
 
@@ -56,17 +58,13 @@ public abstract class GorillaEncoderV2 extends Encoder {
     bitsLeft = Byte.SIZE;
   }
 
-  /**
-   * Stores a 0 and increases the count of bits by 1
-   */
+  /** Stores a 0 and increases the count of bits by 1 */
   protected void skipBit(ByteArrayOutputStream out) {
     bitsLeft--;
     flipByte(out);
   }
 
-  /**
-   * Stores a 1 and increases the count of bits by 1
-   */
+  /** Stores a 1 and increases the count of bits by 1 */
   protected void writeBit(ByteArrayOutputStream out) {
     buffer |= (1 << (bitsLeft - 1));
     bitsLeft--;
@@ -77,7 +75,7 @@ public abstract class GorillaEncoderV2 extends Encoder {
    * Writes the given long value using the defined amount of least significant bits.
    *
    * @param value The long value to be written
-   * @param bits  How many bits are stored to the stream
+   * @param bits How many bits are stored to the stream
    */
   protected void writeBits(long value, int bits, ByteArrayOutputStream out) {
     while (bits > 0) {

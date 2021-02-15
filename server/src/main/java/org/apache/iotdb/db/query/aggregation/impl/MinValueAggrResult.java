@@ -64,8 +64,8 @@ public class MinValueAggrResult extends AggregateResult {
   }
 
   @Override
-  public void updateResultUsingTimestamps(long[] timestamps, int length,
-      IReaderByTimestamp dataReader) throws IOException {
+  public void updateResultUsingTimestamps(
+      long[] timestamps, int length, IReaderByTimestamp dataReader) throws IOException {
     Comparable<Object> minVal = null;
     for (int i = 0; i < length; i++) {
       Object value = dataReader.getValueInTimestamp(timestamps[i]);
@@ -93,12 +93,10 @@ public class MinValueAggrResult extends AggregateResult {
   }
 
   @Override
-  protected void deserializeSpecificFields(ByteBuffer buffer) {
-  }
+  protected void deserializeSpecificFields(ByteBuffer buffer) {}
 
   @Override
-  protected void serializeSpecificFields(OutputStream outputStream) throws IOException {
-  }
+  protected void serializeSpecificFields(OutputStream outputStream) throws IOException {}
 
   private void updateResult(Comparable<Object> minVal) {
     if (minVal == null) {
@@ -108,5 +106,4 @@ public class MinValueAggrResult extends AggregateResult {
       setValue(minVal);
     }
   }
-
 }

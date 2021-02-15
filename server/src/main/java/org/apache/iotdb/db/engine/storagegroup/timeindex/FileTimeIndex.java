@@ -37,22 +37,16 @@ import org.apache.iotdb.tsfile.utils.ReadWriteIOUtils;
 
 public class FileTimeIndex implements ITimeIndex {
 
-  protected static final Map<String, String> cachedDevicePool = CachedStringPool.getInstance()
-      .getCachedPool();
+  protected static final Map<String, String> cachedDevicePool =
+      CachedStringPool.getInstance().getCachedPool();
 
-  /**
-   * start time
-   */
+  /** start time */
   protected long startTime;
 
-  /**
-   * end times. The value is Long.MIN_VALUE if it's an unsealed sequence tsfile
-   */
+  /** end times. The value is Long.MIN_VALUE if it's an unsealed sequence tsfile */
   protected long endTime;
 
-  /**
-   * devices
-   */
+  /** devices */
   protected Set<String> devices;
 
   public FileTimeIndex() {
@@ -88,8 +82,8 @@ public class FileTimeIndex implements ITimeIndex {
       String cachedPath = cachedDevicePool.computeIfAbsent(path, k -> k);
       deviceSet.add(cachedPath);
     }
-    return new FileTimeIndex(deviceSet, ReadWriteIOUtils.readLong(inputStream),
-        ReadWriteIOUtils.readLong(inputStream));
+    return new FileTimeIndex(
+        deviceSet, ReadWriteIOUtils.readLong(inputStream), ReadWriteIOUtils.readLong(inputStream));
   }
 
   @Override
@@ -133,8 +127,9 @@ public class FileTimeIndex implements ITimeIndex {
 
   @Override
   public long calculateRamSize() {
-    return RamUsageEstimator.sizeOf(devices) + RamUsageEstimator.sizeOf(startTime) +
-        RamUsageEstimator.sizeOf(endTime);
+    return RamUsageEstimator.sizeOf(devices)
+        + RamUsageEstimator.sizeOf(startTime)
+        + RamUsageEstimator.sizeOf(endTime);
   }
 
   @Override

@@ -58,26 +58,26 @@ public class LevelCompactionLogTest extends LevelCompactionTest {
 
   @Test
   public void testCompactionLog() {
-    LevelCompactionTsFileManagement levelCompactionTsFileManagement = new LevelCompactionTsFileManagement(
-        COMPACTION_TEST_SG, tempSGDir.getPath());
+    LevelCompactionTsFileManagement levelCompactionTsFileManagement =
+        new LevelCompactionTsFileManagement(COMPACTION_TEST_SG, tempSGDir.getPath());
     levelCompactionTsFileManagement.addAll(seqResources, true);
     levelCompactionTsFileManagement.addAll(unseqResources, false);
     levelCompactionTsFileManagement.forkCurrentFileList(0);
-    CompactionMergeTask compactionMergeTask = levelCompactionTsFileManagement.new CompactionMergeTask(
-        this::closeCompactionMergeCallBack, 0);
+    CompactionMergeTask compactionMergeTask =
+        levelCompactionTsFileManagement
+        .new CompactionMergeTask(this::closeCompactionMergeCallBack, 0);
     compactionMergeWorking = true;
     compactionMergeTask.run();
     while (compactionMergeWorking) {
-      //wait
+      // wait
     }
-    File logFile = FSFactoryProducer.getFSFactory()
-        .getFile(tempSGDir.getPath(), COMPACTION_TEST_SG + COMPACTION_LOG_NAME);
+    File logFile =
+        FSFactoryProducer.getFSFactory()
+            .getFile(tempSGDir.getPath(), COMPACTION_TEST_SG + COMPACTION_LOG_NAME);
     assertFalse(logFile.exists());
   }
 
-  /**
-   * close compaction merge callback, to release some locks
-   */
+  /** close compaction merge callback, to release some locks */
   private void closeCompactionMergeCallBack() {
     this.compactionMergeWorking = false;
   }

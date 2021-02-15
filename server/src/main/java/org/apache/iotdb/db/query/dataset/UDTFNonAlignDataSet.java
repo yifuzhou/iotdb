@@ -49,23 +49,33 @@ public class UDTFNonAlignDataSet extends UDTFDataSet implements DirectNonAlignDa
   protected int[] alreadyReturnedRowNumArray;
   protected int[] offsetArray;
 
-  /**
-   * execute with value filter
-   */
-  public UDTFNonAlignDataSet(QueryContext context, UDTFPlan udtfPlan,
-      List<PartialPath> deduplicatedPaths, List<TSDataType> deduplicatedDataTypes,
-      TimeGenerator timestampGenerator, List<IReaderByTimestamp> readersOfSelectedSeries,
-      List<Boolean> cached) throws IOException, QueryProcessException {
-    super(context, udtfPlan, deduplicatedPaths, deduplicatedDataTypes, timestampGenerator,
-        readersOfSelectedSeries, cached);
+  /** execute with value filter */
+  public UDTFNonAlignDataSet(
+      QueryContext context,
+      UDTFPlan udtfPlan,
+      List<PartialPath> deduplicatedPaths,
+      List<TSDataType> deduplicatedDataTypes,
+      TimeGenerator timestampGenerator,
+      List<IReaderByTimestamp> readersOfSelectedSeries,
+      List<Boolean> cached)
+      throws IOException, QueryProcessException {
+    super(
+        context,
+        udtfPlan,
+        deduplicatedPaths,
+        deduplicatedDataTypes,
+        timestampGenerator,
+        readersOfSelectedSeries,
+        cached);
     isInitialized = false;
   }
 
-  /**
-   * execute without value filter
-   */
-  public UDTFNonAlignDataSet(QueryContext context, UDTFPlan udtfPlan,
-      List<PartialPath> deduplicatedPaths, List<TSDataType> deduplicatedDataTypes,
+  /** execute without value filter */
+  public UDTFNonAlignDataSet(
+      QueryContext context,
+      UDTFPlan udtfPlan,
+      List<PartialPath> deduplicatedPaths,
+      List<TSDataType> deduplicatedDataTypes,
       List<ManagedSeriesReader> readersOfSelectedSeries)
       throws QueryProcessException, IOException, InterruptedException {
     super(context, udtfPlan, deduplicatedPaths, deduplicatedDataTypes, readersOfSelectedSeries);
@@ -97,8 +107,8 @@ public class UDTFNonAlignDataSet extends UDTFDataSet implements DirectNonAlignDa
     List<ByteBuffer> valueBufferList = new ArrayList<>(columnsNum);
 
     for (int i = 0; i < columnsNum; ++i) {
-      Pair<ByteBuffer, ByteBuffer> timeValueByteBufferPair = fillColumnBuffer(i, fetchSize,
-          encoder); // todo: parallelization
+      Pair<ByteBuffer, ByteBuffer> timeValueByteBufferPair =
+          fillColumnBuffer(i, fetchSize, encoder); // todo: parallelization
       timeBufferList.add(timeValueByteBufferPair.left);
       valueBufferList.add(timeValueByteBufferPair.right);
     }
@@ -110,8 +120,9 @@ public class UDTFNonAlignDataSet extends UDTFDataSet implements DirectNonAlignDa
     return tsQueryNonAlignDataSet;
   }
 
-  protected Pair<ByteBuffer, ByteBuffer> fillColumnBuffer(int transformedDataColumnIndex,
-      int fetchSize, WatermarkEncoder encoder) throws IOException, QueryProcessException {
+  protected Pair<ByteBuffer, ByteBuffer> fillColumnBuffer(
+      int transformedDataColumnIndex, int fetchSize, WatermarkEncoder encoder)
+      throws IOException, QueryProcessException {
     PublicBAOS timeBAOS = new PublicBAOS();
     PublicBAOS valueBAOS = new PublicBAOS();
 
@@ -130,23 +141,35 @@ public class UDTFNonAlignDataSet extends UDTFDataSet implements DirectNonAlignDa
         switch (type) {
           case INT32:
             int intValue = reader.currentInt();
-            ReadWriteIOUtils.write(encoder != null && encoder.needEncode(timestamp)
-                ? encoder.encodeInt(intValue, timestamp) : intValue, valueBAOS);
+            ReadWriteIOUtils.write(
+                encoder != null && encoder.needEncode(timestamp)
+                    ? encoder.encodeInt(intValue, timestamp)
+                    : intValue,
+                valueBAOS);
             break;
           case INT64:
             long longValue = reader.currentLong();
-            ReadWriteIOUtils.write(encoder != null && encoder.needEncode(timestamp)
-                ? encoder.encodeLong(longValue, timestamp) : longValue, valueBAOS);
+            ReadWriteIOUtils.write(
+                encoder != null && encoder.needEncode(timestamp)
+                    ? encoder.encodeLong(longValue, timestamp)
+                    : longValue,
+                valueBAOS);
             break;
           case FLOAT:
             float floatValue = reader.currentFloat();
-            ReadWriteIOUtils.write(encoder != null && encoder.needEncode(timestamp)
-                ? encoder.encodeFloat(floatValue, timestamp) : floatValue, valueBAOS);
+            ReadWriteIOUtils.write(
+                encoder != null && encoder.needEncode(timestamp)
+                    ? encoder.encodeFloat(floatValue, timestamp)
+                    : floatValue,
+                valueBAOS);
             break;
           case DOUBLE:
             double doubleValue = reader.currentDouble();
-            ReadWriteIOUtils.write(encoder != null && encoder.needEncode(timestamp)
-                ? encoder.encodeDouble(doubleValue, timestamp) : doubleValue, valueBAOS);
+            ReadWriteIOUtils.write(
+                encoder != null && encoder.needEncode(timestamp)
+                    ? encoder.encodeDouble(doubleValue, timestamp)
+                    : doubleValue,
+                valueBAOS);
             break;
           case BOOLEAN:
             ReadWriteIOUtils.write(reader.currentBoolean(), valueBAOS);

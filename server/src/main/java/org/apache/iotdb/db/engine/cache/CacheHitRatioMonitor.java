@@ -28,7 +28,6 @@ import org.slf4j.LoggerFactory;
 
 public class CacheHitRatioMonitor implements CacheHitRatioMonitorMXBean, IService {
 
-
   private static Logger logger = LoggerFactory.getLogger(CacheHitRatioMonitor.class);
   static final CacheHitRatioMonitor instance = AsyncCacheHitRatioHolder.DISPLAYER;
 
@@ -135,7 +134,6 @@ public class CacheHitRatioMonitor implements CacheHitRatioMonitorMXBean, IServic
 
     private static final CacheHitRatioMonitor DISPLAYER = new CacheHitRatioMonitor();
 
-    private AsyncCacheHitRatioHolder() {
-    }
+    private AsyncCacheHitRatioHolder() {}
   }
 }

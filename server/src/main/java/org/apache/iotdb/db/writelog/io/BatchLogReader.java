@@ -33,7 +33,7 @@ import org.slf4j.LoggerFactory;
  * BatchedLogReader reads logs from a binary batch of log in the format of ByteBuffer. The
  * ByteBuffer must be readable.
  */
-public class BatchLogReader implements ILogReader{
+public class BatchLogReader implements ILogReader {
 
   private static Logger logger = LoggerFactory.getLogger(BatchLogReader.class);
 
@@ -59,7 +59,6 @@ public class BatchLogReader implements ILogReader{
     }
     return plans;
   }
-
 
   @Override
   public void close() {

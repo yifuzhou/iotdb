@@ -29,9 +29,7 @@ import org.apache.iotdb.tsfile.read.reader.IChunkReader;
 import org.apache.iotdb.tsfile.read.reader.IPageReader;
 import org.apache.iotdb.tsfile.read.reader.IPointReader;
 
-/**
- * To read chunk data in memory
- */
+/** To read chunk data in memory */
 public class MemChunkReader implements IChunkReader, IPointReader {
 
   private IPointReader timeValuePairIterator;
@@ -40,13 +38,13 @@ public class MemChunkReader implements IChunkReader, IPointReader {
   private TimeValuePair cachedTimeValuePair;
   private List<IPageReader> pageReaderList;
 
-
   public MemChunkReader(ReadOnlyMemChunk readableChunk, Filter filter) {
     timeValuePairIterator = readableChunk.getPointReader();
     this.filter = filter;
     // we treat one ReadOnlyMemChunk as one Page
-    this.pageReaderList = Collections.singletonList(
-        new MemPageReader(timeValuePairIterator, readableChunk.getChunkMetaData(), filter));
+    this.pageReaderList =
+        Collections.singletonList(
+            new MemPageReader(timeValuePairIterator, readableChunk.getChunkMetaData(), filter));
   }
 
   @Override
@@ -56,8 +54,8 @@ public class MemChunkReader implements IChunkReader, IPointReader {
     }
     while (timeValuePairIterator.hasNextTimeValuePair()) {
       TimeValuePair timeValuePair = timeValuePairIterator.nextTimeValuePair();
-      if (filter == null || filter
-          .satisfy(timeValuePair.getTimestamp(), timeValuePair.getValue().getValue())) {
+      if (filter == null
+          || filter.satisfy(timeValuePair.getTimestamp(), timeValuePair.getValue().getValue())) {
         hasCachedTimeValuePair = true;
         cachedTimeValuePair = timeValuePair;
         break;

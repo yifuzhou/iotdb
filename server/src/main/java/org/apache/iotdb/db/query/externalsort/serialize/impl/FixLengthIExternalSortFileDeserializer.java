@@ -33,10 +33,10 @@ import org.apache.iotdb.tsfile.utils.TsPrimitiveType;
 
 /**
  * FileFormat: [Header][Body]
- * <p>
- * [Header] = [DataTypeLength] + [DataTypeInStringBytes]
- * <p>
- * [DataTypeLength] = 4 bytes.
+ *
+ * <p>[Header] = [DataTypeLength] + [DataTypeInStringBytes]
+ *
+ * <p>[DataTypeLength] = 4 bytes.
  */
 public class FixLengthIExternalSortFileDeserializer implements IExternalSortFileDeserializer {
 
@@ -107,8 +107,8 @@ public class FixLengthIExternalSortFileDeserializer implements IExternalSortFile
         this.reader = new TimeValuePairReader.BinaryReader();
         break;
       default:
-        throw new RuntimeException("Unknown TSDataType in FixLengthTimeValuePairSerializer:"
-            + type);
+        throw new RuntimeException(
+            "Unknown TSDataType in FixLengthTimeValuePairSerializer:" + type);
     }
   }
 
@@ -116,8 +116,11 @@ public class FixLengthIExternalSortFileDeserializer implements IExternalSortFile
 
     public abstract TimeValuePair read(InputStream inputStream) throws IOException;
 
-    private static void handleIncorrectRead(int bytesToRead, int bytesActuallyRead) throws IOException {
-      throw new IOException(String.format("Intend to read %d bytes but %d are actually returned",
+    private static void handleIncorrectRead(int bytesToRead, int bytesActuallyRead)
+        throws IOException {
+      throw new IOException(
+          String.format(
+              "Intend to read %d bytes but %d are actually returned",
               bytesToRead, bytesActuallyRead));
     }
 
@@ -137,13 +140,14 @@ public class FixLengthIExternalSortFileDeserializer implements IExternalSortFile
         if (readLen != BYTE_LEN) {
           handleIncorrectRead(BYTE_LEN, readLen);
         }
-        return new TimeValuePair(BytesUtils.bytesToLong(timestampBytes),
+        return new TimeValuePair(
+            BytesUtils.bytesToLong(timestampBytes),
             new TsPrimitiveType.TsBoolean(BytesUtils.bytesToBool(valueBytes)));
       }
     }
 
-    private static class IntReader extends
-        FixLengthIExternalSortFileDeserializer.TimeValuePairReader {
+    private static class IntReader
+        extends FixLengthIExternalSortFileDeserializer.TimeValuePairReader {
 
       byte[] timestampBytes = new byte[8];
       byte[] valueBytes = new byte[4];
@@ -158,13 +162,14 @@ public class FixLengthIExternalSortFileDeserializer implements IExternalSortFile
         if (readLen != INT_LEN) {
           handleIncorrectRead(INT_LEN, readLen);
         }
-        return new TimeValuePair(BytesUtils.bytesToLong(timestampBytes),
+        return new TimeValuePair(
+            BytesUtils.bytesToLong(timestampBytes),
             new TsPrimitiveType.TsInt(BytesUtils.bytesToInt(valueBytes)));
       }
     }
 
-    private static class LongReader extends
-        FixLengthIExternalSortFileDeserializer.TimeValuePairReader {
+    private static class LongReader
+        extends FixLengthIExternalSortFileDeserializer.TimeValuePairReader {
 
       byte[] timestampBytes = new byte[8];
       byte[] valueBytes = new byte[8];
@@ -179,7 +184,8 @@ public class FixLengthIExternalSortFileDeserializer implements IExternalSortFile
         if (readLen != LONG_LEN) {
           handleIncorrectRead(LONG_LEN, readLen);
         }
-        return new TimeValuePair(BytesUtils.bytesToLong(timestampBytes),
+        return new TimeValuePair(
+            BytesUtils.bytesToLong(timestampBytes),
             new TsPrimitiveType.TsLong(BytesUtils.bytesToLong(valueBytes)));
       }
     }
@@ -200,7 +206,8 @@ public class FixLengthIExternalSortFileDeserializer implements IExternalSortFile
         if (readLen != FLOAT_LEN) {
           handleIncorrectRead(FLOAT_LEN, readLen);
         }
-        return new TimeValuePair(BytesUtils.bytesToLong(timestampBytes),
+        return new TimeValuePair(
+            BytesUtils.bytesToLong(timestampBytes),
             new TsPrimitiveType.TsFloat(BytesUtils.bytesToFloat(valueBytes)));
       }
     }
@@ -221,7 +228,8 @@ public class FixLengthIExternalSortFileDeserializer implements IExternalSortFile
         if (readLen != DOUBLE_LEN) {
           handleIncorrectRead(DOUBLE_LEN, readLen);
         }
-        return new TimeValuePair(BytesUtils.bytesToLong(timestampBytes),
+        return new TimeValuePair(
+            BytesUtils.bytesToLong(timestampBytes),
             new TsPrimitiveType.TsDouble(BytesUtils.bytesToDouble(valueBytes)));
       }
     }
@@ -249,7 +257,8 @@ public class FixLengthIExternalSortFileDeserializer implements IExternalSortFile
         if (readLen != length) {
           handleIncorrectRead(length, readLen);
         }
-        return new TimeValuePair(BytesUtils.bytesToLong(timestampBytes),
+        return new TimeValuePair(
+            BytesUtils.bytesToLong(timestampBytes),
             new TsPrimitiveType.TsBinary(new Binary(BytesUtils.bytesToString(valueBytes))));
       }
     }

@@ -42,16 +42,10 @@ public class ChunkReaderWrap {
   // attributes for mem chunk
   private ReadOnlyMemChunk readOnlyMemChunk;
 
-  /**
-   * This is used in test.
-   */
-  protected ChunkReaderWrap() {
+  /** This is used in test. */
+  protected ChunkReaderWrap() {}
 
-  }
-
-  /**
-   * constructor of diskChunkReader
-   */
+  /** constructor of diskChunkReader */
   public ChunkReaderWrap(ChunkMetadata metaData, IChunkLoader chunkLoader, Filter filter) {
     this.type = ChunkReaderType.DISK_CHUNK;
     this.chunkMetaData = metaData;
@@ -59,9 +53,7 @@ public class ChunkReaderWrap {
     this.filter = filter;
   }
 
-  /**
-   * constructor of MemChunkReader
-   */
+  /** constructor of MemChunkReader */
   public ChunkReaderWrap(ReadOnlyMemChunk readOnlyMemChunk, Filter filter) {
     type = ChunkReaderType.MEM_CHUNK;
     this.readOnlyMemChunk = readOnlyMemChunk;
@@ -97,7 +89,7 @@ public class ChunkReaderWrap {
   }
 
   enum ChunkReaderType {
-    DISK_CHUNK, MEM_CHUNK
+    DISK_CHUNK,
+    MEM_CHUNK
   }
-
 }

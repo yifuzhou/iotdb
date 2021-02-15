@@ -44,8 +44,11 @@ class HDFSConfUtil {
       conf.addResource(new File(tsFileConfig.getCoreSitePath()).toURI().toURL());
       conf.addResource(new File(tsFileConfig.getHdfsSitePath()).toURI().toURL());
     } catch (MalformedURLException e) {
-      logger.error("Failed to add resource core-site.xml {} and hdfs-site.xml {}. ",
-          tsFileConfig.getCoreSitePath(), tsFileConfig.getHdfsSitePath(), e);
+      logger.error(
+          "Failed to add resource core-site.xml {} and hdfs-site.xml {}. ",
+          tsFileConfig.getCoreSitePath(),
+          tsFileConfig.getHdfsSitePath(),
+          e);
     }
 
     conf.set("fs.hdfs.impl", "org.apache.hadoop.hdfs.DistributedFileSystem");
@@ -60,13 +63,18 @@ class HDFSConfUtil {
       conf.set("dfs.nameservices", dfsNameservices);
       conf.set("dfs.ha.namenodes." + dfsNameservices, String.join(",", dfsHaNamenodes));
       for (int i = 0; i < dfsHaNamenodes.length; i++) {
-        conf.set("dfs.namenode.rpc-address." + dfsNameservices + TsFileConstant.PATH_SEPARATOR + dfsHaNamenodes[i].trim(),
+        conf.set(
+            "dfs.namenode.rpc-address."
+                + dfsNameservices
+                + TsFileConstant.PATH_SEPARATOR
+                + dfsHaNamenodes[i].trim(),
             hdfsIps[i] + ":" + tsFileConfig.getHdfsPort());
       }
       boolean dfsHaAutomaticFailoverEnabled = tsFileConfig.isDfsHaAutomaticFailoverEnabled();
       conf.set("dfs.ha.automatic-failover.enabled", String.valueOf(dfsHaAutomaticFailoverEnabled));
       if (dfsHaAutomaticFailoverEnabled) {
-        conf.set("dfs.client.failover.proxy.provider." + dfsNameservices,
+        conf.set(
+            "dfs.client.failover.proxy.provider." + dfsNameservices,
             tsFileConfig.getDfsClientFailoverProxyProvider());
       }
     }
@@ -79,11 +87,14 @@ class HDFSConfUtil {
 
       UserGroupInformation.setConfiguration(conf);
       try {
-        UserGroupInformation.loginUserFromKeytab(tsFileConfig.getKerberosPrincipal(),
-            tsFileConfig.getKerberosKeytabFilePath());
+        UserGroupInformation.loginUserFromKeytab(
+            tsFileConfig.getKerberosPrincipal(), tsFileConfig.getKerberosKeytabFilePath());
       } catch (IOException e) {
-        logger.error("Failed to login user from key tab. User: {}, path:{}. ",
-            tsFileConfig.getKerberosPrincipal(), tsFileConfig.getKerberosKeytabFilePath(), e);
+        logger.error(
+            "Failed to login user from key tab. User: {}, path:{}. ",
+            tsFileConfig.getKerberosPrincipal(),
+            tsFileConfig.getKerberosKeytabFilePath(),
+            e);
       }
     }
 

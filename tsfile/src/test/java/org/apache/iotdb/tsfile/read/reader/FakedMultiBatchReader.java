@@ -56,7 +56,5 @@ public class FakedMultiBatchReader implements IBatchReader {
   }
 
   @Override
-  public void close() throws IOException {
-
-  }
+  public void close() throws IOException {}
 }

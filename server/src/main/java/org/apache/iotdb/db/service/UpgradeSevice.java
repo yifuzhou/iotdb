@@ -40,9 +40,7 @@ public class UpgradeSevice implements IService {
   private AtomicInteger threadCnt = new AtomicInteger();
   private static int cntUpgradeFileNum;
 
-
-  private UpgradeSevice() {
-  }
+  private UpgradeSevice() {}
 
   public static UpgradeSevice getINSTANCE() {
     return INSTANCE;
@@ -54,8 +52,9 @@ public class UpgradeSevice implements IService {
     if (updateThreadNum <= 0) {
       updateThreadNum = 1;
     }
-    upgradeThreadPool = Executors.newFixedThreadPool(updateThreadNum,
-        r -> new Thread(r, "UpgradeThread-" + threadCnt.getAndIncrement()));
+    upgradeThreadPool =
+        Executors.newFixedThreadPool(
+            updateThreadNum, r -> new Thread(r, "UpgradeThread-" + threadCnt.getAndIncrement()));
     UpgradeLog.createUpgradeLog();
     countUpgradeFiles();
     if (cntUpgradeFileNum == 0) {
@@ -80,7 +79,6 @@ public class UpgradeSevice implements IService {
   public ServiceType getID() {
     return ServiceType.UPGRADE_SERVICE;
   }
-
 
   public static void setCntUpgradeFileNum(int cntUpgradeFileNum) {
     UpgradeUtils.getCntUpgradeFileLock().writeLock().lock();

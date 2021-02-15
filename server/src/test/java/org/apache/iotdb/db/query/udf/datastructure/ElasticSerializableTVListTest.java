@@ -90,8 +90,9 @@ public class ElasticSerializableTVListTest extends SerializableListTest {
 
   private void initESTVList(TSDataType dataType) {
     try {
-      tvList = ElasticSerializableTVList
-          .newElasticSerializableTVList(dataType, QUERY_ID, MEMORY_USAGE_LIMIT_IN_MB, CACHE_SIZE);
+      tvList =
+          ElasticSerializableTVList.newElasticSerializableTVList(
+              dataType, QUERY_ID, MEMORY_USAGE_LIMIT_IN_MB, CACHE_SIZE);
     } catch (QueryProcessException e) {
       fail(e.toString());
     }
@@ -193,8 +194,11 @@ public class ElasticSerializableTVListTest extends SerializableListTest {
 
     try {
       for (int i = 0; i < ITERATION_TIMES; ++i) {
-        tvList.putBinary(i, Binary.valueOf(
-            generateRandomString(byteLengthMin + random.nextInt(byteLengthMax - byteLengthMin))));
+        tvList.putBinary(
+            i,
+            Binary.valueOf(
+                generateRandomString(
+                    byteLengthMin + random.nextInt(byteLengthMax - byteLengthMin))));
       }
       LayerPointReader reader = tvList.getPointReaderUsingEvictionStrategy();
       while (reader.next()) {
@@ -206,8 +210,11 @@ public class ElasticSerializableTVListTest extends SerializableListTest {
       byteLengthMin = SerializableList.INITIAL_BYTE_ARRAY_LENGTH_FOR_MEMORY_CONTROL * 16;
       byteLengthMax = SerializableList.INITIAL_BYTE_ARRAY_LENGTH_FOR_MEMORY_CONTROL * 32;
       for (int i = 0; i < ITERATION_TIMES; ++i) {
-        tvList.putBinary(i, Binary.valueOf(
-            generateRandomString(byteLengthMin + random.nextInt(byteLengthMax - byteLengthMin))));
+        tvList.putBinary(
+            i,
+            Binary.valueOf(
+                generateRandomString(
+                    byteLengthMin + random.nextInt(byteLengthMax - byteLengthMin))));
       }
       while (reader.next()) {
         int length = reader.currentBinary().getLength();
@@ -218,8 +225,11 @@ public class ElasticSerializableTVListTest extends SerializableListTest {
       byteLengthMin = SerializableList.INITIAL_BYTE_ARRAY_LENGTH_FOR_MEMORY_CONTROL * 256;
       byteLengthMax = SerializableList.INITIAL_BYTE_ARRAY_LENGTH_FOR_MEMORY_CONTROL * 512;
       for (int i = 0; i < ITERATION_TIMES; ++i) {
-        tvList.putBinary(i, Binary.valueOf(
-            generateRandomString(byteLengthMin + random.nextInt(byteLengthMax - byteLengthMin))));
+        tvList.putBinary(
+            i,
+            Binary.valueOf(
+                generateRandomString(
+                    byteLengthMin + random.nextInt(byteLengthMax - byteLengthMin))));
       }
       while (reader.next()) {
         int length = reader.currentBinary().getLength();
@@ -228,8 +238,11 @@ public class ElasticSerializableTVListTest extends SerializableListTest {
       }
 
       for (int i = 0; i < 2 * ITERATION_TIMES; ++i) {
-        tvList.putBinary(i, Binary.valueOf(
-            generateRandomString(byteLengthMin + random.nextInt(byteLengthMax - byteLengthMin))));
+        tvList.putBinary(
+            i,
+            Binary.valueOf(
+                generateRandomString(
+                    byteLengthMin + random.nextInt(byteLengthMax - byteLengthMin))));
         reader.next();
         int length = reader.currentBinary().getLength();
         assertTrue(byteLengthMin <= length && length < byteLengthMax);

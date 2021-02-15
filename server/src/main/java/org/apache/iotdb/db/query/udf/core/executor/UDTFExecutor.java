@@ -62,9 +62,9 @@ public class UDTFExecutor {
     }
     configurations.check();
 
-    collector = ElasticSerializableTVList
-        .newElasticSerializableTVList(configurations.getOutputDataType(), queryId,
-            collectorMemoryBudgetInMB, 1);
+    collector =
+        ElasticSerializableTVList.newElasticSerializableTVList(
+            configurations.getOutputDataType(), queryId, collectorMemoryBudgetInMB, 1);
   }
 
   public void execute(Row row) throws QueryProcessException {
@@ -96,9 +96,10 @@ public class UDTFExecutor {
   }
 
   private void onError(String methodName, Exception e) throws QueryProcessException {
-    throw new QueryProcessException(String
-        .format("Error occurred during executing UDTF#%s: %s", methodName, System.lineSeparator())
-        + e.toString());
+    throw new QueryProcessException(
+        String.format(
+                "Error occurred during executing UDTF#%s: %s", methodName, System.lineSeparator())
+            + e.toString());
   }
 
   public UDFContext getContext() {

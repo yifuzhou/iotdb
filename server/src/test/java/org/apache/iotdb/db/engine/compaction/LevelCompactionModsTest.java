@@ -61,15 +61,15 @@ public class LevelCompactionModsTest extends LevelCompactionTest {
 
   @Test
   public void testCompactionMods() throws IllegalPathException, IOException {
-    LevelCompactionTsFileManagement levelCompactionTsFileManagement = new LevelCompactionTsFileManagement(
-        COMPACTION_TEST_SG, tempSGDir.getPath());
+    LevelCompactionTsFileManagement levelCompactionTsFileManagement =
+        new LevelCompactionTsFileManagement(COMPACTION_TEST_SG, tempSGDir.getPath());
     TsFileResource sourceTsFileResource = seqResources.get(0);
     TsFileResource targetTsFileResource = seqResources.get(1);
     List<Modification> filterModifications = new ArrayList<>();
     Modification modification1;
     Modification modification2;
-    try (ModificationFile sourceModificationFile = new ModificationFile(
-        sourceTsFileResource.getTsFilePath() + ModificationFile.FILE_SUFFIX)) {
+    try (ModificationFile sourceModificationFile =
+        new ModificationFile(sourceTsFileResource.getTsFilePath() + ModificationFile.FILE_SUFFIX)) {
       modification1 = new Deletion(new PartialPath(deviceIds[0], "sensor0"), 0, 0);
       modification2 = new Deletion(new PartialPath(deviceIds[0], "sensor1"), 0, 0);
       sourceModificationFile.write(modification1);
@@ -78,10 +78,10 @@ public class LevelCompactionModsTest extends LevelCompactionTest {
     }
     List<TsFileResource> sourceTsFileResources = new ArrayList<>();
     sourceTsFileResources.add(sourceTsFileResource);
-    levelCompactionTsFileManagement
-        .renameLevelFilesMods(filterModifications, sourceTsFileResources, targetTsFileResource);
-    try (ModificationFile targetModificationFile = new ModificationFile(
-        targetTsFileResource.getTsFilePath() + ModificationFile.FILE_SUFFIX)) {
+    levelCompactionTsFileManagement.renameLevelFilesMods(
+        filterModifications, sourceTsFileResources, targetTsFileResource);
+    try (ModificationFile targetModificationFile =
+        new ModificationFile(targetTsFileResource.getTsFilePath() + ModificationFile.FILE_SUFFIX)) {
       Collection<Modification> modifications = targetModificationFile.getModifications();
       assertEquals(1, modifications.size());
       assertEquals(modification2, modifications.stream().findFirst().get());

@@ -28,5 +28,4 @@ public class FieldTest {
     Field field = new Field(null);
     field.getIntV();
   }
-
 }

@@ -85,7 +85,6 @@ public class IoTDBEngineTimeGeneratorIT {
     EnvironmentUtils.envSetUp();
 
     insertData();
-
   }
 
   @AfterClass
@@ -101,8 +100,9 @@ public class IoTDBEngineTimeGeneratorIT {
 
   private static void insertData() throws ClassNotFoundException, SQLException {
     Class.forName(Config.JDBC_DRIVER_NAME);
-    try (Connection connection = DriverManager
-        .getConnection(Config.IOTDB_URL_PREFIX + "127.0.0.1:6667/", "root", "root");
+    try (Connection connection =
+            DriverManager.getConnection(
+                Config.IOTDB_URL_PREFIX + "127.0.0.1:6667/", "root", "root");
         Statement statement = connection.createStatement()) {
 
       // create storage group and measurement
@@ -112,17 +112,22 @@ public class IoTDBEngineTimeGeneratorIT {
 
       // insert data (time from 300-999)
       for (long time = 300; time < 1000; time++) {
-        String sql = String
-            .format("insert into root.vehicle.d0(timestamp,s0) values(%s,%s)", time, time % 17);
+        String sql =
+            String.format(
+                "insert into root.vehicle.d0(timestamp,s0) values(%s,%s)", time, time % 17);
         statement.execute(sql);
-        sql = String
-            .format("insert into root.vehicle.d0(timestamp,s1) values(%s,%s)", time, time % 29);
+        sql =
+            String.format(
+                "insert into root.vehicle.d0(timestamp,s1) values(%s,%s)", time, time % 29);
         statement.execute(sql);
-        sql = String
-            .format("insert into root.vehicle.d0(timestamp,s2) values(%s,%s)", time, time % 31);
+        sql =
+            String.format(
+                "insert into root.vehicle.d0(timestamp,s2) values(%s,%s)", time, time % 31);
         statement.execute(sql);
-        sql = String.format("insert into root.vehicle.d0(timestamp,s3) values(%s,'%s')", time,
-            TestConstant.stringValue[(int) time % 5]);
+        sql =
+            String.format(
+                "insert into root.vehicle.d0(timestamp,s3) values(%s,'%s')",
+                time, TestConstant.stringValue[(int) time % 5]);
         statement.execute(sql);
 
         if (satisfyTimeFilter1(time)) {
@@ -140,21 +145,26 @@ public class IoTDBEngineTimeGeneratorIT {
       for (long time = 1200; time < 1500; time++) {
         String sql = null;
         if (time % 2 == 0) {
-          sql = String
-              .format("insert into root.vehicle.d0(timestamp,s0) values(%s,%s)", time, time % 17);
+          sql =
+              String.format(
+                  "insert into root.vehicle.d0(timestamp,s0) values(%s,%s)", time, time % 17);
           statement.execute(sql);
-          sql = String
-              .format("insert into root.vehicle.d0(timestamp,s1) values(%s,%s)", time, time % 29);
+          sql =
+              String.format(
+                  "insert into root.vehicle.d0(timestamp,s1) values(%s,%s)", time, time % 29);
           statement.execute(sql);
           if (satisfyTimeFilter1(time)) {
             count++;
           }
         }
-        sql = String
-            .format("insert into root.vehicle.d0(timestamp,s2) values(%s,%s)", time, time % 31);
+        sql =
+            String.format(
+                "insert into root.vehicle.d0(timestamp,s2) values(%s,%s)", time, time % 31);
         statement.execute(sql);
-        sql = String.format("insert into root.vehicle.d0(timestamp,s3) values(%s,'%s')", time,
-            TestConstant.stringValue[(int) time % 5]);
+        sql =
+            String.format(
+                "insert into root.vehicle.d0(timestamp,s3) values(%s,'%s')",
+                time, TestConstant.stringValue[(int) time % 5]);
         statement.execute(sql);
       }
 
@@ -164,36 +174,31 @@ public class IoTDBEngineTimeGeneratorIT {
     }
   }
 
-  /**
-   * value >= 14 && time > 500
-   */
+  /** value >= 14 && time > 500 */
   private static boolean satisfyTimeFilter1(long time) {
     return time % 17 >= 14 && time > 500;
   }
 
-  /**
-   * root.vehicle.d0.s0 >= 5 && root.vehicle.d0.s2 >= 11 || time > 900
-   */
+  /** root.vehicle.d0.s0 >= 5 && root.vehicle.d0.s2 >= 11 || time > 900 */
   private static boolean satisfyTimeFilter2(long time) {
     return (time % 17 >= 5 || time > 900) && (time % 31 >= 11.5 || time > 900);
   }
 
-  /**
-   * value >= 14 && time > 500
-   */
+  /** value >= 14 && time > 500 */
   @Test
   public void testOneSeriesWithValueAndTimeFilter()
       throws IOException, StorageEngineException, IllegalPathException {
-    //System.out.println("Test >>> root.vehicle.d0.s0 >= 14 && time > 500");
+    // System.out.println("Test >>> root.vehicle.d0.s0 >= 14 && time > 500");
 
-    PartialPath pd0s0 = new PartialPath(TestConstant.d0 + TsFileConstant.PATH_SEPARATOR + TestConstant.s0);
+    PartialPath pd0s0 =
+        new PartialPath(TestConstant.d0 + TsFileConstant.PATH_SEPARATOR + TestConstant.s0);
     ValueFilter.ValueGtEq valueGtEq = ValueFilter.gtEq(14);
     TimeFilter.TimeGt timeGt = TimeFilter.gt(500);
 
-    SingleSeriesExpression singleSeriesExpression = new SingleSeriesExpression(pd0s0,
-        FilterFactory.and(valueGtEq, timeGt));
-    ServerTimeGenerator timeGenerator = new ServerTimeGenerator(singleSeriesExpression,
-        TEST_QUERY_CONTEXT, new RawDataQueryPlan());
+    SingleSeriesExpression singleSeriesExpression =
+        new SingleSeriesExpression(pd0s0, FilterFactory.and(valueGtEq, timeGt));
+    ServerTimeGenerator timeGenerator =
+        new ServerTimeGenerator(singleSeriesExpression, TEST_QUERY_CONTEXT, new RawDataQueryPlan());
 
     int cnt = 0;
     while (timeGenerator.hasNext()) {
@@ -205,15 +210,14 @@ public class IoTDBEngineTimeGeneratorIT {
     assertEquals(count, cnt);
   }
 
-  /**
-   * root.vehicle.d1.s0 >= 5, and d1.s0 has no data
-   */
+  /** root.vehicle.d1.s0 >= 5, and d1.s0 has no data */
   @Test
   public void testEmptySeriesWithValueFilter()
       throws IOException, StorageEngineException, IllegalPathException {
-    //System.out.println("Test >>> root.vehicle.d1.s0 >= 5");
+    // System.out.println("Test >>> root.vehicle.d1.s0 >= 5");
 
-    PartialPath pd1s0 = new PartialPath(TestConstant.d1 + TsFileConstant.PATH_SEPARATOR + TestConstant.s0);
+    PartialPath pd1s0 =
+        new PartialPath(TestConstant.d1 + TsFileConstant.PATH_SEPARATOR + TestConstant.s0);
     ValueFilter.ValueGtEq valueGtEq = ValueFilter.gtEq(5);
 
     IExpression singleSeriesExpression = new SingleSeriesExpression(pd1s0, valueGtEq);
@@ -222,8 +226,8 @@ public class IoTDBEngineTimeGeneratorIT {
     paths.add(pd1s0);
     queryPlan.setDeduplicatedPaths(paths);
 
-    ServerTimeGenerator timeGenerator = new ServerTimeGenerator(singleSeriesExpression,
-        TEST_QUERY_CONTEXT, queryPlan);
+    ServerTimeGenerator timeGenerator =
+        new ServerTimeGenerator(singleSeriesExpression, TEST_QUERY_CONTEXT, queryPlan);
 
     int cnt = 0;
     while (timeGenerator.hasNext()) {
@@ -232,42 +236,42 @@ public class IoTDBEngineTimeGeneratorIT {
     assertEquals(0, cnt);
   }
 
-  /**
-   * root.vehicle.d0.s0 >= 5 && root.vehicle.d0.s2 >= 11.5 || time > 900
-   */
+  /** root.vehicle.d0.s0 >= 5 && root.vehicle.d0.s2 >= 11.5 || time > 900 */
   @Test
   public void testMultiSeriesWithValueFilterAndTimeFilter()
       throws IOException, StorageEngineException, IllegalPathException {
-    System.out
-        .println("Test >>> root.vehicle.d0.s0 >= 5 && root.vehicle.d0.s2 >= 11.5 || time > 900");
+    System.out.println(
+        "Test >>> root.vehicle.d0.s0 >= 5 && root.vehicle.d0.s2 >= 11.5 || time > 900");
 
-    PartialPath pd0s0 = new PartialPath(TestConstant.d0 + TsFileConstant.PATH_SEPARATOR + TestConstant.s0);
-    PartialPath pd0s2 = new PartialPath(TestConstant.d0 + TsFileConstant.PATH_SEPARATOR + TestConstant.s2);
+    PartialPath pd0s0 =
+        new PartialPath(TestConstant.d0 + TsFileConstant.PATH_SEPARATOR + TestConstant.s0);
+    PartialPath pd0s2 =
+        new PartialPath(TestConstant.d0 + TsFileConstant.PATH_SEPARATOR + TestConstant.s2);
 
     ValueFilter.ValueGtEq valueGtEq5 = ValueFilter.gtEq(5);
     ValueFilter.ValueGtEq valueGtEq11 = ValueFilter.gtEq(11.5f);
     TimeFilter.TimeGt timeGt = TimeFilter.gt(900L);
 
-    IExpression singleSeriesExpression1 = new SingleSeriesExpression(pd0s0,
-        FilterFactory.or(valueGtEq5, timeGt));
-    IExpression singleSeriesExpression2 = new SingleSeriesExpression(pd0s2,
-        FilterFactory.or(valueGtEq11, timeGt));
-    IExpression andExpression = BinaryExpression
-        .and(singleSeriesExpression1, singleSeriesExpression2);
+    IExpression singleSeriesExpression1 =
+        new SingleSeriesExpression(pd0s0, FilterFactory.or(valueGtEq5, timeGt));
+    IExpression singleSeriesExpression2 =
+        new SingleSeriesExpression(pd0s2, FilterFactory.or(valueGtEq11, timeGt));
+    IExpression andExpression =
+        BinaryExpression.and(singleSeriesExpression1, singleSeriesExpression2);
 
     RawDataQueryPlan queryPlan = new RawDataQueryPlan();
     List<PartialPath> paths = new ArrayList<>();
     paths.add(pd0s0);
     paths.add(pd0s2);
     queryPlan.setDeduplicatedPaths(paths);
-    ServerTimeGenerator timeGenerator = new ServerTimeGenerator(andExpression,
-        TEST_QUERY_CONTEXT, queryPlan);
+    ServerTimeGenerator timeGenerator =
+        new ServerTimeGenerator(andExpression, TEST_QUERY_CONTEXT, queryPlan);
     int cnt = 0;
     while (timeGenerator.hasNext()) {
       long time = timeGenerator.next();
       assertTrue(satisfyTimeFilter2(time));
       cnt++;
-//       System.out.println("cnt =" + cnt + "; time = " + time);
+      //       System.out.println("cnt =" + cnt + "; time = " + time);
     }
     assertEquals(count2, cnt);
   }

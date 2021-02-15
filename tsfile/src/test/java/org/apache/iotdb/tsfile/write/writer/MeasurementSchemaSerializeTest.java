@@ -33,8 +33,8 @@ public class MeasurementSchemaSerializeTest {
 
   @Test
   public void deserializeFromByteBufferTest() throws IOException {
-    MeasurementSchema standard = new MeasurementSchema("sensor_1",
-        TSDataType.FLOAT, TSEncoding.RLE);
+    MeasurementSchema standard =
+        new MeasurementSchema("sensor_1", TSDataType.FLOAT, TSEncoding.RLE);
     ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
     standard.serializeTo(outputStream);
     ByteBuffer byteBuffer = ByteBuffer.wrap(outputStream.toByteArray());
@@ -44,8 +44,8 @@ public class MeasurementSchemaSerializeTest {
 
   @Test
   public void deserializeFromInputStreamTest() throws IOException {
-    MeasurementSchema standard = new MeasurementSchema("sensor_1",
-        TSDataType.FLOAT, TSEncoding.RLE);
+    MeasurementSchema standard =
+        new MeasurementSchema("sensor_1", TSDataType.FLOAT, TSEncoding.RLE);
     ByteBuffer byteBuffer = ByteBuffer.allocate(1024);
     standard.serializeTo(byteBuffer);
     ByteArrayInputStream inputStream = new ByteArrayInputStream(byteBuffer.array());

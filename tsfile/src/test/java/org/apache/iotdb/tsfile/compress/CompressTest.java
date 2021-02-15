@@ -31,16 +31,15 @@ import org.xerial.snappy.Snappy;
 
 public class CompressTest {
 
-  private final String inputString = "Hello snappy-java! Snappy-java is a JNI-based wrapper of "
-      + "Snappy, a fast compressor/decompressor.";
+  private final String inputString =
+      "Hello snappy-java! Snappy-java is a JNI-based wrapper of "
+          + "Snappy, a fast compressor/decompressor.";
 
   @Before
-  public void setUp() {
-  }
+  public void setUp() {}
 
   @After
-  public void tearDown() {
-  }
+  public void tearDown() {}
 
   @Test
   public void snappyCompressorTest1() throws IOException {
@@ -76,7 +75,6 @@ public class CompressTest {
     String result = new String(uncompressed, StandardCharsets.UTF_8);
     assertEquals(inputString, result);
   }
-
 
   @Test
   public void lz4CompressorTest1() throws IOException {

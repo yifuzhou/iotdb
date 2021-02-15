@@ -36,9 +36,7 @@ import org.apache.iotdb.db.service.IoTDB;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * MetaSingleSnapshotLogManager provides a MetaSimpleSnapshot as snapshot.
- */
+/** MetaSingleSnapshotLogManager provides a MetaSimpleSnapshot as snapshot. */
 public class MetaSingleSnapshotLogManager extends RaftLogManager {
 
   private static final Logger logger = LoggerFactory.getLogger(MetaSingleSnapshotLogManager.class);
@@ -75,8 +73,9 @@ public class MetaSingleSnapshotLogManager extends RaftLogManager {
 
   @Override
   public Snapshot getSnapshot(long minIndex) {
-    MetaSimpleSnapshot snapshot = new MetaSimpleSnapshot(storageGroupTTLMap, userMap, roleMap,
-        metaGroupMember.getPartitionTable().serialize());
+    MetaSimpleSnapshot snapshot =
+        new MetaSimpleSnapshot(
+            storageGroupTTLMap, userMap, roleMap, metaGroupMember.getPartitionTable().serialize());
     snapshot.setLastLogIndex(commitIndex);
     snapshot.setLastLogTerm(term);
     return snapshot;

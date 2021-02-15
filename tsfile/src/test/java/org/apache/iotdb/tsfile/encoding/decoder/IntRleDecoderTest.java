@@ -94,8 +94,7 @@ public class IntRleDecoderTest {
   }
 
   @After
-  public void tearDown() throws Exception {
-  }
+  public void tearDown() throws Exception {}
 
   @Test
   public void testRleReadBigInt() throws IOException {
@@ -165,8 +164,7 @@ public class IntRleDecoderTest {
     }
   }
 
-  public void testLength(List<Integer> list, boolean isDebug, int repeatCount)
-      throws IOException {
+  public void testLength(List<Integer> list, boolean isDebug, int repeatCount) throws IOException {
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
     RleEncoder<Integer> encoder = new IntRleEncoder();
     for (int i = 0; i < repeatCount; i++) {

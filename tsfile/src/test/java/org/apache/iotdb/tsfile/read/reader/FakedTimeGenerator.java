@@ -26,8 +26,6 @@ import org.apache.iotdb.tsfile.read.expression.impl.SingleSeriesExpression;
 import org.apache.iotdb.tsfile.read.filter.TimeFilter;
 import org.apache.iotdb.tsfile.read.filter.factory.FilterFactory;
 import org.apache.iotdb.tsfile.read.query.timegenerator.TimeGenerator;
-import org.apache.iotdb.tsfile.read.query.timegenerator.node.AndNode;
-import org.apache.iotdb.tsfile.read.query.timegenerator.node.LeafNode;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -39,14 +37,15 @@ public class FakedTimeGenerator extends TimeGenerator {
     IExpression expression =
         BinaryExpression.or(
             BinaryExpression.and(
-                new SingleSeriesExpression(new Path("d1", "s1"),
+                new SingleSeriesExpression(
+                    new Path("d1", "s1"),
                     FilterFactory.and(TimeFilter.gtEq(1L), TimeFilter.ltEq(5L))),
-                new SingleSeriesExpression(new Path("d2", "s2"),
-                    FilterFactory.and(TimeFilter.gtEq(1L), TimeFilter.ltEq(10L)))
-            ),
-            new SingleSeriesExpression(new Path("d2", "s2"),
-                FilterFactory.and(TimeFilter.gtEq(11L), TimeFilter.ltEq(15L)))
-        );
+                new SingleSeriesExpression(
+                    new Path("d2", "s2"),
+                    FilterFactory.and(TimeFilter.gtEq(1L), TimeFilter.ltEq(10L)))),
+            new SingleSeriesExpression(
+                new Path("d2", "s2"),
+                FilterFactory.and(TimeFilter.gtEq(11L), TimeFilter.ltEq(15L))));
 
     super.constructNode(expression);
   }
@@ -73,5 +72,4 @@ public class FakedTimeGenerator extends TimeGenerator {
     }
     Assert.assertEquals(10L, count);
   }
-
 }

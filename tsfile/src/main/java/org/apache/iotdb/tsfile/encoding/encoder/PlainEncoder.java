@@ -92,7 +92,8 @@ public class PlainEncoder extends Encoder {
       // write value
       out.write(value.getValues());
     } catch (IOException e) {
-      logger.error("tsfile-encoding PlainEncoder: error occurs when encode Binary value {}", value, e);
+      logger.error(
+          "tsfile-encoding PlainEncoder: error occurs when encode Binary value {}", value, e);
     }
   }
 
@@ -104,21 +105,21 @@ public class PlainEncoder extends Encoder {
   @Override
   public int getOneItemMaxSize() {
     switch (dataType) {
-    case BOOLEAN:
-      return 1;
-    case INT32:
-      return 4;
-    case INT64:
-      return 8;
-    case FLOAT:
-      return 4;
-    case DOUBLE:
-      return 8;
-    case TEXT:
-      // refer to encode(Binary,ByteArrayOutputStream)
-      return 4 + TSFileConfig.BYTE_SIZE_PER_CHAR * maxStringLength;
-    default:
-      throw new UnsupportedOperationException(dataType.toString());
+      case BOOLEAN:
+        return 1;
+      case INT32:
+        return 4;
+      case INT64:
+        return 8;
+      case FLOAT:
+        return 4;
+      case DOUBLE:
+        return 8;
+      case TEXT:
+        // refer to encode(Binary,ByteArrayOutputStream)
+        return 4 + TSFileConfig.BYTE_SIZE_PER_CHAR * maxStringLength;
+      default:
+        throw new UnsupportedOperationException(dataType.toString());
     }
   }
 

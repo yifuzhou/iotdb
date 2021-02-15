@@ -61,9 +61,7 @@ public class MemUtilsTest {
     Assert.assertEquals(sizeSum, MemUtils.getRecordSize(insertPlan, 0, 1, false));
   }
 
-  /**
-   * This method tests MemUtils.getStringMem() and MemUtils.getDataPointMem()
-   */
+  /** This method tests MemUtils.getStringMem() and MemUtils.getDataPointMem() */
   @Test
   public void getMemSizeTest() {
     int totalSize = 0;
@@ -110,5 +108,4 @@ public class MemUtilsTest {
     String r = "4 GB 877 MB 539 KB 903 B";
     Assert.assertEquals(r, MemUtils.bytesCntToStr(5215121287L));
   }
-
 }

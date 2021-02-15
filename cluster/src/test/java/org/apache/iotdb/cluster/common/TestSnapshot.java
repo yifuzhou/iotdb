@@ -33,12 +33,12 @@ public class TestSnapshot extends Snapshot {
   private ByteBuffer data;
 
   public TestSnapshot() {
-    data = ByteBuffer.wrap(new byte[8192*2048]);
+    data = ByteBuffer.wrap(new byte[8192 * 2048]);
   }
 
   public TestSnapshot(int id) {
     this.id = id;
-    data = ByteBuffer.wrap(new byte[8192*2048]);
+    data = ByteBuffer.wrap(new byte[8192 * 2048]);
   }
 
   @Override
@@ -106,5 +106,4 @@ public class TestSnapshot extends Snapshot {
       return testSnapshot;
     }
   }
-
 }

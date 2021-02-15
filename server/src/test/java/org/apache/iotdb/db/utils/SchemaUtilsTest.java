@@ -50,15 +50,20 @@ public class SchemaUtilsTest {
     measurementTypes.add(TSDataType.TEXT);
     measurementTypes.add(TSDataType.BOOLEAN);
     measurementTypes.add(TSDataType.DOUBLE);
-    Assert.assertEquals(Collections.nCopies(measurementTypes.size(), TSDataType.INT64),
+    Assert.assertEquals(
+        Collections.nCopies(measurementTypes.size(), TSDataType.INT64),
         SchemaUtils.getAggregatedDataTypes(measurementTypes, SQLConstant.MIN_TIME));
-    Assert.assertEquals(Collections.nCopies(measurementTypes.size(), TSDataType.INT64),
+    Assert.assertEquals(
+        Collections.nCopies(measurementTypes.size(), TSDataType.INT64),
         SchemaUtils.getAggregatedDataTypes(measurementTypes, SQLConstant.COUNT));
-    Assert.assertEquals(Collections.nCopies(measurementTypes.size(), TSDataType.DOUBLE),
+    Assert.assertEquals(
+        Collections.nCopies(measurementTypes.size(), TSDataType.DOUBLE),
         SchemaUtils.getAggregatedDataTypes(measurementTypes, SQLConstant.SUM));
-    Assert.assertEquals(measurementTypes,
+    Assert.assertEquals(
+        measurementTypes,
         SchemaUtils.getAggregatedDataTypes(measurementTypes, SQLConstant.LAST_VALUE));
-    Assert.assertEquals(measurementTypes,
+    Assert.assertEquals(
+        measurementTypes,
         SchemaUtils.getAggregatedDataTypes(measurementTypes, SQLConstant.MAX_VALUE));
   }
 }

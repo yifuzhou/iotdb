@@ -45,17 +45,25 @@ public class AsyncMetaClient extends AsyncClient {
   Node node;
   AsyncClientPool pool;
 
-  public AsyncMetaClient(TProtocolFactory protocolFactory,
+  public AsyncMetaClient(
+      TProtocolFactory protocolFactory,
       TAsyncClientManager clientManager,
       TNonblockingTransport transport) {
     super(protocolFactory, clientManager, transport);
   }
 
-  public AsyncMetaClient(TProtocolFactory protocolFactory,
-      TAsyncClientManager clientManager, Node node, AsyncClientPool pool) throws IOException {
+  public AsyncMetaClient(
+      TProtocolFactory protocolFactory,
+      TAsyncClientManager clientManager,
+      Node node,
+      AsyncClientPool pool)
+      throws IOException {
     // the difference of the two clients lies in the port
-    super(protocolFactory, clientManager, new TNonblockingSocket(node.getIp(), node.getMetaPort(),
-        RaftServer.getConnectionTimeoutInMS()));
+    super(
+        protocolFactory,
+        clientManager,
+        new TNonblockingSocket(
+            node.getIp(), node.getMetaPort(), RaftServer.getConnectionTimeoutInMS()));
     this.node = node;
     this.pool = pool;
   }
@@ -75,7 +83,7 @@ public class AsyncMetaClient extends AsyncClient {
   public void onError(Exception e) {
     super.onError(e);
     pool.recreateClient(node);
-    //TODO: if e instance of network failure
+    // TODO: if e instance of network failure
     pool.onError(node);
   }
 
@@ -96,11 +104,8 @@ public class AsyncMetaClient extends AsyncClient {
 
   @Override
   public String toString() {
-    return "MetaClient{" +
-        "node=" + node +
-        '}';
+    return "MetaClient{" + "node=" + node + '}';
   }
-
 
   public void close() {
     ___transport.close();
@@ -113,7 +118,10 @@ public class AsyncMetaClient extends AsyncClient {
 
   public boolean isReady() {
     if (___currentMethod != null) {
-      logger.warn("Client {} is running {} and will timeout at {}", hashCode(), ___currentMethod,
+      logger.warn(
+          "Client {} is running {} and will timeout at {}",
+          hashCode(),
+          ___currentMethod,
           new Date(___currentMethod.getTimeoutTimestamp()));
     }
     return ___currentMethod == null;

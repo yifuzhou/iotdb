@@ -19,6 +19,11 @@
 
 package org.apache.iotdb.db.query.reader.series;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import org.apache.iotdb.db.engine.querycontext.QueryDataSource;
 import org.apache.iotdb.db.engine.storagegroup.TsFileResource;
 import org.apache.iotdb.db.exception.StorageEngineException;
@@ -34,12 +39,6 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 public class SeriesReaderByTimestampTest {
 
@@ -62,16 +61,24 @@ public class SeriesReaderByTimestampTest {
 
   @Test
   public void test() throws IOException, IllegalPathException {
-    QueryDataSource dataSource = new QueryDataSource(
-        new PartialPath(SERIES_READER_TEST_SG + ".device0.sensor0"),
-        seqResources, unseqResources);
+    QueryDataSource dataSource =
+        new QueryDataSource(
+            new PartialPath(SERIES_READER_TEST_SG + ".device0.sensor0"),
+            seqResources,
+            unseqResources);
 
     Set<String> allSensors = new HashSet<>();
     allSensors.add("sensor0");
 
-    SeriesReaderByTimestamp seriesReader = new SeriesReaderByTimestamp(
-        new PartialPath(SERIES_READER_TEST_SG + ".device0.sensor0"), allSensors,
-        TSDataType.INT32, new QueryContext(), dataSource, null, true);
+    SeriesReaderByTimestamp seriesReader =
+        new SeriesReaderByTimestamp(
+            new PartialPath(SERIES_READER_TEST_SG + ".device0.sensor0"),
+            allSensors,
+            TSDataType.INT32,
+            new QueryContext(),
+            dataSource,
+            null,
+            true);
 
     for (int time = 0; time < 500; time++) {
       Integer value = (Integer) seriesReader.getValueInTimestamp(time);

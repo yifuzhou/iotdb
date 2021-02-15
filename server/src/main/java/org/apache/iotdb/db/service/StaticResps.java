@@ -29,29 +29,27 @@ import org.apache.iotdb.rpc.TSStatusCode;
 import org.apache.iotdb.service.rpc.thrift.TSExecuteStatementResp;
 import org.apache.iotdb.tsfile.file.metadata.enums.TSDataType;
 
-/**
- * Static responses that won't change for all requests.
- */
+/** Static responses that won't change for all requests. */
 class StaticResps {
 
   private StaticResps() {
     // enum-like class
   }
 
-  static final TSExecuteStatementResp LAST_RESP = getExecuteResp(
-      Arrays.asList(COLUMN_TIMESERIES, COLUMN_VALUE),
-      Arrays.asList(TSDataType.TEXT.toString(), TSDataType.TEXT.toString()), false
-  );
+  static final TSExecuteStatementResp LAST_RESP =
+      getExecuteResp(
+          Arrays.asList(COLUMN_TIMESERIES, COLUMN_VALUE),
+          Arrays.asList(TSDataType.TEXT.toString(), TSDataType.TEXT.toString()),
+          false);
 
-  public static TSExecuteStatementResp getNoTimeExecuteResp(List<String> columns,
-      List<String> dataTypes) {
+  public static TSExecuteStatementResp getNoTimeExecuteResp(
+      List<String> columns, List<String> dataTypes) {
     return getExecuteResp(columns, dataTypes, true);
   }
 
-  private static TSExecuteStatementResp getExecuteResp(List<String> columns,
-      List<String> dataTypes, boolean ignoreTimeStamp) {
-    TSExecuteStatementResp resp =
-        RpcUtils.getTSExecuteStatementResp(TSStatusCode.SUCCESS_STATUS);
+  private static TSExecuteStatementResp getExecuteResp(
+      List<String> columns, List<String> dataTypes, boolean ignoreTimeStamp) {
+    TSExecuteStatementResp resp = RpcUtils.getTSExecuteStatementResp(TSStatusCode.SUCCESS_STATUS);
     resp.setIgnoreTimeStamp(ignoreTimeStamp);
     resp.setColumns(columns);
     resp.setDataTypeList(dataTypes);

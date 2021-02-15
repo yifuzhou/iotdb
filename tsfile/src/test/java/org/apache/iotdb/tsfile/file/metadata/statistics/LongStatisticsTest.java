@@ -117,5 +117,4 @@ public class LongStatisticsTest {
     assertEquals(111L, (long) longStats3.getFirstValue());
     assertEquals(114L, (long) longStats3.getLastValue());
   }
-
 }

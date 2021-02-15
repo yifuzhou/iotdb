@@ -36,13 +36,27 @@ public class SeriesReaderByTimestamp implements IReaderByTimestamp {
   private BatchData batchData;
   private boolean ascending;
 
-  public SeriesReaderByTimestamp(PartialPath seriesPath, Set<String> allSensors,
-      TSDataType dataType, QueryContext context, QueryDataSource dataSource,
-      TsFileFilter fileFilter, boolean ascending) {
+  public SeriesReaderByTimestamp(
+      PartialPath seriesPath,
+      Set<String> allSensors,
+      TSDataType dataType,
+      QueryContext context,
+      QueryDataSource dataSource,
+      TsFileFilter fileFilter,
+      boolean ascending) {
     UnaryFilter timeFilter =
         ascending ? TimeFilter.gtEq(Long.MIN_VALUE) : TimeFilter.ltEq(Long.MAX_VALUE);
-    seriesReader = new SeriesReader(seriesPath, allSensors, dataType, context,
-        dataSource, timeFilter, null, fileFilter, ascending);
+    seriesReader =
+        new SeriesReader(
+            seriesPath,
+            allSensors,
+            dataType,
+            context,
+            dataSource,
+            timeFilter,
+            null,
+            fileFilter,
+            ascending);
     this.ascending = ascending;
   }
 

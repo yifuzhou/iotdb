@@ -51,16 +51,16 @@ public class ClusterTimeGeneratorTest extends BaseQueryTest {
     try {
       IExpression expression =
           BinaryExpression.and(
-              new SingleSeriesExpression(new PartialPath(TestUtils.getTestSeries(0, 0)),
-                  ValueFilter.gtEq(3.0)),
-              new SingleSeriesExpression(new PartialPath(TestUtils.getTestSeries(1, 1)),
-                  ValueFilter.ltEq(8.0)));
+              new SingleSeriesExpression(
+                  new PartialPath(TestUtils.getTestSeries(0, 0)), ValueFilter.gtEq(3.0)),
+              new SingleSeriesExpression(
+                  new PartialPath(TestUtils.getTestSeries(1, 1)), ValueFilter.ltEq(8.0)));
       dataQueryPlan.setExpression(expression);
       dataQueryPlan.addDeduplicatedPaths(new PartialPath(TestUtils.getTestSeries(0, 0)));
       dataQueryPlan.addDeduplicatedPaths(new PartialPath(TestUtils.getTestSeries(1, 1)));
 
-      ClusterTimeGenerator timeGenerator = new ClusterTimeGenerator(expression, context,
-          testMetaMember, dataQueryPlan);
+      ClusterTimeGenerator timeGenerator =
+          new ClusterTimeGenerator(expression, context, testMetaMember, dataQueryPlan);
       for (int i = 3; i <= 8; i++) {
         assertTrue(timeGenerator.hasNext());
         assertEquals(i, timeGenerator.next());
@@ -70,5 +70,4 @@ public class ClusterTimeGeneratorTest extends BaseQueryTest {
       QueryResourceManager.getInstance().endQuery(context.getQueryId());
     }
   }
-
 }

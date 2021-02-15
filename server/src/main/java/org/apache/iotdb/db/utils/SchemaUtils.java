@@ -47,11 +47,10 @@ import org.slf4j.LoggerFactory;
 
 public class SchemaUtils {
 
-  private SchemaUtils() {
-  }
+  private SchemaUtils() {}
 
-  private static final Map<TSDataType, Set<TSEncoding>> schemaChecker = new EnumMap<>(
-      TSDataType.class);
+  private static final Map<TSDataType, Set<TSEncoding>> schemaChecker =
+      new EnumMap<>(TSDataType.class);
 
   static {
     Set<TSEncoding> booleanSet = new HashSet<>();
@@ -90,13 +89,13 @@ public class SchemaUtils {
       TSDataType dataType = schema.getType();
       TSEncoding encoding = schema.getEncodingType();
       CompressionType compressionType = schema.getCompressor();
-      IoTDB.metaManager.createTimeseries(path, dataType, encoding,
-          compressionType, Collections.emptyMap());
+      IoTDB.metaManager.createTimeseries(
+          path, dataType, encoding, compressionType, Collections.emptyMap());
     } catch (PathAlreadyExistException ignored) {
       // ignore added timeseries
     } catch (MetadataException e) {
-      if (!(e.getCause() instanceof ClosedByInterruptException) &&
-          !(e.getCause() instanceof ClosedChannelException)) {
+      if (!(e.getCause() instanceof ClosedByInterruptException)
+          && !(e.getCause() instanceof ClosedChannelException)) {
         logger.error("Cannot create timeseries {} in snapshot, ignored", schema.getFullPath(), e);
       }
     }
@@ -113,11 +112,11 @@ public class SchemaUtils {
     TSDataType dataType = schema.getType();
     TSEncoding encoding = schema.getEncodingType();
     CompressionType compressionType = schema.getCompressor();
-    MeasurementSchema measurementSchema = new MeasurementSchema(path.getMeasurement(),
-        dataType, encoding, compressionType);
+    MeasurementSchema measurementSchema =
+        new MeasurementSchema(path.getMeasurement(), dataType, encoding, compressionType);
 
-    MeasurementMNode measurementMNode = new MeasurementMNode(null, path.getMeasurement(),
-        measurementSchema, null);
+    MeasurementMNode measurementMNode =
+        new MeasurementMNode(null, path.getMeasurement(), measurementSchema, null);
     IoTDB.metaManager.cacheMeta(path, measurementMNode);
   }
 
@@ -131,12 +130,12 @@ public class SchemaUtils {
   }
 
   /**
-   * @param paths       time series paths
+   * @param paths time series paths
    * @param aggregation aggregation function, may be null
    * @return The data type of aggregation or (data type of paths if aggregation is null)
    */
-  public static List<TSDataType> getSeriesTypesByPaths(Collection<PartialPath> paths,
-      String aggregation) throws MetadataException {
+  public static List<TSDataType> getSeriesTypesByPaths(
+      Collection<PartialPath> paths, String aggregation) throws MetadataException {
     TSDataType dataType = getAggregationType(aggregation);
     if (dataType != null) {
       return Collections.nCopies(paths.size(), dataType);
@@ -149,16 +148,17 @@ public class SchemaUtils {
   }
 
   /**
-   * If the datatype of 'aggregation' depends on 'measurementDataType' (min_value, max_value), return
-   * 'measurementDataType' directly, or return a list whose elements are all the datatype of 'aggregation' and its length
-   * is the same as 'measurementDataType'.
+   * If the datatype of 'aggregation' depends on 'measurementDataType' (min_value, max_value),
+   * return 'measurementDataType' directly, or return a list whose elements are all the datatype of
+   * 'aggregation' and its length is the same as 'measurementDataType'.
+   *
    * @param measurementDataType
    * @param aggregation
    * @return
    * @throws MetadataException
    */
-  public static List<TSDataType> getAggregatedDataTypes(List<TSDataType> measurementDataType,
-      String aggregation) throws MetadataException {
+  public static List<TSDataType> getAggregatedDataTypes(
+      List<TSDataType> measurementDataType, String aggregation) throws MetadataException {
     TSDataType dataType = getAggregationType(aggregation);
     if (dataType != null) {
       return Collections.nCopies(measurementDataType.size(), dataType);
@@ -170,8 +170,8 @@ public class SchemaUtils {
     return IoTDB.metaManager.getSeriesType(path);
   }
 
-  public static List<TSDataType> getSeriesTypesByPaths(List<PartialPath> paths,
-      List<String> aggregations) throws MetadataException {
+  public static List<TSDataType> getSeriesTypesByPaths(
+      List<PartialPath> paths, List<String> aggregations) throws MetadataException {
     List<TSDataType> tsDataTypes = new ArrayList<>();
     for (int i = 0; i < paths.size(); i++) {
       String aggrStr = aggregations != null ? aggregations.get(i) : null;
@@ -235,8 +235,9 @@ public class SchemaUtils {
   public static void checkDataTypeWithEncoding(TSDataType dataType, TSEncoding encoding)
       throws MetadataException {
     if (!schemaChecker.get(dataType).contains(encoding)) {
-      throw new MetadataException(String
-          .format("encoding %s does not support %s", encoding.toString(), dataType.toString()),
+      throw new MetadataException(
+          String.format(
+              "encoding %s does not support %s", encoding.toString(), dataType.toString()),
           true);
     }
   }

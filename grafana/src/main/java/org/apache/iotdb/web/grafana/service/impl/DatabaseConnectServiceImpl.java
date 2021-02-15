@@ -30,8 +30,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class DatabaseConnectServiceImpl implements DatabaseConnectService {
 
-  @Autowired
-  BasicDao basicDao;
+  @Autowired BasicDao basicDao;
 
   @Override
   public int testConnection() {
@@ -47,5 +46,4 @@ public class DatabaseConnectServiceImpl implements DatabaseConnectService {
   public List<String> getMetaData() {
     return basicDao.getMetaData();
   }
-
 }

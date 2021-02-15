@@ -35,9 +35,7 @@ public class UDTFAbs extends UDTFMath {
   public void beforeStart(UDFParameters parameters, UDTFConfigurations configurations)
       throws MetadataException {
     dataType = parameters.getDataType(0);
-    configurations
-        .setAccessStrategy(new RowByRowAccessStrategy())
-        .setOutputDataType(dataType);
+    configurations.setAccessStrategy(new RowByRowAccessStrategy()).setOutputDataType(dataType);
   }
 
   @Override
@@ -59,8 +57,8 @@ public class UDTFAbs extends UDTFMath {
         break;
       default:
         // This will not happen.
-        throw new UDFInputSeriesDataTypeNotValidException(0, dataType, TSDataType.INT32,
-            TSDataType.INT64, TSDataType.FLOAT, TSDataType.DOUBLE);
+        throw new UDFInputSeriesDataTypeNotValidException(
+            0, dataType, TSDataType.INT32, TSDataType.INT64, TSDataType.FLOAT, TSDataType.DOUBLE);
     }
   }
 

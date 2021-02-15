@@ -52,7 +52,7 @@ public class CompactionLogAnalyzer {
 
   /**
    * @return analyze (written device set, last offset, source file list, target file , is contains
-   * merge finished)
+   *     merge finished)
    */
   public void analyze() throws IOException {
     String currLine;

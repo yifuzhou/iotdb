@@ -52,94 +52,131 @@ public class PageReaderTest {
   @Test
   public void testLong() {
 
-    LoopWriteReadTest test = new LoopWriteReadTest("Test INT64",
-        new LongRleEncoder(),
-        new LongRleDecoder(), TSDataType.INT64, POINTS_COUNT_IN_ONE_PAGE) {
-      @Override
-      public Object generateValueByIndex(int i) {
-        return Long.MAX_VALUE - i;
-      }
-    };
+    LoopWriteReadTest test =
+        new LoopWriteReadTest(
+            "Test INT64",
+            new LongRleEncoder(),
+            new LongRleDecoder(),
+            TSDataType.INT64,
+            POINTS_COUNT_IN_ONE_PAGE) {
+          @Override
+          public Object generateValueByIndex(int i) {
+            return Long.MAX_VALUE - i;
+          }
+        };
     test.test(TSDataType.INT64);
   }
 
   @Test
   public void testBoolean() {
-    LoopWriteReadTest test = new LoopWriteReadTest("Test Boolean",
-        new IntRleEncoder(),
-        new IntRleDecoder(), TSDataType.BOOLEAN, POINTS_COUNT_IN_ONE_PAGE) {
-      @Override
-      public Object generateValueByIndex(int i) {
-        return i % 3 == 0;
-      }
-    };
+    LoopWriteReadTest test =
+        new LoopWriteReadTest(
+            "Test Boolean",
+            new IntRleEncoder(),
+            new IntRleDecoder(),
+            TSDataType.BOOLEAN,
+            POINTS_COUNT_IN_ONE_PAGE) {
+          @Override
+          public Object generateValueByIndex(int i) {
+            return i % 3 == 0;
+          }
+        };
     test.test(TSDataType.BOOLEAN);
   }
 
   @Test
   public void testInt() {
-    LoopWriteReadTest test = new LoopWriteReadTest("Test INT32", new IntRleEncoder(),
-        new IntRleDecoder(), TSDataType.INT32, POINTS_COUNT_IN_ONE_PAGE) {
-      @Override
-      public Object generateValueByIndex(int i) {
-        return i;
-      }
-    };
+    LoopWriteReadTest test =
+        new LoopWriteReadTest(
+            "Test INT32",
+            new IntRleEncoder(),
+            new IntRleDecoder(),
+            TSDataType.INT32,
+            POINTS_COUNT_IN_ONE_PAGE) {
+          @Override
+          public Object generateValueByIndex(int i) {
+            return i;
+          }
+        };
     test.test(TSDataType.INT32);
   }
 
   @Test
   public void testFloat() {
-    LoopWriteReadTest test = new LoopWriteReadTest("Test FLOAT", new SinglePrecisionEncoderV1(),
-        new SinglePrecisionDecoderV1(), TSDataType.FLOAT, POINTS_COUNT_IN_ONE_PAGE) {
-      @Override
-      public Object generateValueByIndex(int i) {
-        return (float) i / 10 - (float) i / 100;
-      }
-    };
+    LoopWriteReadTest test =
+        new LoopWriteReadTest(
+            "Test FLOAT",
+            new SinglePrecisionEncoderV1(),
+            new SinglePrecisionDecoderV1(),
+            TSDataType.FLOAT,
+            POINTS_COUNT_IN_ONE_PAGE) {
+          @Override
+          public Object generateValueByIndex(int i) {
+            return (float) i / 10 - (float) i / 100;
+          }
+        };
     test.test(TSDataType.FLOAT);
 
-    LoopWriteReadTest test2 = new LoopWriteReadTest("Test FLOAT", new SinglePrecisionEncoderV1(),
-        new SinglePrecisionDecoderV1(), TSDataType.FLOAT, POINTS_COUNT_IN_ONE_PAGE) {
-      @Override
-      public Object generateValueByIndex(int i) {
-        return (float) i / 100 - (float) i / 10;
-      }
-    };
+    LoopWriteReadTest test2 =
+        new LoopWriteReadTest(
+            "Test FLOAT",
+            new SinglePrecisionEncoderV1(),
+            new SinglePrecisionDecoderV1(),
+            TSDataType.FLOAT,
+            POINTS_COUNT_IN_ONE_PAGE) {
+          @Override
+          public Object generateValueByIndex(int i) {
+            return (float) i / 100 - (float) i / 10;
+          }
+        };
     test2.test(TSDataType.FLOAT);
   }
 
   @Test
   public void testDouble() {
-    LoopWriteReadTest test = new LoopWriteReadTest("Test Double", new DoublePrecisionEncoderV1(),
-        new DoublePrecisionDecoderV1(), TSDataType.DOUBLE, POINTS_COUNT_IN_ONE_PAGE) {
-      @Override
-      public Object generateValueByIndex(int i) {
-        return (double) i / 10 - (double) i / 100;
-      }
-    };
+    LoopWriteReadTest test =
+        new LoopWriteReadTest(
+            "Test Double",
+            new DoublePrecisionEncoderV1(),
+            new DoublePrecisionDecoderV1(),
+            TSDataType.DOUBLE,
+            POINTS_COUNT_IN_ONE_PAGE) {
+          @Override
+          public Object generateValueByIndex(int i) {
+            return (double) i / 10 - (double) i / 100;
+          }
+        };
     test.test(TSDataType.DOUBLE);
 
-    LoopWriteReadTest test2 = new LoopWriteReadTest("Test Double", new DoublePrecisionEncoderV1(),
-        new DoublePrecisionDecoderV1(), TSDataType.DOUBLE, POINTS_COUNT_IN_ONE_PAGE) {
-      @Override
-      public Object generateValueByIndex(int i) {
-        return (double) i / 1000 - (double) i / 100;
-      }
-    };
+    LoopWriteReadTest test2 =
+        new LoopWriteReadTest(
+            "Test Double",
+            new DoublePrecisionEncoderV1(),
+            new DoublePrecisionDecoderV1(),
+            TSDataType.DOUBLE,
+            POINTS_COUNT_IN_ONE_PAGE) {
+          @Override
+          public Object generateValueByIndex(int i) {
+            return (double) i / 1000 - (double) i / 100;
+          }
+        };
     test2.test(TSDataType.DOUBLE);
   }
 
   @Test
   public void testBinary() {
-    LoopWriteReadTest test = new LoopWriteReadTest("Test Double",
-        new PlainEncoder(TSDataType.TEXT, 1000),
-        new PlainDecoder(), TSDataType.TEXT, POINTS_COUNT_IN_ONE_PAGE) {
-      @Override
-      public Object generateValueByIndex(int i) {
-        return new Binary("TEST TEXT" + i);
-      }
-    };
+    LoopWriteReadTest test =
+        new LoopWriteReadTest(
+            "Test Double",
+            new PlainEncoder(TSDataType.TEXT, 1000),
+            new PlainDecoder(),
+            TSDataType.TEXT,
+            POINTS_COUNT_IN_ONE_PAGE) {
+          @Override
+          public Object generateValueByIndex(int i) {
+            return new Binary("TEST TEXT" + i);
+          }
+        };
     test.test(TSDataType.TEXT);
   }
 
@@ -152,8 +189,8 @@ public class PageReaderTest {
     private String name;
     private int count;
 
-    public LoopWriteReadTest(String name, Encoder encoder, Decoder decoder, TSDataType dataType,
-        int count) {
+    public LoopWriteReadTest(
+        String name, Encoder encoder, Decoder decoder, TSDataType dataType, int count) {
       this.name = name;
       this.encoder = encoder;
       this.decoder = decoder;
@@ -171,8 +208,9 @@ public class PageReaderTest {
 
         ByteBuffer page = ByteBuffer.wrap(pageWriter.getUncompressedBytes().array());
 
-        PageReader pageReader = new PageReader(page, dataType, decoder,
-            new DeltaBinaryDecoder.LongDeltaDecoder(), null);
+        PageReader pageReader =
+            new PageReader(
+                page, dataType, decoder, new DeltaBinaryDecoder.LongDeltaDecoder(), null);
 
         int index = 0;
         BatchData data = pageReader.getAllSatisfiedPageData();
@@ -201,8 +239,9 @@ public class PageReaderTest {
 
         ByteBuffer page = ByteBuffer.wrap(pageWriter.getUncompressedBytes().array());
 
-        PageReader pageReader = new PageReader(page, dataType, decoder,
-            new DeltaBinaryDecoder.LongDeltaDecoder(), null);
+        PageReader pageReader =
+            new PageReader(
+                page, dataType, decoder, new DeltaBinaryDecoder.LongDeltaDecoder(), null);
 
         int index = 0;
         List<TimeRange> deleteIntervals = new ArrayList<>();
@@ -252,7 +291,6 @@ public class PageReaderTest {
           case TEXT:
             pageWriter.write(i, (Binary) generateValueByIndex(i));
             break;
-
         }
       }
     }
@@ -262,14 +300,14 @@ public class PageReaderTest {
 
   @Test
   public void testPageDelete() {
-    LoopWriteReadTest test = new LoopWriteReadTest("Test INT64",
-        new LongRleEncoder(),
-        new LongRleDecoder(), TSDataType.INT64, 100) {
-      @Override
-      public Object generateValueByIndex(int i) {
-        return Long.MAX_VALUE - i;
-      }
-    };
+    LoopWriteReadTest test =
+        new LoopWriteReadTest(
+            "Test INT64", new LongRleEncoder(), new LongRleDecoder(), TSDataType.INT64, 100) {
+          @Override
+          public Object generateValueByIndex(int i) {
+            return Long.MAX_VALUE - i;
+          }
+        };
     test.testDelete(TSDataType.INT64);
   }
 }

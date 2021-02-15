@@ -34,8 +34,15 @@ import org.junit.Test;
 
 public class ElasticSerializableRowRecordListTest extends SerializableListTest {
 
-  private static final TSDataType[] DATA_TYPES = {TSDataType.INT32, TSDataType.INT64,
-      TSDataType.FLOAT, TSDataType.DOUBLE, TSDataType.BOOLEAN, TSDataType.TEXT, TSDataType.TEXT};
+  private static final TSDataType[] DATA_TYPES = {
+    TSDataType.INT32,
+    TSDataType.INT64,
+    TSDataType.FLOAT,
+    TSDataType.DOUBLE,
+    TSDataType.BOOLEAN,
+    TSDataType.TEXT,
+    TSDataType.TEXT
+  };
 
   private ElasticSerializableRowRecordList rowRecordList;
 
@@ -62,8 +69,9 @@ public class ElasticSerializableRowRecordListTest extends SerializableListTest {
 
   private void initESRowRecordList() {
     try {
-      rowRecordList = new ElasticSerializableRowRecordList(DATA_TYPES, QUERY_ID,
-          MEMORY_USAGE_LIMIT_IN_MB, CACHE_SIZE);
+      rowRecordList =
+          new ElasticSerializableRowRecordList(
+              DATA_TYPES, QUERY_ID, MEMORY_USAGE_LIMIT_IN_MB, CACHE_SIZE);
     } catch (QueryProcessException e) {
       fail(e.toString());
     }

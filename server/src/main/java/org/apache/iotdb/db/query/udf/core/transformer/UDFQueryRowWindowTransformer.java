@@ -28,8 +28,8 @@ public class UDFQueryRowWindowTransformer extends UDFQueryTransformer {
 
   protected final LayerRowWindowReader layerRowWindowReader;
 
-  public UDFQueryRowWindowTransformer(LayerRowWindowReader layerRowWindowReader,
-      UDTFExecutor executor) {
+  public UDFQueryRowWindowTransformer(
+      LayerRowWindowReader layerRowWindowReader, UDTFExecutor executor) {
     super(executor);
     this.layerRowWindowReader = layerRowWindowReader;
   }

@@ -26,14 +26,14 @@ import org.apache.iotdb.db.metadata.MManager;
 import org.apache.iotdb.db.metadata.PartialPath;
 
 /**
- * for DBA to view the mapping from device to virtual storage group ID
- * usage: run this class with arguments [system_schema_dir], if args are not given, use default in config
+ * for DBA to view the mapping from device to virtual storage group ID usage: run this class with
+ * arguments [system_schema_dir], if args are not given, use default in config
  */
 public class DeviceMappingViewer {
 
   public static void main(String[] args) throws MetadataException {
     // has schema log dir
-    if(args.length == 1){
+    if (args.length == 1) {
       IoTDBDescriptor.getInstance().getConfig().setSchemaDir(args[0]);
     }
 
@@ -44,15 +44,16 @@ public class DeviceMappingViewer {
 
     Set<PartialPath> partialPathSet = mManager.getDevices(new PartialPath("root.*"));
 
-    if(partialPathSet.isEmpty() && args.length == 1){
+    if (partialPathSet.isEmpty() && args.length == 1) {
       System.out.println("no mlog in given system schema dir: " + args[0] + " please have a check");
-    }
-    else{
+    } else {
       System.out.println();
-      System.out.println("--------------------- mapping from device to virtual storage group ID ---------------------");
+      System.out.println(
+          "--------------------- mapping from device to virtual storage group ID ---------------------");
       System.out.println("Format is: device name -> virtual storage group ID");
-      for(PartialPath partialPath : partialPathSet){
-        System.out.println(partialPath + " -> " + partitioner.deviceToVirtualStorageGroupId(partialPath));
+      for (PartialPath partialPath : partialPathSet) {
+        System.out.println(
+            partialPath + " -> " + partitioner.deviceToVirtualStorageGroupId(partialPath));
       }
     }
 

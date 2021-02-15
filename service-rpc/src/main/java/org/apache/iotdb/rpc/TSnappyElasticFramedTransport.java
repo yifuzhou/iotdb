@@ -51,10 +51,10 @@ public class TSnappyElasticFramedTransport extends TCompressedElasticFramedTrans
     this(underlying, DEFAULT_BUF_CAPACITY, DEFAULT_MAX_LENGTH);
   }
 
-  public TSnappyElasticFramedTransport(TTransport underlying, int initialBufferCapacity, int maxLength) {
+  public TSnappyElasticFramedTransport(
+      TTransport underlying, int initialBufferCapacity, int maxLength) {
     super(underlying, initialBufferCapacity, maxLength);
   }
-
 
   @Override
   protected int uncompressedLength(byte[] buf, int off, int len) throws IOException {

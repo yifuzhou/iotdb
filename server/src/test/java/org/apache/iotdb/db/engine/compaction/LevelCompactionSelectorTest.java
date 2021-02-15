@@ -55,21 +55,20 @@ public class LevelCompactionSelectorTest extends LevelCompactionTest {
     FileUtils.deleteDirectory(tempSGDir);
   }
 
-  /**
-   * just compaction once
-   */
+  /** just compaction once */
   @Test
   public void testCompactionSelector() throws NoSuchFieldException, IllegalAccessException {
-    LevelCompactionTsFileManagement levelCompactionTsFileManagement = new LevelCompactionTsFileManagement(
-        COMPACTION_TEST_SG, tempSGDir.getPath());
+    LevelCompactionTsFileManagement levelCompactionTsFileManagement =
+        new LevelCompactionTsFileManagement(COMPACTION_TEST_SG, tempSGDir.getPath());
     levelCompactionTsFileManagement.addAll(seqResources, true);
     levelCompactionTsFileManagement.addAll(unseqResources, false);
     levelCompactionTsFileManagement.forkCurrentFileList(0);
-    Field fieldForkedSequenceTsFileResources = LevelCompactionTsFileManagement.class
-        .getDeclaredField("forkedSequenceTsFileResources");
+    Field fieldForkedSequenceTsFileResources =
+        LevelCompactionTsFileManagement.class.getDeclaredField("forkedSequenceTsFileResources");
     fieldForkedSequenceTsFileResources.setAccessible(true);
-    List<TsFileResource> forkedSequenceTsFileResources = (List<TsFileResource>) fieldForkedSequenceTsFileResources
-        .get(levelCompactionTsFileManagement);
+    List<TsFileResource> forkedSequenceTsFileResources =
+        (List<TsFileResource>)
+            fieldForkedSequenceTsFileResources.get(levelCompactionTsFileManagement);
     assertEquals(2, forkedSequenceTsFileResources.size());
   }
 }

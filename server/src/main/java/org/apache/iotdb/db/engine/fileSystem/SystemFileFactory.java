@@ -25,11 +25,11 @@ import org.apache.iotdb.db.conf.IoTDBDescriptor;
 import org.apache.iotdb.tsfile.fileSystem.FSType;
 
 public enum SystemFileFactory {
-
   INSTANCE;
 
   private static FSType fsType = IoTDBDescriptor.getInstance().getConfig().getSystemFileStorageFs();
   private static final String UNSUPPORT_FILE_SYSTEM = "Unsupported file system: ";
+
   public File getFile(String pathname) {
     if (fsType.equals(FSType.HDFS)) {
       throw new UnsupportedOperationException(UNSUPPORT_FILE_SYSTEM + fsType.name());
@@ -65,5 +65,4 @@ public enum SystemFileFactory {
       return new File(uri);
     }
   }
-
 }

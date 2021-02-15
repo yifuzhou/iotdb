@@ -150,8 +150,8 @@ public class MetaSyncService extends BaseSyncService implements TSMetaService.If
 
     if (metaGroupMember.getCharacter() == NodeCharacter.FOLLOWER
         && metaGroupMember.getLeader() != null) {
-      logger.info("Forward the node removal request of {} to leader {}", node,
-          metaGroupMember.getLeader());
+      logger.info(
+          "Forward the node removal request of {} to leader {}", node, metaGroupMember.getLeader());
       Long rst = forwardRemoveNode(node);
       if (rst != null) {
         return rst;

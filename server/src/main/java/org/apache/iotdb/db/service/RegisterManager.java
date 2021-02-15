@@ -37,9 +37,7 @@ public class RegisterManager {
     iServices = new ArrayList<>();
   }
 
-  /**
-   * register service.
-   */
+  /** register service. */
   public void register(IService service) throws StartupException {
     for (IService s : iServices) {
       if (s.getID() == service.getID()) {
@@ -51,11 +49,9 @@ public class RegisterManager {
     service.start();
   }
 
-  /**
-   * stop all service and clear iService list.
-   */
+  /** stop all service and clear iService list. */
   public void deregisterAll() {
-    //we stop JMXServer at last
+    // we stop JMXServer at last
     Collections.reverse(iServices);
     for (IService service : iServices) {
       try {
@@ -69,11 +65,9 @@ public class RegisterManager {
     logger.info("deregister all service.");
   }
 
-  /**
-   * stop all service and clear iService list.
-   */
+  /** stop all service and clear iService list. */
   public void shutdownAll() throws ShutdownException {
-    //we stop JMXServer at last
+    // we stop JMXServer at last
     Collections.reverse(iServices);
     for (IService service : iServices) {
       service.shutdown(deregisterTimeOut);

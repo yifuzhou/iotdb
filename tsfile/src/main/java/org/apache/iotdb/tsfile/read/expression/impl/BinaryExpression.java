@@ -19,7 +19,6 @@
 package org.apache.iotdb.tsfile.read.expression.impl;
 
 import java.io.Serializable;
-
 import org.apache.iotdb.tsfile.read.expression.ExpressionType;
 import org.apache.iotdb.tsfile.read.expression.IBinaryExpression;
 import org.apache.iotdb.tsfile.read.expression.IExpression;

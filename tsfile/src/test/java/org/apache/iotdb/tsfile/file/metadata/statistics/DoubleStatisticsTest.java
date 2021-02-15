@@ -87,10 +87,8 @@ public class DoubleStatisticsTest {
     assertEquals(122.34d, doubleStats3.getFirstValue(), maxError);
     assertEquals(125.34d, doubleStats3.getLastValue(), maxError);
 
-
     doubleStats3.mergeStatistics(doubleStats5);
     assertEquals(122.34d, doubleStats3.getFirstValue(), maxError);
     assertEquals(125.34d, doubleStats3.getLastValue(), maxError);
   }
-
 }

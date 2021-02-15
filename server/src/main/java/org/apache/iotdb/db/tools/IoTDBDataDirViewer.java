@@ -40,7 +40,7 @@ public class IoTDBDataDirViewer {
     String outFile = "IoTDB_data_dir_overview.txt";
     if (args.length == 0) {
       String path = "data/data";
-      data_dir = path.split(","); //multiple data dirs separated by comma
+      data_dir = path.split(","); // multiple data dirs separated by comma
     } else if (args.length == 1) {
       data_dir = args[0].split(",");
     } else if (args.length == 2) {
@@ -58,15 +58,17 @@ public class IoTDBDataDirViewer {
         if (seqAndUnseqDirs == null || seqAndUnseqDirs.length != 2) {
           throw new IOException(
               "Irregular data dir structure.There should be a sequence and unsequence directory "
-                  + "under the data directory " + dirFile.getName());
+                  + "under the data directory "
+                  + dirFile.getName());
         }
         List<File> fileList = Arrays.asList(seqAndUnseqDirs);
         fileList.sort((Comparator.comparing(File::getName)));
-        if (!seqAndUnseqDirs[0].getName().equals("sequence") || !seqAndUnseqDirs[1].getName()
-            .equals("unsequence")) {
+        if (!seqAndUnseqDirs[0].getName().equals("sequence")
+            || !seqAndUnseqDirs[1].getName().equals("unsequence")) {
           throw new IOException(
               "Irregular data dir structure.There should be a sequence and unsequence directory "
-                  + "under the data directory " + dirFile.getName());
+                  + "under the data directory "
+                  + dirFile.getName());
         }
 
         printlnBoth(pw, "|==============================================================");
@@ -86,7 +88,8 @@ public class IoTDBDataDirViewer {
     if (storageGroupDirs == null) {
       throw new IOException(
           "Irregular data dir structure.There should be storage group directories under "
-              + "the sequence/unsequence directory " + seqOrUnseqDir.getName());
+              + "the sequence/unsequence directory "
+              + seqOrUnseqDir.getName());
     }
     List<File> fileList = Arrays.asList(storageGroupDirs);
     fileList.sort((Comparator.comparing(File::getName)));
@@ -102,7 +105,8 @@ public class IoTDBDataDirViewer {
     if (files == null) {
       throw new IOException(
           "Irregular data dir structure.There should be timeInterval directories under "
-              + "the storage group directory " + storageGroup.getName());
+              + "the storage group directory "
+              + storageGroup.getName());
     }
     List<File> fileList = Arrays.asList(files);
     fileList.sort((Comparator.comparing(File::getName)));
@@ -118,7 +122,8 @@ public class IoTDBDataDirViewer {
     if (files == null) {
       throw new IOException(
           "Irregular data dir structure.There should be tsfiles under "
-              + "the timeInterval directories directory " + timeInterval.getName());
+              + "the timeInterval directories directory "
+              + timeInterval.getName());
     }
     List<File> fileList = Arrays.asList(files);
     fileList.sort((Comparator.comparing(File::getName)));
@@ -132,20 +137,22 @@ public class IoTDBDataDirViewer {
     }
   }
 
-  private static void printResource(String filename, PrintWriter pw)
-      throws IOException {
+  private static void printResource(String filename, PrintWriter pw) throws IOException {
     filename = filename.substring(0, filename.length() - 9);
     TsFileResource resource = new TsFileResource(SystemFileFactory.INSTANCE.getFile(filename));
     resource.deserialize();
     // sort device strings
     SortedSet<String> keys = new TreeSet<>(resource.getDevices());
     for (String device : keys) {
-      printlnBoth(pw,
-          String.format("|  |  |  |  |--device %s, start time %d (%s), end time %d (%s)", device,
-              resource.getStartTime(device), DatetimeUtils
-                  .convertMillsecondToZonedDateTime(resource.getStartTime(device)),
-              resource.getEndTime(device), DatetimeUtils
-                  .convertMillsecondToZonedDateTime(resource.getEndTime(device))));
+      printlnBoth(
+          pw,
+          String.format(
+              "|  |  |  |  |--device %s, start time %d (%s), end time %d (%s)",
+              device,
+              resource.getStartTime(device),
+              DatetimeUtils.convertMillsecondToZonedDateTime(resource.getStartTime(device)),
+              resource.getEndTime(device),
+              DatetimeUtils.convertMillsecondToZonedDateTime(resource.getEndTime(device))));
     }
   }
 

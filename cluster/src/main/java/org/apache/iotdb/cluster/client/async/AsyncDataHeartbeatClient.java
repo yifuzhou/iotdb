@@ -34,11 +34,19 @@ import org.apache.thrift.transport.TNonblockingSocket;
  */
 public class AsyncDataHeartbeatClient extends AsyncDataClient {
 
-  private AsyncDataHeartbeatClient(TProtocolFactory protocolFactory,
-      TAsyncClientManager clientManager, Node node, AsyncClientPool pool) throws IOException {
-    super(protocolFactory, clientManager, new TNonblockingSocket(node.getIp(),
-        node.getDataPort() + ClusterUtils.DATA_HEARTBEAT_PORT_OFFSET
-        , RaftServer.getConnectionTimeoutInMS()));
+  private AsyncDataHeartbeatClient(
+      TProtocolFactory protocolFactory,
+      TAsyncClientManager clientManager,
+      Node node,
+      AsyncClientPool pool)
+      throws IOException {
+    super(
+        protocolFactory,
+        clientManager,
+        new TNonblockingSocket(
+            node.getIp(),
+            node.getDataPort() + ClusterUtils.DATA_HEARTBEAT_PORT_OFFSET,
+            RaftServer.getConnectionTimeoutInMS()));
     this.node = node;
     this.pool = pool;
   }
@@ -60,10 +68,12 @@ public class AsyncDataHeartbeatClient extends AsyncDataClient {
 
   @Override
   public String toString() {
-    return "AsyncDataHeartbeatClient{" +
-        "node=" + super.getNode() + "," +
-        "dataHeartbeatPort=" + (super.getNode().getDataPort()
-        + ClusterUtils.DATA_HEARTBEAT_PORT_OFFSET) +
-        '}';
+    return "AsyncDataHeartbeatClient{"
+        + "node="
+        + super.getNode()
+        + ","
+        + "dataHeartbeatPort="
+        + (super.getNode().getDataPort() + ClusterUtils.DATA_HEARTBEAT_PORT_OFFSET)
+        + '}';
   }
 }

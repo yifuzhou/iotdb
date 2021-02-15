@@ -33,10 +33,9 @@ import org.apache.thrift.async.AsyncMethodCallback;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * PullSnapshotHandler receives the result of pulling a data partition from a node.
- */
-public class PullSnapshotHandler<T extends Snapshot> implements AsyncMethodCallback<PullSnapshotResp> {
+/** PullSnapshotHandler receives the result of pulling a data partition from a node. */
+public class PullSnapshotHandler<T extends Snapshot>
+    implements AsyncMethodCallback<PullSnapshotResp> {
 
   private static final Logger logger = LoggerFactory.getLogger(PullSnapshotHandler.class);
   private AtomicReference<Map<Integer, T>> resultRef;
@@ -44,8 +43,11 @@ public class PullSnapshotHandler<T extends Snapshot> implements AsyncMethodCallb
   private List<Integer> slot;
   private SnapshotFactory<T> factory;
 
-  public PullSnapshotHandler(AtomicReference<Map<Integer, T>> resultRef,
-      Node owner, List<Integer> slots, SnapshotFactory<T> factory) {
+  public PullSnapshotHandler(
+      AtomicReference<Map<Integer, T>> resultRef,
+      Node owner,
+      List<Integer> slots,
+      SnapshotFactory<T> factory) {
     this.resultRef = resultRef;
     this.node = owner;
     this.slot = slots;
@@ -74,5 +76,4 @@ public class PullSnapshotHandler<T extends Snapshot> implements AsyncMethodCallb
       resultRef.notifyAll();
     }
   }
-
 }

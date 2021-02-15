@@ -4,7 +4,6 @@
 
 package org.apache.iotdb.cluster.partition.slot;
 
-
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -44,15 +43,14 @@ public class SlotPartitionTable implements PartitionTable {
   private static final Logger logger = LoggerFactory.getLogger(SlotPartitionTable.class);
   private static SlotStrategy slotStrategy = new DefaultStrategy();
 
-  private int replicationNum =
-      ClusterDescriptor.getInstance().getConfig().getReplicationNum();
+  private int replicationNum = ClusterDescriptor.getInstance().getConfig().getReplicationNum();
 
-  //all nodes
+  // all nodes
   private List<Node> nodeRing = new ArrayList<>();
-  //normally, it is equal to ClusterConstant.SLOT_NUM.
+  // normally, it is equal to ClusterConstant.SLOT_NUM.
   private int totalSlotNumbers;
 
-  //The following fields are used for determining which node a data item belongs to.
+  // The following fields are used for determining which node a data item belongs to.
   // the slots held by each node
   private Map<Node, List<Integer>> nodeSlotMap = new ConcurrentHashMap<>();
   // each slot is managed by whom
@@ -61,7 +59,7 @@ public class SlotPartitionTable implements PartitionTable {
   // find the data source
   private Map<Node, Map<Integer, Node>> previousNodeMap = new ConcurrentHashMap<>();
 
-  //the filed is used for determining which nodes need to be a group.
+  // the filed is used for determining which nodes need to be a group.
   // the data groups which this node belongs to.
   private List<PartitionGroup> localGroups;
 
@@ -132,7 +130,6 @@ public class SlotPartitionTable implements PartitionTable {
     }
   }
 
-
   // find replicationNum groups that a node is in
   private List<PartitionGroup> getPartitionGroups(Node node) {
     List<PartitionGroup> ret = new ArrayList<>();
@@ -184,7 +181,9 @@ public class SlotPartitionTable implements PartitionTable {
 
   public PartitionGroup route(int slot) {
     if (slot >= slotNodes.length || slot < 0) {
-      logger.warn("Invalid slot to route: {}, stack trace: {}", slot,
+      logger.warn(
+          "Invalid slot to route: {}, stack trace: {}",
+          slot,
           Thread.currentThread().getStackTrace());
       return null;
     }
@@ -200,11 +199,10 @@ public class SlotPartitionTable implements PartitionTable {
   @Override
   public Node routeToHeaderByTime(String storageGroupName, long timestamp) {
     synchronized (nodeRing) {
-      int slot = getSlotStrategy()
-          .calculateSlotByTime(storageGroupName, timestamp, getTotalSlotNumbers());
+      int slot =
+          getSlotStrategy().calculateSlotByTime(storageGroupName, timestamp, getTotalSlotNumbers());
       Node node = slotNodes[slot];
-      logger.trace("The slot of {}@{} is {}, held by {}", storageGroupName, timestamp,
-          slot, node);
+      logger.trace("The slot of {}@{} is {}, held by {}", storageGroupName, timestamp, slot, node);
       return node;
     }
   }
@@ -262,10 +260,10 @@ public class SlotPartitionTable implements PartitionTable {
     return result;
   }
 
-
   /**
    * Move last slots from each group whose slot number is bigger than the new average to the new
    * node.
+   *
    * @param newNode
    * @return a map recording what slots each group lost.
    */
@@ -407,11 +405,11 @@ public class SlotPartitionTable implements PartitionTable {
       return false;
     }
     SlotPartitionTable that = (SlotPartitionTable) o;
-    return totalSlotNumbers == that.totalSlotNumbers &&
-        Objects.equals(nodeRing, that.nodeRing) &&
-        Objects.equals(nodeSlotMap, that.nodeSlotMap) &&
-        Arrays.equals(slotNodes, that.slotNodes) &&
-        Objects.equals(previousNodeMap, that.previousNodeMap);
+    return totalSlotNumbers == that.totalSlotNumbers
+        && Objects.equals(nodeRing, that.nodeRing)
+        && Objects.equals(nodeSlotMap, that.nodeSlotMap)
+        && Arrays.equals(slotNodes, that.slotNodes)
+        && Objects.equals(previousNodeMap, that.previousNodeMap);
   }
 
   @Override

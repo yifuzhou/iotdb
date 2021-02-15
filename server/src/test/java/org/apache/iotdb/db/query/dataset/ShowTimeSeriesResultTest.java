@@ -34,11 +34,18 @@ public class ShowTimeSeriesResultTest {
   @Test
   public void serializeTest() throws IOException {
     Map<String, String> tag = Collections.singletonMap("tag1", "this is the first tag");
-    Map<String, String> attribute = Collections
-        .singletonMap("attribute1", "this is the first attribute");
-    ShowTimeSeriesResult showTimeSeriesResult = new ShowTimeSeriesResult("root.sg1.d1.s1",
-        "temperature", "root.sg1", TSDataType.DOUBLE, TSEncoding.GORILLA, CompressionType.SNAPPY,
-        tag, attribute);
+    Map<String, String> attribute =
+        Collections.singletonMap("attribute1", "this is the first attribute");
+    ShowTimeSeriesResult showTimeSeriesResult =
+        new ShowTimeSeriesResult(
+            "root.sg1.d1.s1",
+            "temperature",
+            "root.sg1",
+            TSDataType.DOUBLE,
+            TSEncoding.GORILLA,
+            CompressionType.SNAPPY,
+            tag,
+            attribute);
 
     ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
     showTimeSeriesResult.serialize(outputStream);

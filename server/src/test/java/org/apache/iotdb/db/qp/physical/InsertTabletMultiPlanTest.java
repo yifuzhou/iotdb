@@ -39,15 +39,15 @@ import org.apache.iotdb.tsfile.utils.Binary;
 import org.junit.Assert;
 import org.junit.Test;
 
-
 public class InsertTabletMultiPlanTest extends InsertTabletPlanTest {
 
   private final Planner processor = new Planner();
 
   @Test
   public void testInsertMultiTabletPlan()
-      throws QueryProcessException, MetadataException, InterruptedException, QueryFilterOptimizationException, StorageEngineException, IOException {
-    long[] times = new long[]{110L, 111L, 112L, 113L};
+      throws QueryProcessException, MetadataException, InterruptedException,
+          QueryFilterOptimizationException, StorageEngineException, IOException {
+    long[] times = new long[] {110L, 111L, 112L, 113L};
     List<Integer> dataTypes = new ArrayList<>();
     dataTypes.add(TSDataType.DOUBLE.ordinal());
     dataTypes.add(TSDataType.FLOAT.ordinal());
@@ -75,8 +75,11 @@ public class InsertTabletMultiPlanTest extends InsertTabletPlanTest {
 
     List<InsertTabletPlan> insertTabletPlanList = new ArrayList<>();
     for (int i = 0; i < 10; i++) {
-      InsertTabletPlan tabletPlan = new InsertTabletPlan(new PartialPath("root.multi.d" + i),
-          new String[]{"s1", "s2", "s3", "s4", "s5", "s6"}, dataTypes);
+      InsertTabletPlan tabletPlan =
+          new InsertTabletPlan(
+              new PartialPath("root.multi.d" + i),
+              new String[] {"s1", "s2", "s3", "s4", "s5", "s6"},
+              dataTypes);
       tabletPlan.setTimes(times);
       tabletPlan.setColumns(columns);
       tabletPlan.setRowCount(times.length);
@@ -87,8 +90,7 @@ public class InsertTabletMultiPlanTest extends InsertTabletPlanTest {
     InsertMultiTabletPlan insertMultiTabletPlan = new InsertMultiTabletPlan(insertTabletPlanList);
 
     executor.insertTablet(insertMultiTabletPlan);
-    QueryPlan queryPlan = (QueryPlan) processor
-        .parseSQLToPhysicalPlan("select * from root.multi");
+    QueryPlan queryPlan = (QueryPlan) processor.parseSQLToPhysicalPlan("select * from root.multi");
     QueryDataSet dataSet = executor.processQuery(queryPlan, EnvironmentUtils.TEST_QUERY_CONTEXT);
     Assert.assertEquals(60, dataSet.getPaths().size());
     while (dataSet.hasNext()) {

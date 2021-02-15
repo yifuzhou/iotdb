@@ -35,9 +35,11 @@ public class SerializableBinaryTVList extends SerializableTVList {
 
   protected static int calculateCapacity(float memoryLimitInMB, int byteArrayLength) {
     float memoryLimitInB = memoryLimitInMB * MB / 2;
-    return TSFileConfig.ARRAY_CAPACITY_THRESHOLD *
-        (int) (memoryLimitInB / (TSFileConfig.ARRAY_CAPACITY_THRESHOLD *
-            calculateSingleBinaryTVPairMemory(byteArrayLength)));
+    return TSFileConfig.ARRAY_CAPACITY_THRESHOLD
+        * (int)
+            (memoryLimitInB
+                / (TSFileConfig.ARRAY_CAPACITY_THRESHOLD
+                    * calculateSingleBinaryTVPairMemory(byteArrayLength)));
   }
 
   protected static int calculateSingleBinaryTVPairMemory(int byteArrayLength) {

@@ -54,8 +54,8 @@ public abstract class BaseAsyncService implements RaftService.AsyncIface {
   }
 
   @Override
-  public void sendHeartbeat(HeartBeatRequest request,
-      AsyncMethodCallback<HeartBeatResponse> resultHandler) {
+  public void sendHeartbeat(
+      HeartBeatRequest request, AsyncMethodCallback<HeartBeatResponse> resultHandler) {
     resultHandler.onComplete(member.processHeartbeatRequest(request));
   }
 
@@ -104,8 +104,8 @@ public abstract class BaseAsyncService implements RaftService.AsyncIface {
   }
 
   @Override
-  public void readFile(String filePath, long offset, int length,
-      AsyncMethodCallback<ByteBuffer> resultHandler) {
+  public void readFile(
+      String filePath, long offset, int length, AsyncMethodCallback<ByteBuffer> resultHandler) {
     try {
       resultHandler.onComplete(IOUtils.readFile(filePath, offset, length));
     } catch (IOException e) {
@@ -114,8 +114,7 @@ public abstract class BaseAsyncService implements RaftService.AsyncIface {
   }
 
   @Override
-  public void removeHardLink(String hardLinkPath,
-      AsyncMethodCallback<Void> resultHandler) {
+  public void removeHardLink(String hardLinkPath, AsyncMethodCallback<Void> resultHandler) {
     try {
       Files.deleteIfExists(new File(hardLinkPath).toPath());
       resultHandler.onComplete(null);
@@ -125,14 +124,14 @@ public abstract class BaseAsyncService implements RaftService.AsyncIface {
   }
 
   @Override
-  public void matchTerm(long index, long term, Node header,
-      AsyncMethodCallback<Boolean> resultHandler) {
+  public void matchTerm(
+      long index, long term, Node header, AsyncMethodCallback<Boolean> resultHandler) {
     resultHandler.onComplete(member.matchLog(index, term));
   }
 
   @Override
-  public void executeNonQueryPlan(ExecutNonQueryReq request,
-      AsyncMethodCallback<TSStatus> resultHandler) {
+  public void executeNonQueryPlan(
+      ExecutNonQueryReq request, AsyncMethodCallback<TSStatus> resultHandler) {
     if (member.getCharacter() != NodeCharacter.LEADER) {
       // forward the plan to the leader
       AsyncClient client = member.getAsyncClient(member.getLeader());
@@ -150,8 +149,10 @@ public abstract class BaseAsyncService implements RaftService.AsyncIface {
 
     try {
       TSStatus status = member.executeNonQueryPlan(request);
-      resultHandler.onComplete(StatusUtils.getStatus(status,
-          new EndPoint(member.getThisNode().getIp(), member.getThisNode().getClientPort())));
+      resultHandler.onComplete(
+          StatusUtils.getStatus(
+              status,
+              new EndPoint(member.getThisNode().getIp(), member.getThisNode().getClientPort())));
     } catch (Exception e) {
       resultHandler.onError(e);
     }

@@ -44,7 +44,6 @@ public class DropIndexPlan extends PhysicalPlan {
     super(false, OperatorType.DROP_INDEX);
     this.paths = paths;
     this.indexType = indexType;
-
   }
 
   @Override
@@ -64,7 +63,6 @@ public class DropIndexPlan extends PhysicalPlan {
   public void setIndexType(IndexType indexType) {
     this.indexType = indexType;
   }
-
 
   @Override
   public void serialize(DataOutputStream stream) throws IOException {
@@ -115,8 +113,7 @@ public class DropIndexPlan extends PhysicalPlan {
       return false;
     }
     DropIndexPlan that = (DropIndexPlan) o;
-    return Objects.equals(paths, that.paths)
-        && Objects.equals(indexType, that.indexType);
+    return Objects.equals(paths, that.paths) && Objects.equals(indexType, that.indexType);
   }
 
   @Override
@@ -126,7 +123,6 @@ public class DropIndexPlan extends PhysicalPlan {
 
   @Override
   public String toString() {
-    return String.format("paths: %s, index type: %s",
-        paths, indexType);
+    return String.format("paths: %s, index type: %s", paths, indexType);
   }
 }

@@ -60,9 +60,7 @@ public abstract class BasicUserManager implements IUserManager {
     reset();
   }
 
-  /**
-   * Try to load admin. If it doesn't exist, automatically create one.
-   */
+  /** Try to load admin. If it doesn't exist, automatically create one. */
   private void initAdmin() throws AuthException {
     User admin;
     try {
@@ -312,7 +310,6 @@ public abstract class BasicUserManager implements IUserManager {
     }
   }
 
-
   @Override
   public void replaceAllUsers(Map<String, User> users) throws AuthException {
     synchronized (this) {
@@ -329,5 +326,4 @@ public abstract class BasicUserManager implements IUserManager {
       }
     }
   }
-
 }

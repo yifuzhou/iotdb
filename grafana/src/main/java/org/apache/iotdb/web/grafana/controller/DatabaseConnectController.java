@@ -18,6 +18,10 @@
  */
 package org.apache.iotdb.web.grafana.controller;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.time.Instant;
@@ -29,11 +33,6 @@ import java.util.List;
 import java.util.Objects;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
 import org.apache.iotdb.tsfile.utils.Pair;
 import org.apache.iotdb.web.grafana.bean.TimeValues;
 import org.apache.iotdb.web.grafana.service.DatabaseConnectService;
@@ -55,8 +54,7 @@ public class DatabaseConnectController {
   private static final Logger logger = LoggerFactory.getLogger(DatabaseConnectController.class);
   public static final Gson GSON = new GsonBuilder().create();
 
-  @Autowired
-  private DatabaseConnectService databaseConnectService;
+  @Autowired private DatabaseConnectService databaseConnectService;
 
   @RequestMapping(value = "/", method = RequestMethod.GET)
   @ResponseStatus(value = HttpStatus.OK)
@@ -141,12 +139,12 @@ public class DatabaseConnectController {
     JsonObject obj = jsonObject.get("range").getAsJsonObject();
     Instant from = Instant.parse(obj.get("from").getAsString());
     Instant to = Instant.parse(obj.get("to").getAsString());
-    return new Pair<>(from.atZone(ZoneId.of("Asia/Shanghai")),
-        to.atZone(ZoneId.of("Asia/Shanghai")));
+    return new Pair<>(
+        from.atZone(ZoneId.of("Asia/Shanghai")), to.atZone(ZoneId.of("Asia/Shanghai")));
   }
 
-  private void setJsonTable(JsonObject obj, String target,
-      Pair<ZonedDateTime, ZonedDateTime> timeRange) {
+  private void setJsonTable(
+      JsonObject obj, String target, Pair<ZonedDateTime, ZonedDateTime> timeRange) {
     List<TimeValues> timeValues = databaseConnectService.querySeries(target, timeRange);
     JsonArray columns = new JsonArray();
     JsonObject column = new JsonObject();
@@ -172,8 +170,8 @@ public class DatabaseConnectController {
     obj.add("values", values);
   }
 
-  private void setJsonTimeseries(JsonObject obj, String target,
-      Pair<ZonedDateTime, ZonedDateTime> timeRange) {
+  private void setJsonTimeseries(
+      JsonObject obj, String target, Pair<ZonedDateTime, ZonedDateTime> timeRange) {
     List<TimeValues> timeValues = databaseConnectService.querySeries(target, timeRange);
     logger.info("query size: {}", timeValues.size());
 

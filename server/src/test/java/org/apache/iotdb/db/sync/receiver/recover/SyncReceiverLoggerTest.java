@@ -46,8 +46,10 @@ public class SyncReceiverLoggerTest {
   public void setUp()
       throws IOException, InterruptedException, StartupException, DiskSpaceInsufficientException {
     EnvironmentUtils.envSetUp();
-    dataDir = new File(DirectoryManager.getInstance().getNextFolderForSequenceFile())
-        .getParentFile().getAbsolutePath();
+    dataDir =
+        new File(DirectoryManager.getInstance().getNextFolderForSequenceFile())
+            .getParentFile()
+            .getAbsolutePath();
   }
 
   @After
@@ -57,31 +59,28 @@ public class SyncReceiverLoggerTest {
 
   @Test
   public void testSyncReceiverLogger() throws IOException {
-    receiverLogger = new SyncReceiverLogger(
-        new File(getReceiverFolderFile(), SyncConstant.SYNC_LOG_NAME));
+    receiverLogger =
+        new SyncReceiverLogger(new File(getReceiverFolderFile(), SyncConstant.SYNC_LOG_NAME));
     Set<String> deletedFileNames = new HashSet<>();
     Set<String> deletedFileNamesTest = new HashSet<>();
     receiverLogger.startSyncDeletedFilesName();
     for (int i = 0; i < 200; i++) {
-      receiverLogger
-          .finishSyncDeletedFileName(new File(getReceiverFolderFile(), "deleted" + i));
-      deletedFileNames
-          .add(new File(getReceiverFolderFile(), "deleted" + i).getAbsolutePath());
+      receiverLogger.finishSyncDeletedFileName(new File(getReceiverFolderFile(), "deleted" + i));
+      deletedFileNames.add(new File(getReceiverFolderFile(), "deleted" + i).getAbsolutePath());
     }
     Set<String> toBeSyncedFiles = new HashSet<>();
     Set<String> toBeSyncedFilesTest = new HashSet<>();
     receiverLogger.startSyncTsFiles();
     for (int i = 0; i < 200; i++) {
-      receiverLogger
-          .finishSyncTsfile(new File(getReceiverFolderFile(), "new" + i));
-      toBeSyncedFiles
-          .add(new File(getReceiverFolderFile(), "new" + i).getAbsolutePath());
+      receiverLogger.finishSyncTsfile(new File(getReceiverFolderFile(), "new" + i));
+      toBeSyncedFiles.add(new File(getReceiverFolderFile(), "new" + i).getAbsolutePath());
     }
     receiverLogger.close();
     int count = 0;
     int mode = 0;
-    try (BufferedReader br = new BufferedReader(
-        new FileReader(new File(getReceiverFolderFile(), SyncConstant.SYNC_LOG_NAME)))) {
+    try (BufferedReader br =
+        new BufferedReader(
+            new FileReader(new File(getReceiverFolderFile(), SyncConstant.SYNC_LOG_NAME)))) {
       String line;
       while ((line = br.readLine()) != null) {
         count++;
@@ -106,7 +105,11 @@ public class SyncReceiverLoggerTest {
   }
 
   private File getReceiverFolderFile() {
-    return new File(dataDir + File.separatorChar + SyncConstant.SYNC_RECEIVER + File.separatorChar
-        + "127.0.0.1_5555");
+    return new File(
+        dataDir
+            + File.separatorChar
+            + SyncConstant.SYNC_RECEIVER
+            + File.separatorChar
+            + "127.0.0.1_5555");
   }
 }

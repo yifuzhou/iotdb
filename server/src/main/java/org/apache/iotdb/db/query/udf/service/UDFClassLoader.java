@@ -53,8 +53,8 @@ public class UDFClassLoader extends URLClassLoader {
   }
 
   private void addURLs() throws IOException {
-    HashSet<File> fileSet = new HashSet<>(
-        FileUtils.listFiles(SystemFileFactory.INSTANCE.getFile(libRoot), null, true));
+    HashSet<File> fileSet =
+        new HashSet<>(FileUtils.listFiles(SystemFileFactory.INSTANCE.getFile(libRoot), null, true));
     URL[] urls = FileUtils.toURLs(fileSet.toArray(new File[0]));
     for (URL url : urls) {
       super.addURL(url);

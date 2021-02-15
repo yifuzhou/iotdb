@@ -18,10 +18,9 @@
  */
 package org.apache.iotdb.tsfile.read.reader;
 
-import org.apache.iotdb.tsfile.read.common.BatchData;
-
 import java.io.IOException;
 import java.util.List;
+import org.apache.iotdb.tsfile.read.common.BatchData;
 
 public interface IChunkReader {
 

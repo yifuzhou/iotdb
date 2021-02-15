@@ -51,9 +51,7 @@ public interface ITimeIndex {
    */
   ITimeIndex deserialize(ByteBuffer buffer);
 
-  /**
-   * do something when TsFileResource is closing (may be empty method)
-   */
+  /** do something when TsFileResource is closing (may be empty method) */
   void close();
 
   /**
@@ -63,9 +61,7 @@ public interface ITimeIndex {
    */
   Set<String> getDevices();
 
-  /**
-   * @return whether end time is empty (Long.MIN_VALUE)
-   */
+  /** @return whether end time is empty (Long.MIN_VALUE) */
   boolean endTimeEmpty();
 
   /**
@@ -74,9 +70,7 @@ public interface ITimeIndex {
    */
   boolean stillLives(long timeLowerBound);
 
-  /**
-   * @return Calculate file index ram size
-   */
+  /** @return Calculate file index ram size */
   long calculateRamSize();
 
   /**
@@ -108,7 +102,7 @@ public interface ITimeIndex {
    * update start time
    *
    * @param deviceId device name
-   * @param time     start time
+   * @param time start time
    */
   void updateStartTime(String deviceId, long time);
 
@@ -116,7 +110,7 @@ public interface ITimeIndex {
    * update end time
    *
    * @param deviceId device name
-   * @param time     end time
+   * @param time end time
    */
   void updateEndTime(String deviceId, long time);
 

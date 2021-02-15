@@ -29,7 +29,6 @@ import org.apache.iotdb.tsfile.utils.ReadWriteForEncodingUtils;
 
 public class PlainDecoder extends Decoder {
 
-
   public PlainDecoder() {
     super(TSEncoding.PLAIN);
   }

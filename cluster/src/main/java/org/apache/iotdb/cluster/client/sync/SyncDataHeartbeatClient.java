@@ -36,14 +36,17 @@ public class SyncDataHeartbeatClient extends SyncDataClient {
   private SyncDataHeartbeatClient(TProtocolFactory protocolFactory, Node node, SyncClientPool pool)
       throws TTransportException {
     // the difference of the two clients lies in the port
-    super(protocolFactory.getProtocol(RpcTransportFactory.INSTANCE.getTransport(
-        new TSocket(node.getIp(), node.getDataPort() + ClusterUtils.DATA_HEARTBEAT_PORT_OFFSET,
-            RaftServer.getConnectionTimeoutInMS()))));
+    super(
+        protocolFactory.getProtocol(
+            RpcTransportFactory.INSTANCE.getTransport(
+                new TSocket(
+                    node.getIp(),
+                    node.getDataPort() + ClusterUtils.DATA_HEARTBEAT_PORT_OFFSET,
+                    RaftServer.getConnectionTimeoutInMS()))));
     this.node = node;
     this.pool = pool;
     getInputProtocol().getTransport().open();
   }
-
 
   public static class FactorySync implements SyncClientFactory {
 
@@ -62,10 +65,12 @@ public class SyncDataHeartbeatClient extends SyncDataClient {
 
   @Override
   public String toString() {
-    return "SyncHeartbeatDataClient{" +
-        "node=" + super.getNode() + "," +
-        "dataHeartbeatPort=" + (super.getNode().getDataPort()
-        + ClusterUtils.DATA_HEARTBEAT_PORT_OFFSET) +
-        '}';
+    return "SyncHeartbeatDataClient{"
+        + "node="
+        + super.getNode()
+        + ","
+        + "dataHeartbeatPort="
+        + (super.getNode().getDataPort() + ClusterUtils.DATA_HEARTBEAT_PORT_OFFSET)
+        + '}';
   }
 }

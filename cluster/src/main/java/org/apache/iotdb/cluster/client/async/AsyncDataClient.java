@@ -47,17 +47,25 @@ public class AsyncDataClient extends AsyncClient {
   Node node;
   AsyncClientPool pool;
 
-  public AsyncDataClient(TProtocolFactory protocolFactory,
+  public AsyncDataClient(
+      TProtocolFactory protocolFactory,
       TAsyncClientManager clientManager,
       TNonblockingTransport transport) {
     super(protocolFactory, clientManager, transport);
   }
 
-  public AsyncDataClient(TProtocolFactory protocolFactory,
-      TAsyncClientManager clientManager, Node node, AsyncClientPool pool) throws IOException {
+  public AsyncDataClient(
+      TProtocolFactory protocolFactory,
+      TAsyncClientManager clientManager,
+      Node node,
+      AsyncClientPool pool)
+      throws IOException {
     // the difference of the two clients lies in the port
-    super(protocolFactory, clientManager, new TNonblockingSocket(node.getIp(), node.getDataPort()
-        , RaftServer.getConnectionTimeoutInMS()));
+    super(
+        protocolFactory,
+        clientManager,
+        new TNonblockingSocket(
+            node.getIp(), node.getDataPort(), RaftServer.getConnectionTimeoutInMS()));
     this.node = node;
     this.pool = pool;
   }
@@ -70,7 +78,6 @@ public class AsyncDataClient extends AsyncClient {
       pool.putClient(node, this);
       pool.onComplete(node);
     }
-
   }
 
   @SuppressWarnings("squid:S1135")
@@ -79,7 +86,7 @@ public class AsyncDataClient extends AsyncClient {
     super.onError(e);
     if (pool != null) {
       pool.recreateClient(node);
-      //TODO: if e instance of network failure
+      // TODO: if e instance of network failure
       pool.onError(node);
     }
   }
@@ -128,9 +135,7 @@ public class AsyncDataClient extends AsyncClient {
 
   @Override
   public String toString() {
-    return "DataClient{" +
-        "node=" + node +
-        '}';
+    return "DataClient{" + "node=" + node + '}';
   }
 
   public Node getNode() {
@@ -139,7 +144,10 @@ public class AsyncDataClient extends AsyncClient {
 
   public boolean isReady() {
     if (___currentMethod != null) {
-      logger.warn("Client {} is running {} and will timeout at {}", hashCode(), ___currentMethod,
+      logger.warn(
+          "Client {} is running {} and will timeout at {}",
+          hashCode(),
+          ___currentMethod,
           new Date(___currentMethod.getTimeoutTimestamp()));
     }
     return ___currentMethod == null && !hasError();

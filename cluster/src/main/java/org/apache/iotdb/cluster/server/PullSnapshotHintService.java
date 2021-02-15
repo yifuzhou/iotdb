@@ -129,9 +129,7 @@ public class PullSnapshotHintService {
 
   private static class PullSnapshotHint {
 
-    /**
-     * Nodes to send this hint;
-     */
+    /** Nodes to send this hint; */
     private List<Node> receivers;
 
     private Node header;

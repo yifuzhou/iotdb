@@ -47,14 +47,15 @@ public class ClusterFillExecutorTest extends BaseQueryTest {
   public void testPreviousFill()
       throws QueryProcessException, StorageEngineException, IOException, IllegalPathException {
     FillQueryPlan plan = new FillQueryPlan();
-    plan.setDeduplicatedPaths(Collections.singletonList(
-        new PartialPath(TestUtils.getTestSeries(0, 10))));
+    plan.setDeduplicatedPaths(
+        Collections.singletonList(new PartialPath(TestUtils.getTestSeries(0, 10))));
     plan.setDeduplicatedDataTypes(Collections.singletonList(TSDataType.DOUBLE));
     plan.setPaths(plan.getDeduplicatedPaths());
     plan.setDataTypes(plan.getDeduplicatedDataTypes());
     long defaultFillInterval = IoTDBDescriptor.getInstance().getConfig().getDefaultFillInterval();
-    Map<TSDataType, IFill> tsDataTypeIFillMap = Collections.singletonMap(TSDataType.DOUBLE,
-        new PreviousFill(TSDataType.DOUBLE, 0, defaultFillInterval));
+    Map<TSDataType, IFill> tsDataTypeIFillMap =
+        Collections.singletonMap(
+            TSDataType.DOUBLE, new PreviousFill(TSDataType.DOUBLE, 0, defaultFillInterval));
     plan.setFillType(tsDataTypeIFillMap);
     QueryContext context =
         new RemoteQueryContext(QueryResourceManager.getInstance().assignQueryId(true, 1024, -1));
@@ -63,16 +64,22 @@ public class ClusterFillExecutorTest extends BaseQueryTest {
       ClusterFillExecutor fillExecutor;
       QueryDataSet queryDataSet;
       long[] queryTimes = new long[] {-1, 0, 5, 10, 20};
-      Object[][] answers = new Object[][]{
-          new Object[]{null},
-          new Object[]{0.0},
-          new Object[]{0.0},
-          new Object[]{10.0},
-          new Object[]{10.0},
-      };
+      Object[][] answers =
+          new Object[][] {
+            new Object[] {null},
+            new Object[] {0.0},
+            new Object[] {0.0},
+            new Object[] {10.0},
+            new Object[] {10.0},
+          };
       for (int i = 0; i < queryTimes.length; i++) {
-        fillExecutor = new ClusterFillExecutor(plan.getDeduplicatedPaths(),
-            plan.getDeduplicatedDataTypes(), queryTimes[i], plan.getFillType(), testMetaMember);
+        fillExecutor =
+            new ClusterFillExecutor(
+                plan.getDeduplicatedPaths(),
+                plan.getDeduplicatedDataTypes(),
+                queryTimes[i],
+                plan.getFillType(),
+                testMetaMember);
         queryDataSet = fillExecutor.execute(context, plan);
         checkDoubleDataset(queryDataSet, answers[i]);
         assertFalse(queryDataSet.hasNext());
@@ -86,14 +93,16 @@ public class ClusterFillExecutorTest extends BaseQueryTest {
   public void testLinearFill()
       throws QueryProcessException, StorageEngineException, IOException, IllegalPathException {
     FillQueryPlan plan = new FillQueryPlan();
-    plan.setDeduplicatedPaths(Collections.singletonList(
-        new PartialPath(TestUtils.getTestSeries(0, 10))));
+    plan.setDeduplicatedPaths(
+        Collections.singletonList(new PartialPath(TestUtils.getTestSeries(0, 10))));
     plan.setDeduplicatedDataTypes(Collections.singletonList(TSDataType.DOUBLE));
     plan.setPaths(plan.getDeduplicatedPaths());
     plan.setDataTypes(plan.getDeduplicatedDataTypes());
     long defaultFillInterval = IoTDBDescriptor.getInstance().getConfig().getDefaultFillInterval();
-    Map<TSDataType, IFill> tsDataTypeIFillMap = Collections.singletonMap(TSDataType.DOUBLE,
-        new LinearFill(TSDataType.DOUBLE, 0, defaultFillInterval, defaultFillInterval));
+    Map<TSDataType, IFill> tsDataTypeIFillMap =
+        Collections.singletonMap(
+            TSDataType.DOUBLE,
+            new LinearFill(TSDataType.DOUBLE, 0, defaultFillInterval, defaultFillInterval));
     plan.setFillType(tsDataTypeIFillMap);
     QueryContext context =
         new RemoteQueryContext(QueryResourceManager.getInstance().assignQueryId(true, 1024, -1));
@@ -102,16 +111,22 @@ public class ClusterFillExecutorTest extends BaseQueryTest {
       ClusterFillExecutor fillExecutor;
       QueryDataSet queryDataSet;
       long[] queryTimes = new long[] {-1, 0, 5, 10, 20};
-      Object[][] answers = new Object[][]{
-          new Object[]{null},
-          new Object[]{0.0},
-          new Object[]{5.0},
-          new Object[]{10.0},
-          new Object[]{null},
-      };
+      Object[][] answers =
+          new Object[][] {
+            new Object[] {null},
+            new Object[] {0.0},
+            new Object[] {5.0},
+            new Object[] {10.0},
+            new Object[] {null},
+          };
       for (int i = 0; i < queryTimes.length; i++) {
-        fillExecutor = new ClusterFillExecutor(plan.getDeduplicatedPaths(),
-            plan.getDeduplicatedDataTypes(), queryTimes[i], plan.getFillType(), testMetaMember);
+        fillExecutor =
+            new ClusterFillExecutor(
+                plan.getDeduplicatedPaths(),
+                plan.getDeduplicatedDataTypes(),
+                queryTimes[i],
+                plan.getFillType(),
+                testMetaMember);
         queryDataSet = fillExecutor.execute(context, plan);
         checkDoubleDataset(queryDataSet, answers[i]);
         assertFalse(queryDataSet.hasNext());

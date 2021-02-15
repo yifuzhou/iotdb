@@ -60,7 +60,8 @@ public class RawDataQueryPlan extends QueryPlan {
   }
 
   public void addDeduplicatedPaths(PartialPath path) {
-    deviceToMeasurements.computeIfAbsent(path.getDevice(), key -> new HashSet<>())
+    deviceToMeasurements
+        .computeIfAbsent(path.getDevice(), key -> new HashSet<>())
         .add(path.getMeasurement());
     this.deduplicatedPaths.add(path);
   }
@@ -72,8 +73,10 @@ public class RawDataQueryPlan extends QueryPlan {
   public void setDeduplicatedPaths(List<PartialPath> deduplicatedPaths) {
     deviceToMeasurements.clear();
     deduplicatedPaths.forEach(
-        path -> deviceToMeasurements.computeIfAbsent(path.getDevice(), key -> new HashSet<>())
-            .add(path.getMeasurement()));
+        path ->
+            deviceToMeasurements
+                .computeIfAbsent(path.getDevice(), key -> new HashSet<>())
+                .add(path.getMeasurement()));
     this.deduplicatedPaths = deduplicatedPaths;
   }
 
@@ -85,8 +88,7 @@ public class RawDataQueryPlan extends QueryPlan {
     this.deduplicatedDataTypes.add(dataType);
   }
 
-  public void setDeduplicatedDataTypes(
-      List<TSDataType> deduplicatedDataTypes) {
+  public void setDeduplicatedDataTypes(List<TSDataType> deduplicatedDataTypes) {
     this.deduplicatedDataTypes = deduplicatedDataTypes;
   }
 
@@ -95,7 +97,8 @@ public class RawDataQueryPlan extends QueryPlan {
   }
 
   public void addFilterPathInDeviceToMeasurements(Path path) {
-    deviceToMeasurements.computeIfAbsent(path.getDevice(), key -> new HashSet<>())
+    deviceToMeasurements
+        .computeIfAbsent(path.getDevice(), key -> new HashSet<>())
         .add(path.getMeasurement());
   }
 

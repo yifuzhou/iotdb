@@ -19,15 +19,14 @@
 
 package org.apache.iotdb.db.qp.physical.sys;
 
-import org.apache.iotdb.db.metadata.PartialPath;
-import org.apache.iotdb.db.qp.logical.Operator;
-
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import org.apache.iotdb.db.metadata.PartialPath;
+import org.apache.iotdb.db.qp.logical.Operator;
 
 public class StorageGroupMNodePlan extends MNodePlan {
   private long dataTTL;
@@ -99,8 +98,8 @@ public class StorageGroupMNodePlan extends MNodePlan {
     }
     StorageGroupMNodePlan that = (StorageGroupMNodePlan) o;
     return Objects.equals(name, that.name)
-      && Objects.equals(dataTTL, that.dataTTL)
-      && Objects.equals(childSize, that.childSize);
+        && Objects.equals(dataTTL, that.dataTTL)
+        && Objects.equals(childSize, that.childSize);
   }
 
   @Override

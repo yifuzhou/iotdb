@@ -22,7 +22,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.apache.iotdb.tsfile.exception.write.TsFileNotCompleteException;
 import org.apache.iotdb.tsfile.file.metadata.ChunkGroupMetadata;
 import org.apache.iotdb.tsfile.file.metadata.ChunkMetadata;
@@ -68,8 +67,7 @@ public class ForceAppendTsFileWriter extends TsFileIOWriter {
       List<String> devices = reader.getAllDevices();
       for (String device : devices) {
         List<ChunkMetadata> chunkMetadataList = new ArrayList<>();
-        reader.readChunkMetadataInDevice(device).values()
-            .forEach(chunkMetadataList::addAll);          
+        reader.readChunkMetadataInDevice(device).values().forEach(chunkMetadataList::addAll);
         ChunkGroupMetadata chunkGroupMetadata = new ChunkGroupMetadata(device, chunkMetadataList);
         chunkGroupMetadataList.add(chunkGroupMetadata);
       }
@@ -83,5 +81,4 @@ public class ForceAppendTsFileWriter extends TsFileIOWriter {
   public long getTruncatePosition() {
     return truncatePosition;
   }
-
 }

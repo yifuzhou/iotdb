@@ -36,8 +36,7 @@ public class MemTableManager {
   public static final int MEMTABLE_NUM_FOR_EACH_PARTITION = 4;
   private int currentMemtableNumber = 0;
 
-  private MemTableManager() {
-  }
+  private MemTableManager() {}
 
   public static MemTableManager getInstance() {
     return InstanceHolder.INSTANCE;
@@ -45,9 +44,10 @@ public class MemTableManager {
 
   /**
    * Called when memory control is disabled
-   * @throws WriteProcessException 
+   *
+   * @throws WriteProcessException
    */
-  public synchronized IMemTable getAvailableMemTable(String storageGroup) 
+  public synchronized IMemTable getAvailableMemTable(String storageGroup)
       throws WriteProcessException {
     if (!reachMaxMemtableNumber()) {
       currentMemtableNumber++;
@@ -87,20 +87,16 @@ public class MemTableManager {
     notifyAll();
   }
 
-  /**
-   * Called when memory control is disabled
-   */
+  /** Called when memory control is disabled */
   private boolean reachMaxMemtableNumber() {
     return currentMemtableNumber >= CONFIG.getMaxMemtableNumber();
   }
 
-  /**
-   * Called when memory control is disabled
-   */
+  /** Called when memory control is disabled */
   public synchronized void addOrDeleteStorageGroup(int diff) {
     int maxMemTableNum = CONFIG.getMaxMemtableNumber();
-    maxMemTableNum += MEMTABLE_NUM_FOR_EACH_PARTITION 
-        * CONFIG.getConcurrentWritingTimePartition() * diff;
+    maxMemTableNum +=
+        MEMTABLE_NUM_FOR_EACH_PARTITION * CONFIG.getConcurrentWritingTimePartition() * diff;
     CONFIG.setMaxMemtableNumber(maxMemTableNum);
     notifyAll();
   }
@@ -109,7 +105,6 @@ public class MemTableManager {
 
     private static final MemTableManager INSTANCE = new MemTableManager();
 
-    private InstanceHolder() {
-    }
+    private InstanceHolder() {}
   }
 }

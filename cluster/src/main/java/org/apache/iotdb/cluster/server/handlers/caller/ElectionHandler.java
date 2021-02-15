@@ -49,8 +49,14 @@ public class ElectionHandler implements AsyncMethodCallback<Long> {
   private AtomicBoolean electionValid;
   private AtomicInteger failingVoteCounter;
 
-  public ElectionHandler(RaftMember raftMember, Node voter, long currTerm, AtomicInteger requiredVoteNum,
-      AtomicBoolean terminated, AtomicBoolean electionValid, AtomicInteger failingVoteCounter) {
+  public ElectionHandler(
+      RaftMember raftMember,
+      Node voter,
+      long currTerm,
+      AtomicInteger requiredVoteNum,
+      AtomicBoolean terminated,
+      AtomicBoolean electionValid,
+      AtomicInteger failingVoteCounter) {
     this.raftMember = raftMember;
     this.voter = voter;
     this.currTerm = currTerm;
@@ -68,15 +74,21 @@ public class ElectionHandler implements AsyncMethodCallback<Long> {
       if (terminated.get()) {
         // a voter has rejected this election, which means the term or the log id falls behind
         // this node is not able to be the leader
-        logger.info("{}: Terminated election received a election response {} from {}", memberName,
-            voterResp, voter);
+        logger.info(
+            "{}: Terminated election received a election response {} from {}",
+            memberName,
+            voterResp,
+            voter);
         return;
       }
 
       if (voterResp == RESPONSE_AGREE) {
         long remaining = requiredVoteNum.decrementAndGet();
-        logger.info("{}: Received a grant vote from {}, remaining votes to succeed: {}",
-            memberName, voter, remaining);
+        logger.info(
+            "{}: Received a grant vote from {}, remaining votes to succeed: {}",
+            memberName,
+            voter,
+            remaining);
         if (remaining == 0) {
           // the election is valid
           electionValid.set(true);
@@ -93,9 +105,12 @@ public class ElectionHandler implements AsyncMethodCallback<Long> {
           onFail();
         } else {
           // the election is rejected by a node with a bigger term, update current term to it
-          logger
-              .info("{}: Election {} rejected from {}: The term of this node is no bigger than {}",
-                  memberName, currTerm, voter, voterResp);
+          logger.info(
+              "{}: Election {} rejected from {}: The term of this node is no bigger than {}",
+              memberName,
+              currTerm,
+              voter,
+              voterResp);
           raftMember.stepDown(voterResp, false);
           // the election is rejected
           terminated.set(true);

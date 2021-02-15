@@ -29,18 +29,18 @@ import org.apache.iotdb.db.qp.logical.Operator;
 import org.apache.iotdb.db.qp.physical.PhysicalPlan;
 
 public class DeleteStorageGroupPlan extends PhysicalPlan {
-  
+
   private List<PartialPath> deletePathList;
-  
-  public DeleteStorageGroupPlan (List<PartialPath> deletePathList) {
-	  super(false, Operator.OperatorType.DELETE_STORAGE_GROUP);
-	  this.deletePathList = deletePathList;
+
+  public DeleteStorageGroupPlan(List<PartialPath> deletePathList) {
+    super(false, Operator.OperatorType.DELETE_STORAGE_GROUP);
+    this.deletePathList = deletePathList;
   }
 
   public DeleteStorageGroupPlan() {
     super(false, Operator.OperatorType.DELETE_STORAGE_GROUP);
   }
-  
+
   @Override
   public List<PartialPath> getPaths() {
     return deletePathList;
@@ -80,5 +80,4 @@ public class DeleteStorageGroupPlan extends PhysicalPlan {
 
     this.index = buffer.getLong();
   }
-
 }

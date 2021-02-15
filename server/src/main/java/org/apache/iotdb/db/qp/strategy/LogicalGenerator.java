@@ -30,13 +30,10 @@ import org.apache.iotdb.db.qp.sql.IoTDBSqlVisitor;
 import org.apache.iotdb.db.qp.sql.SqlBaseLexer;
 import org.apache.iotdb.db.qp.sql.SqlBaseParser;
 
-/**
- * LogicalGenerator.
- */
+/** LogicalGenerator. */
 public class LogicalGenerator {
 
-  public LogicalGenerator() {
-  }
+  public LogicalGenerator() {}
 
   public Operator generate(String sql, ZoneId zoneId) throws ParseCancellationException {
     IoTDBSqlVisitor ioTDBSqlVisitor = new IoTDBSqlVisitor();
@@ -52,7 +49,7 @@ public class LogicalGenerator {
     parser1.addErrorListener(SQLParseError.INSTANCE);
     ParseTree tree;
     try {
-      tree = parser1.singleStatement();  // STAGE 1
+      tree = parser1.singleStatement(); // STAGE 1
     } catch (Exception ex) {
       CharStream charStream2 = CharStreams.fromString(sql);
       SqlBaseLexer lexer2 = new SqlBaseLexer(charStream2);
@@ -63,7 +60,7 @@ public class LogicalGenerator {
       parser2.getInterpreter().setPredictionMode(PredictionMode.LL);
       parser2.removeErrorListeners();
       parser2.addErrorListener(SQLParseError.INSTANCE);
-      tree = parser2.singleStatement();  // STAGE 2
+      tree = parser2.singleStatement(); // STAGE 2
       // if we parse ok, it's LL not SLL
     }
     return ioTDBSqlVisitor.visit(tree);

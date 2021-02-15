@@ -33,8 +33,9 @@ public class TsFileTimeGenerator extends TimeGenerator {
   private IChunkLoader chunkLoader;
   private IMetadataQuerier metadataQuerier;
 
-  public TsFileTimeGenerator(IExpression iexpression, IChunkLoader chunkLoader,
-      IMetadataQuerier metadataQuerier) throws IOException {
+  public TsFileTimeGenerator(
+      IExpression iexpression, IChunkLoader chunkLoader, IMetadataQuerier metadataQuerier)
+      throws IOException {
     this.chunkLoader = chunkLoader;
     this.metadataQuerier = metadataQuerier;
 
@@ -44,8 +45,8 @@ public class TsFileTimeGenerator extends TimeGenerator {
   @Override
   protected IBatchReader generateNewBatchReader(SingleSeriesExpression expression)
       throws IOException {
-    List<ChunkMetadata> chunkMetadataList = metadataQuerier
-        .getChunkMetaDataList(expression.getSeriesPath());
+    List<ChunkMetadata> chunkMetadataList =
+        metadataQuerier.getChunkMetaDataList(expression.getSeriesPath());
     return new FileSeriesReader(chunkLoader, chunkMetadataList, expression.getFilter());
   }
 

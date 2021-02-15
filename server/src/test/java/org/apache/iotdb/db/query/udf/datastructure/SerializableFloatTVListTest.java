@@ -40,8 +40,9 @@ public class SerializableFloatTVListTest extends SerializableTVListTest {
   public void setUp() throws Exception {
     super.setUp();
     originalList = new ArrayList<>();
-    testList = (SerializableFloatTVList) SerializableTVList
-        .newSerializableTVList(TSDataType.FLOAT, QUERY_ID);
+    testList =
+        (SerializableFloatTVList)
+            SerializableTVList.newSerializableTVList(TSDataType.FLOAT, QUERY_ID);
   }
 
   @Override

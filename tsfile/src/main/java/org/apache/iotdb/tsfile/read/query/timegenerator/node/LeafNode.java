@@ -79,9 +79,7 @@ public class LeafNode implements Node {
     return cachedTime == time;
   }
 
-  /**
-   * Function for getting the value at the given time.
-   */
+  /** Function for getting the value at the given time. */
   public Object currentValue() {
     return cachedValue;
   }
@@ -90,5 +88,4 @@ public class LeafNode implements Node {
   public NodeType getType() {
     return NodeType.LEAF;
   }
-
 }

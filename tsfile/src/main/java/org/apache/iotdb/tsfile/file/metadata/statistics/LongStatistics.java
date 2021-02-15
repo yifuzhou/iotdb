@@ -37,7 +37,6 @@ public class LongStatistics extends Statistics<Long> {
 
   static final int LONG_STATISTICS_FIXED_RAM_SIZE = 80;
 
-
   @Override
   public TSDataType getType() {
     return TSDataType.INT64;
@@ -67,8 +66,14 @@ public class LongStatistics extends Statistics<Long> {
     this.lastValue = lastValue;
   }
 
-  private void updateStats(long minValue, long maxValue, long firstValue, long lastValue,
-      double sumValue, long startTime, long endTime) {
+  private void updateStats(
+      long minValue,
+      long maxValue,
+      long firstValue,
+      long lastValue,
+      double sumValue,
+      long startTime,
+      long endTime) {
     if (minValue < this.minValue) {
       this.minValue = minValue;
     }
@@ -159,14 +164,23 @@ public class LongStatistics extends Statistics<Long> {
   protected void mergeStatisticsValue(Statistics stats) {
     LongStatistics longStats = (LongStatistics) stats;
     if (isEmpty) {
-      initializeStats(longStats.getMinValue(), longStats.getMaxValue(), longStats.getFirstValue(),
-          longStats.getLastValue(), longStats.sumValue);
+      initializeStats(
+          longStats.getMinValue(),
+          longStats.getMaxValue(),
+          longStats.getFirstValue(),
+          longStats.getLastValue(),
+          longStats.sumValue);
       isEmpty = false;
     } else {
-      updateStats(longStats.getMinValue(), longStats.getMaxValue(), longStats.getFirstValue(),
-          longStats.getLastValue(), longStats.sumValue, stats.getStartTime(), stats.getEndTime());
+      updateStats(
+          longStats.getMinValue(),
+          longStats.getMaxValue(),
+          longStats.getFirstValue(),
+          longStats.getLastValue(),
+          longStats.sumValue,
+          stats.getStartTime(),
+          stats.getEndTime());
     }
-
   }
 
   @Override
@@ -250,8 +264,17 @@ public class LongStatistics extends Statistics<Long> {
 
   @Override
   public String toString() {
-    return super.toString() + " [minValue:" + minValue + ",maxValue:" + maxValue + ",firstValue:"
-        + firstValue +
-        ",lastValue:" + lastValue + ",sumValue:" + sumValue + "]";
+    return super.toString()
+        + " [minValue:"
+        + minValue
+        + ",maxValue:"
+        + maxValue
+        + ",firstValue:"
+        + firstValue
+        + ",lastValue:"
+        + lastValue
+        + ",sumValue:"
+        + sumValue
+        + "]";
   }
 }

@@ -52,9 +52,7 @@ import org.apache.iotdb.tsfile.write.schema.MeasurementSchema;
 import org.junit.After;
 import org.junit.Before;
 
-/**
- * IoTDBTests are tests that need a IoTDB daemon to support the tests.
- */
+/** IoTDBTests are tests that need a IoTDB daemon to support the tests. */
 public abstract class IoTDBTest {
 
   private PlanExecutor planExecutor;
@@ -134,20 +132,32 @@ public abstract class IoTDBTest {
   private void createTimeSeries(int sgNum, int seriesNum) {
     try {
       MeasurementSchema schema = TestUtils.getTestMeasurementSchema(seriesNum);
-      planExecutor.processNonQuery(new CreateTimeSeriesPlan(new PartialPath(TestUtils.getTestSg(sgNum) +
-          IoTDBConstant.PATH_SEPARATOR +
-          schema.getMeasurementId()),
-          schema.getType(), schema.getEncodingType(), schema.getCompressor(), schema.getProps(),
-          Collections.emptyMap(), Collections.emptyMap(), null));
-    } catch (QueryProcessException | StorageGroupNotSetException | StorageEngineException | IllegalPathException e) {
+      planExecutor.processNonQuery(
+          new CreateTimeSeriesPlan(
+              new PartialPath(
+                  TestUtils.getTestSg(sgNum)
+                      + IoTDBConstant.PATH_SEPARATOR
+                      + schema.getMeasurementId()),
+              schema.getType(),
+              schema.getEncodingType(),
+              schema.getCompressor(),
+              schema.getProps(),
+              Collections.emptyMap(),
+              Collections.emptyMap(),
+              null));
+    } catch (QueryProcessException
+        | StorageGroupNotSetException
+        | StorageEngineException
+        | IllegalPathException e) {
       // ignore
     }
   }
 
   protected QueryDataSet query(List<String> pathStrs, IExpression expression)
-      throws QueryProcessException, QueryFilterOptimizationException, StorageEngineException, IOException, MetadataException, InterruptedException {
-    QueryContext context = new QueryContext(QueryResourceManager.getInstance().assignQueryId(true
-        , 1024, -1));
+      throws QueryProcessException, QueryFilterOptimizationException, StorageEngineException,
+          IOException, MetadataException, InterruptedException {
+    QueryContext context =
+        new QueryContext(QueryResourceManager.getInstance().assignQueryId(true, 1024, -1));
     RawDataQueryPlan queryPlan = new RawDataQueryPlan();
     queryPlan.setExpression(expression);
     List<PartialPath> paths = new ArrayList<>();
@@ -166,5 +176,4 @@ public abstract class IoTDBTest {
 
     return planExecutor.processQuery(queryPlan, context);
   }
-
 }

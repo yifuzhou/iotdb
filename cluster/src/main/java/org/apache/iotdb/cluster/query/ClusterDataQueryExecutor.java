@@ -70,9 +70,15 @@ public class ClusterDataQueryExecutor extends RawDataQueryExecutor {
 
       ManagedSeriesReader reader;
       try {
-        reader = readerFactory.getSeriesReader(path,
-            queryPlan.getAllMeasurementsInDevice(path.getDevice()), dataType, timeFilter,
-            null, context, queryPlan.isAscending());
+        reader =
+            readerFactory.getSeriesReader(
+                path,
+                queryPlan.getAllMeasurementsInDevice(path.getDevice()),
+                dataType,
+                timeFilter,
+                null,
+                context,
+                queryPlan.isAscending());
       } catch (EmptyIntervalException e) {
         logger.info(e.getMessage());
         return Collections.emptyList();
@@ -87,17 +93,17 @@ public class ClusterDataQueryExecutor extends RawDataQueryExecutor {
   }
 
   @Override
-  protected IReaderByTimestamp getReaderByTimestamp(PartialPath path,
-      Set<String> deviceMeasurements, TSDataType dataType,
-      QueryContext context)
+  protected IReaderByTimestamp getReaderByTimestamp(
+      PartialPath path, Set<String> deviceMeasurements, TSDataType dataType, QueryContext context)
       throws StorageEngineException, QueryProcessException {
-    return readerFactory.getReaderByTimestamp(path, deviceMeasurements, dataType, context,
-        queryPlan.isAscending());
+    return readerFactory.getReaderByTimestamp(
+        path, deviceMeasurements, dataType, context, queryPlan.isAscending());
   }
 
   @Override
-  protected TimeGenerator getTimeGenerator(IExpression queryExpression,
-      QueryContext context, RawDataQueryPlan rawDataQueryPlan) throws StorageEngineException {
+  protected TimeGenerator getTimeGenerator(
+      IExpression queryExpression, QueryContext context, RawDataQueryPlan rawDataQueryPlan)
+      throws StorageEngineException {
     return new ClusterTimeGenerator(queryExpression, context, metaGroupMember, rawDataQueryPlan);
   }
 }

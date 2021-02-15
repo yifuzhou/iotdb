@@ -64,8 +64,8 @@ import org.apache.thrift.transport.TTransportException;
  * data partition. Each node has one MetaClusterServer instance, the single-node IoTDB instance is
  * started-up at the same time.
  */
-public class MetaClusterServer extends RaftServer implements TSMetaService.AsyncIface,
-    TSMetaService.Iface {
+public class MetaClusterServer extends RaftServer
+    implements TSMetaService.AsyncIface, TSMetaService.Iface {
 
   // each node only contains one MetaGroupMember
   private MetaGroupMember member;
@@ -109,9 +109,7 @@ public class MetaClusterServer extends RaftServer implements TSMetaService.Async
     registerManager.register(ClusterMonitor.INSTANCE);
   }
 
-  /**
-   * Also stops the IoTDB instance, the MetaGroupMember and the ClusterMonitor.
-   */
+  /** Also stops the IoTDB instance, the MetaGroupMember and the ClusterMonitor. */
   @Override
   public void stop() {
     if (ioTDB == null) {
@@ -125,9 +123,7 @@ public class MetaClusterServer extends RaftServer implements TSMetaService.Async
     registerManager.deregisterAll();
   }
 
-  /**
-   * Build a initial cluster with other nodes on the seed list.
-   */
+  /** Build a initial cluster with other nodes on the seed list. */
   public void buildCluster() throws ConfigInconsistentException, StartUpCheckFailureException {
     member.buildCluster();
   }
@@ -150,11 +146,12 @@ public class MetaClusterServer extends RaftServer implements TSMetaService.Async
   @Override
   TServerTransport getServerSocket() throws TTransportException {
     if (ClusterDescriptor.getInstance().getConfig().isUseAsyncServer()) {
-      return new TNonblockingServerSocket(new InetSocketAddress(config.getClusterRpcIp(),
-          config.getInternalMetaPort()), getConnectionTimeoutInMS());
+      return new TNonblockingServerSocket(
+          new InetSocketAddress(config.getClusterRpcIp(), config.getInternalMetaPort()),
+          getConnectionTimeoutInMS());
     } else {
-      return new TServerSocket(new InetSocketAddress(config.getClusterRpcIp(),
-          config.getInternalMetaPort()));
+      return new TServerSocket(
+          new InetSocketAddress(config.getClusterRpcIp(), config.getInternalMetaPort()));
     }
   }
 
@@ -211,8 +208,8 @@ public class MetaClusterServer extends RaftServer implements TSMetaService.Async
   }
 
   @Override
-  public void executeNonQueryPlan(ExecutNonQueryReq request,
-      AsyncMethodCallback<TSStatus> resultHandler) {
+  public void executeNonQueryPlan(
+      ExecutNonQueryReq request, AsyncMethodCallback<TSStatus> resultHandler) {
     asyncService.executeNonQueryPlan(request, resultHandler);
   }
 
@@ -227,8 +224,8 @@ public class MetaClusterServer extends RaftServer implements TSMetaService.Async
   }
 
   @Override
-  public void readFile(String filePath, long offset, int length,
-      AsyncMethodCallback<ByteBuffer> resultHandler) {
+  public void readFile(
+      String filePath, long offset, int length, AsyncMethodCallback<ByteBuffer> resultHandler) {
     asyncService.readFile(filePath, offset, length, resultHandler);
   }
 
@@ -242,8 +239,8 @@ public class MetaClusterServer extends RaftServer implements TSMetaService.Async
   }
 
   @Override
-  public void checkStatus(StartUpStatus startUpStatus,
-      AsyncMethodCallback<CheckStatusResponse> resultHandler) {
+  public void checkStatus(
+      StartUpStatus startUpStatus, AsyncMethodCallback<CheckStatusResponse> resultHandler) {
     asyncService.checkStatus(startUpStatus, resultHandler);
   }
 
@@ -258,8 +255,8 @@ public class MetaClusterServer extends RaftServer implements TSMetaService.Async
   }
 
   @Override
-  public void matchTerm(long index, long term, Node header,
-      AsyncMethodCallback<Boolean> resultHandler) {
+  public void matchTerm(
+      long index, long term, Node header, AsyncMethodCallback<Boolean> resultHandler) {
     asyncService.matchTerm(index, term, header, resultHandler);
   }
 
@@ -344,8 +341,7 @@ public class MetaClusterServer extends RaftServer implements TSMetaService.Async
   }
 
   @Override
-  public void removeHardLink(String hardLinkPath,
-      AsyncMethodCallback<Void> resultHandler) {
+  public void removeHardLink(String hardLinkPath, AsyncMethodCallback<Void> resultHandler) {
     asyncService.removeHardLink(hardLinkPath, resultHandler);
   }
 

@@ -22,19 +22,17 @@ package org.apache.iotdb.db.engine.modification;
 import java.util.Objects;
 import org.apache.iotdb.db.metadata.PartialPath;
 
-/**
- * Deletion is a delete operation on a timeseries.
- */
+/** Deletion is a delete operation on a timeseries. */
 public class Deletion extends Modification {
 
-  /**
-   * data within the interval [startTime, endTime] are to be deleted.
-   */
+  /** data within the interval [startTime, endTime] are to be deleted. */
   private long startTime;
+
   private long endTime;
 
   /**
    * constructor of Deletion, the start time is set to Long.MIN_VALUE
+   *
    * @param endTime end time of delete interval
    * @param path time series path
    */
@@ -46,6 +44,7 @@ public class Deletion extends Modification {
 
   /**
    * constructor of Deletion
+   *
    * @param startTime start time of delete interval
    * @param endTime end time of delete interval
    * @param path time series path

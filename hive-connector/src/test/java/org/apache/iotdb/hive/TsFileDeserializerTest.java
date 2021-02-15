@@ -18,6 +18,11 @@
  */
 package org.apache.iotdb.hive;
 
+import static org.junit.Assert.*;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveObjectInspector;
 import org.apache.hadoop.hive.serde2.typeinfo.PrimitiveTypeInfo;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfo;
@@ -25,12 +30,6 @@ import org.apache.hadoop.io.*;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import static org.junit.Assert.*;
 
 public class TsFileDeserializerTest {
 
@@ -61,7 +60,9 @@ public class TsFileDeserializerTest {
   @Test
   public void testDeserialize() {
     tsFileDeserializer = new TsFileDeserializer();
-    assertEquals(PrimitiveObjectInspector.PrimitiveCategory.LONG, ((PrimitiveTypeInfo)columnTypes.get(0)).getPrimitiveCategory());
+    assertEquals(
+        PrimitiveObjectInspector.PrimitiveCategory.LONG,
+        ((PrimitiveTypeInfo) columnTypes.get(0)).getPrimitiveCategory());
 
     Writable worryWritable1 = new Text();
     try {
@@ -76,7 +77,8 @@ public class TsFileDeserializerTest {
     worryWritable2.put(new Text("time_stamp"), new LongWritable(1L));
     worryWritable2.put(new Text("sensor_1"), new LongWritable(1L));
     try {
-      assertNull(tsFileDeserializer.deserialize(columnNames, columnTypes, worryWritable2, "device_1"));
+      assertNull(
+          tsFileDeserializer.deserialize(columnNames, columnTypes, worryWritable2, "device_1"));
     } catch (TsFileSerDeException e) {
       fail("Don't expect a TsFileSerDeException to be Thrown!");
     }
@@ -89,11 +91,12 @@ public class TsFileDeserializerTest {
       tsFileDeserializer.deserialize(columnNames, columnTypes, worryWritable3, "device_1");
       fail("Expect a TsFileSerDeException to be thrown!");
     } catch (TsFileSerDeException e) {
-      assertEquals("Unexpected data type: "
-                      + worryWritable3.get(new Text("sensor_1")).getClass().getName()
-                      + " for Date TypeInfo: "
-                      + PrimitiveObjectInspector.PrimitiveCategory.LONG,
-              e.getMessage());
+      assertEquals(
+          "Unexpected data type: "
+              + worryWritable3.get(new Text("sensor_1")).getClass().getName()
+              + " for Date TypeInfo: "
+              + PrimitiveObjectInspector.PrimitiveCategory.LONG,
+          e.getMessage());
     }
 
     MapWritable writable = new MapWritable();
@@ -101,7 +104,8 @@ public class TsFileDeserializerTest {
     writable.put(new Text("time_stamp"), new LongWritable(1L));
     writable.put(new Text("sensor_1"), new LongWritable(1000000L));
     try {
-      Object result = tsFileDeserializer.deserialize(columnNames, columnTypes, writable, "device_1");
+      Object result =
+          tsFileDeserializer.deserialize(columnNames, columnTypes, writable, "device_1");
       assertTrue(result instanceof List);
       List<Object> row = (List<Object>) result;
       assertEquals(columnNames.size(), row.size());
@@ -110,6 +114,5 @@ public class TsFileDeserializerTest {
     } catch (TsFileSerDeException e) {
       fail("Don't expect a TsFileSerDeException to be Thrown!");
     }
-
   }
 }

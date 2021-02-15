@@ -44,13 +44,10 @@ import org.mockito.MockitoAnnotations;
 
 public class BatchTest {
 
-  @Mock
-  private IoTDBConnection connection;
-  @Mock
-  private TSIService.Iface client;
+  @Mock private IoTDBConnection connection;
+  @Mock private TSIService.Iface client;
   private long sessionId;
-  @Mock
-  private IoTDBStatement statement;
+  @Mock private IoTDBStatement statement;
   private TSStatus errorStatus = RpcUtils.getStatus(TSStatusCode.INTERNAL_SERVER_ERROR);
   private TSStatus resp;
   private ZoneId zoneID = ZoneId.systemDefault();
@@ -60,12 +57,10 @@ public class BatchTest {
     MockitoAnnotations.initMocks(this);
     when(connection.createStatement())
         .thenReturn(new IoTDBStatement(connection, client, sessionId, zoneID, 0, 1L));
-
   }
 
   @After
-  public void tearDown() throws Exception {
-  }
+  public void tearDown() throws Exception {}
 
   @SuppressWarnings("serial")
   @Test
@@ -74,24 +69,26 @@ public class BatchTest {
     statement.addBatch("sql1");
     resp = new TSStatus();
     resp =
-        RpcUtils.getStatus(Collections.singletonList(RpcUtils.getStatus(TSStatusCode.SUCCESS_STATUS)));
+        RpcUtils.getStatus(
+            Collections.singletonList(RpcUtils.getStatus(TSStatusCode.SUCCESS_STATUS)));
     when(client.executeBatchStatement(any(TSExecuteBatchStatementReq.class))).thenReturn(resp);
     int[] result = statement.executeBatch();
     assertEquals(1, result.length);
 
-    List<TSStatus> resExpected = new ArrayList<TSStatus>() {
-      {
-        add(RpcUtils.getStatus(TSStatusCode.SUCCESS_STATUS));
-        add(RpcUtils.getStatus(TSStatusCode.SUCCESS_STATUS));
-        add(RpcUtils.getStatus(TSStatusCode.SUCCESS_STATUS));
-        add(RpcUtils.getStatus(TSStatusCode.SUCCESS_STATUS));
-        add(RpcUtils.getStatus(TSStatusCode.SUCCESS_STATUS));
-        add(RpcUtils.getStatus(TSStatusCode.SUCCESS_STATUS));
-        add(RpcUtils.getStatus(TSStatusCode.SUCCESS_STATUS));
-        add(RpcUtils.getStatus(TSStatusCode.SUCCESS_STATUS));
-        add(RpcUtils.getStatus(TSStatusCode.SUCCESS_STATUS));
-      }
-    };
+    List<TSStatus> resExpected =
+        new ArrayList<TSStatus>() {
+          {
+            add(RpcUtils.getStatus(TSStatusCode.SUCCESS_STATUS));
+            add(RpcUtils.getStatus(TSStatusCode.SUCCESS_STATUS));
+            add(RpcUtils.getStatus(TSStatusCode.SUCCESS_STATUS));
+            add(RpcUtils.getStatus(TSStatusCode.SUCCESS_STATUS));
+            add(RpcUtils.getStatus(TSStatusCode.SUCCESS_STATUS));
+            add(RpcUtils.getStatus(TSStatusCode.SUCCESS_STATUS));
+            add(RpcUtils.getStatus(TSStatusCode.SUCCESS_STATUS));
+            add(RpcUtils.getStatus(TSStatusCode.SUCCESS_STATUS));
+            add(RpcUtils.getStatus(TSStatusCode.SUCCESS_STATUS));
+          }
+        };
     resp.setSubStatus(resExpected);
 
     statement.clearBatch();
@@ -100,12 +97,12 @@ public class BatchTest {
         "CREATE TIMESERIES root.ln.wf01.wt01.status WITH DATATYPE=BOOLEAN, ENCODING=PLAIN");
     statement.addBatch(
         "CREATE TIMESERIES root.ln.wf01.wt01.temperature WITH DATATYPE=FLOAT, ENCODING=RLE");
-    statement
-        .addBatch("insert into root.ln.wf01.wt01(timestamp,status) values(1509465600000,true)");
-    statement
-        .addBatch("insert into root.ln.wf01.wt01(timestamp,status) values(1509465660000,true)");
-    statement
-        .addBatch("insert into root.ln.wf01.wt01(timestamp,status) vvvvvv(1509465720000,false)");
+    statement.addBatch(
+        "insert into root.ln.wf01.wt01(timestamp,status) values(1509465600000,true)");
+    statement.addBatch(
+        "insert into root.ln.wf01.wt01(timestamp,status) values(1509465660000,true)");
+    statement.addBatch(
+        "insert into root.ln.wf01.wt01(timestamp,status) vvvvvv(1509465720000,false)");
     statement.addBatch(
         "insert into root.ln.wf01.wt01(timestamp,temperature) values(1509465600000,25.957603)");
     statement.addBatch(
@@ -125,7 +122,8 @@ public class BatchTest {
     Statement statement = connection.createStatement();
     statement.addBatch("sql1");
     resp =
-        RpcUtils.getStatus(Collections.singletonList(RpcUtils.getStatus(TSStatusCode.SQL_PARSE_ERROR)));
+        RpcUtils.getStatus(
+            Collections.singletonList(RpcUtils.getStatus(TSStatusCode.SQL_PARSE_ERROR)));
 
     when(client.executeBatchStatement(any(TSExecuteBatchStatementReq.class))).thenReturn(resp);
     statement.executeBatch();
@@ -138,12 +136,13 @@ public class BatchTest {
     resp = RpcUtils.getStatus(Collections.singletonList(errorStatus));
     statement.addBatch("sql1");
     statement.addBatch("sql1");
-    List<TSStatus> resExpected = new ArrayList<TSStatus>() {
-      {
-        add(RpcUtils.getStatus(TSStatusCode.SUCCESS_STATUS));
-        add(RpcUtils.getStatus(TSStatusCode.SQL_PARSE_ERROR));
-      }
-    };
+    List<TSStatus> resExpected =
+        new ArrayList<TSStatus>() {
+          {
+            add(RpcUtils.getStatus(TSStatusCode.SUCCESS_STATUS));
+            add(RpcUtils.getStatus(TSStatusCode.SQL_PARSE_ERROR));
+          }
+        };
     resp.setSubStatus(resExpected);
     when(client.executeBatchStatement(any(TSExecuteBatchStatementReq.class))).thenReturn(resp);
     try {

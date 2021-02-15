@@ -41,9 +41,7 @@ import org.apache.iotdb.tsfile.utils.Binary;
 import org.apache.iotdb.tsfile.utils.Pair;
 import org.apache.iotdb.tsfile.utils.StringContainer;
 
-/**
- * operator 'in' 'not in'
- */
+/** operator 'in' 'not in' */
 public class InOperator extends FunctionOperator {
 
   private boolean not;
@@ -127,8 +125,9 @@ public class InOperator extends FunctionOperator {
         Set<Binary> binaryValues = new HashSet<>();
         for (String val : values) {
           binaryValues.add(
-              (val.startsWith("'") && val.endsWith("'")) || (val.startsWith("\"") && val
-                  .endsWith("\"")) ? new Binary(val.substring(1, val.length() - 1))
+              (val.startsWith("'") && val.endsWith("'"))
+                      || (val.startsWith("\"") && val.endsWith("\""))
+                  ? new Binary(val.substring(1, val.length() - 1))
                   : new Binary(val));
         }
         ret = In.getUnaryExpression(singlePath, binaryValues, not);
@@ -152,7 +151,12 @@ public class InOperator extends FunctionOperator {
 
   @Override
   public InOperator copy() {
-    InOperator ret = new InOperator(this.tokenIntType, new PartialPath(singlePath.getNodes().clone()), not, new HashSet<>(values));
+    InOperator ret =
+        new InOperator(
+            this.tokenIntType,
+            new PartialPath(singlePath.getNodes().clone()),
+            not,
+            new HashSet<>(values));
     ret.tokenSymbol = tokenSymbol;
     ret.isLeaf = isLeaf;
     ret.isSingle = isSingle;
@@ -176,8 +180,10 @@ public class InOperator extends FunctionOperator {
       return false;
     }
     InOperator that = (InOperator) o;
-    return Objects.equals(singlePath, that.singlePath) && values.containsAll(that.values)
-        && values.size() == that.values.size() && not == that.not;
+    return Objects.equals(singlePath, that.singlePath)
+        && values.containsAll(that.values)
+        && values.size() == that.values.size()
+        && not == that.not;
   }
 
   @Override
@@ -187,8 +193,8 @@ public class InOperator extends FunctionOperator {
 
   private static class In {
 
-    public static <T extends Comparable<T>> IUnaryExpression getUnaryExpression(Path path,
-        Set<T> values, boolean not) {
+    public static <T extends Comparable<T>> IUnaryExpression getUnaryExpression(
+        Path path, Set<T> values, boolean not) {
       if (path.equals("time")) {
         return new GlobalTimeExpression(TimeFilter.in((Set<Long>) values, not));
       } else {

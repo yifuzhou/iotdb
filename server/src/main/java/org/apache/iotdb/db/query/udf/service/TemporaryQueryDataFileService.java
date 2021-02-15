@@ -42,7 +42,10 @@ public class TemporaryQueryDataFileService implements IService {
 
   private static final String TEMPORARY_FILE_DIR =
       IoTDBDescriptor.getInstance().getConfig().getSystemDir()
-          + File.separator + "udf" + File.separator + "tmp";
+          + File.separator
+          + "udf"
+          + File.separator
+          + "tmp";
 
   private final AtomicLong uniqueDataId;
   private final Map<Long, List<SerializationRecorder>> recorders;
@@ -73,15 +76,18 @@ public class TemporaryQueryDataFileService implements IService {
       try {
         recorder.closeFile();
       } catch (IOException e) {
-        logger.warn(String.format("Failed to close file in method deregister(%d), because %s",
-            queryId, e.toString()));
+        logger.warn(
+            String.format(
+                "Failed to close file in method deregister(%d), because %s",
+                queryId, e.toString()));
       }
     }
     try {
       FileUtils.cleanDirectory(SystemFileFactory.INSTANCE.getFile(getDirName(queryId)));
     } catch (IOException e) {
-      logger.warn(String.format("Failed to clean dir in method deregister(%d), because %s",
-          queryId, e.toString()));
+      logger.warn(
+          String.format(
+              "Failed to clean dir in method deregister(%d), because %s", queryId, e.toString()));
     }
   }
 
@@ -128,9 +134,9 @@ public class TemporaryQueryDataFileService implements IService {
 
   private static class TemporaryQueryDataFileServiceHelper {
 
-    private static final TemporaryQueryDataFileService INSTANCE = new TemporaryQueryDataFileService();
+    private static final TemporaryQueryDataFileService INSTANCE =
+        new TemporaryQueryDataFileService();
 
-    private TemporaryQueryDataFileServiceHelper() {
-    }
+    private TemporaryQueryDataFileServiceHelper() {}
   }
 }

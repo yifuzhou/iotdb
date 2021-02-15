@@ -19,16 +19,15 @@
 
 package org.apache.iotdb.db.qp.physical.sys;
 
-import org.apache.iotdb.db.metadata.PartialPath;
-import org.apache.iotdb.db.qp.logical.Operator;
-import org.apache.iotdb.db.qp.physical.PhysicalPlan;
-
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import org.apache.iotdb.db.metadata.PartialPath;
+import org.apache.iotdb.db.qp.logical.Operator;
+import org.apache.iotdb.db.qp.physical.PhysicalPlan;
 
 public class MNodePlan extends PhysicalPlan {
   protected String name;
@@ -106,8 +105,7 @@ public class MNodePlan extends PhysicalPlan {
       return false;
     }
     MNodePlan that = (MNodePlan) o;
-    return Objects.equals(name, that.name)
-      && Objects.equals(childSize, that.childSize);
+    return Objects.equals(name, that.name) && Objects.equals(childSize, that.childSize);
   }
 
   @Override

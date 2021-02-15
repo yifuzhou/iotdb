@@ -17,6 +17,12 @@
  */
 package org.apache.iotdb.flink;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 import org.apache.iotdb.tsfile.file.metadata.enums.TSDataType;
 import org.apache.iotdb.tsfile.file.metadata.enums.TSEncoding;
 import org.apache.iotdb.tsfile.fileSystem.FSFactoryProducer;
@@ -35,32 +41,27 @@ import org.apache.iotdb.tsfile.write.schema.Schema;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
-
-/**
- * Utils used to prepare source TsFiles for the examples.
- */
+/** Utils used to prepare source TsFiles for the examples. */
 public class TsFileUtils {
 
   private static final Logger logger = LoggerFactory.getLogger(TsFileUtils.class);
   private static final String DEFAULT_TEMPLATE = "template";
 
-  private TsFileUtils() {
-  }
+  private TsFileUtils() {}
 
   public static void writeTsFile(String path) {
     try {
       File f = FSFactoryProducer.getFSFactory().getFile(path);
-			Files.delete(f.toPath());
+      Files.delete(f.toPath());
       Schema schema = new Schema();
-      schema.extendTemplate(DEFAULT_TEMPLATE, new MeasurementSchema("sensor_1", TSDataType.FLOAT, TSEncoding.RLE));
-      schema.extendTemplate(DEFAULT_TEMPLATE, new MeasurementSchema("sensor_2", TSDataType.INT32, TSEncoding.TS_2DIFF));
-      schema.extendTemplate(DEFAULT_TEMPLATE, new MeasurementSchema("sensor_3", TSDataType.INT32, TSEncoding.TS_2DIFF));
+      schema.extendTemplate(
+          DEFAULT_TEMPLATE, new MeasurementSchema("sensor_1", TSDataType.FLOAT, TSEncoding.RLE));
+      schema.extendTemplate(
+          DEFAULT_TEMPLATE,
+          new MeasurementSchema("sensor_2", TSDataType.INT32, TSEncoding.TS_2DIFF));
+      schema.extendTemplate(
+          DEFAULT_TEMPLATE,
+          new MeasurementSchema("sensor_3", TSDataType.INT32, TSEncoding.TS_2DIFF));
 
       try (TsFileWriter tsFileWriter = new TsFileWriter(f, schema)) {
 
@@ -73,7 +74,7 @@ public class TsFileUtils {
           tsRecord.addTuple(dPoint1);
           tsRecord.addTuple(dPoint2);
           tsRecord.addTuple(dPoint3);
-          
+
           // write TSRecord
           tsFileWriter.write(tsRecord);
         }
@@ -92,9 +93,10 @@ public class TsFileUtils {
       List<String> result = new ArrayList<>();
       while (queryDataSet.hasNext()) {
         RowRecord rowRecord = queryDataSet.next();
-        String row = rowRecord.getFields().stream()
-            .map(f -> f == null ? "null" : f.getStringValue())
-            .collect(Collectors.joining(","));
+        String row =
+            rowRecord.getFields().stream()
+                .map(f -> f == null ? "null" : f.getStringValue())
+                .collect(Collectors.joining(","));
         result.add(rowRecord.getTimestamp() + "," + row);
       }
       return result.toArray(new String[0]);

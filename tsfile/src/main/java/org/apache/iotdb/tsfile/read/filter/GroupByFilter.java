@@ -42,9 +42,7 @@ public class GroupByFilter implements Filter, Serializable {
     this.endTime = endTime;
   }
 
-  public GroupByFilter() {
-
-  }
+  public GroupByFilter() {}
 
   @Override
   public boolean satisfy(Statistics statistics) {
@@ -53,30 +51,23 @@ public class GroupByFilter implements Filter, Serializable {
 
   @Override
   public boolean satisfy(long time, Object value) {
-    if (time < startTime || time >= endTime)
-      return false;
-    else
-      return (time - startTime) % slidingStep < interval;
+    if (time < startTime || time >= endTime) return false;
+    else return (time - startTime) % slidingStep < interval;
   }
 
   @Override
   public boolean satisfyStartEndTime(long startTime, long endTime) {
-    if (endTime < this.startTime)
-      return false;
-    else if (startTime <= this.startTime)
-      return true;
-    else if (startTime >= this.endTime)
-      return false;
+    if (endTime < this.startTime) return false;
+    else if (startTime <= this.startTime) return true;
+    else if (startTime >= this.endTime) return false;
     else {
       long minTime = startTime - this.startTime;
       long count = minTime / slidingStep;
-      if (minTime <= interval + count * slidingStep)
-        return true;
+      if (minTime <= interval + count * slidingStep) return true;
       else {
         if (this.endTime <= (count + 1) * slidingStep + this.startTime) {
           return false;
-        }
-        else {
+        } else {
           return endTime >= (count + 1) * slidingStep + this.startTime;
         }
       }

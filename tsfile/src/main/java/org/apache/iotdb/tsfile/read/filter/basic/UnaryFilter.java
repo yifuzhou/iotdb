@@ -38,8 +38,7 @@ public abstract class UnaryFilter<T extends Comparable<T>> implements Filter, Se
 
   protected FilterType filterType;
 
-  public UnaryFilter() {
-  }
+  public UnaryFilter() {}
 
   protected UnaryFilter(T value, FilterType filterType) {
     this.value = value;
@@ -87,7 +86,8 @@ public abstract class UnaryFilter<T extends Comparable<T>> implements Filter, Se
       return false;
     }
     UnaryFilter other = ((UnaryFilter) obj);
-    return this.value.equals(other.value) && this.filterType.equals(other.filterType)
+    return this.value.equals(other.value)
+        && this.filterType.equals(other.filterType)
         && this.getSerializeId().equals(other.getSerializeId());
   }
 

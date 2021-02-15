@@ -60,8 +60,10 @@ public class SyncClientTest {
   public void setUp()
       throws IOException, InterruptedException, StartupException, DiskSpaceInsufficientException {
     EnvironmentUtils.envSetUp();
-    dataDir = new File(DirectoryManager.getInstance().getNextFolderForSequenceFile())
-        .getParentFile().getAbsolutePath();
+    dataDir =
+        new File(DirectoryManager.getInstance().getNextFolderForSequenceFile())
+            .getParentFile()
+            .getAbsolutePath();
     config.update(dataDir);
     senderLogAnalyzer = new SyncSenderLogAnalyzer(config.getSenderFolderPath());
   }
@@ -82,9 +84,13 @@ public class SyncClientTest {
           allFileList.put(String.valueOf(i), new HashSet<>());
         }
         String rand = String.valueOf(r.nextInt(10000));
-        String fileName = FilePathUtils.regularizePath(dataDir) + IoTDBConstant.SEQUENCE_FLODER_NAME
-            + File.separator + i
-            + File.separator + rand;
+        String fileName =
+            FilePathUtils.regularizePath(dataDir)
+                + IoTDBConstant.SEQUENCE_FLODER_NAME
+                + File.separator
+                + i
+                + File.separator
+                + rand;
         File file = new File(fileName);
         allFileList.get(String.valueOf(i)).add(file);
         if (!file.getParentFile().exists()) {
@@ -106,7 +112,7 @@ public class SyncClientTest {
       dataFileMap.putIfAbsent(sgFile.getName(), new HashSet<>());
       for (File tsfile : sgFile.listFiles()) {
         if (!tsfile.getName().endsWith(TsFileResource.RESOURCE_SUFFIX)) {
-          ((SyncClient)manager).makeFileSnapshot(tsfile);
+          ((SyncClient) manager).makeFileSnapshot(tsfile);
         }
         dataFileMap.get(sgFile.getName()).add(tsfile.getName());
       }

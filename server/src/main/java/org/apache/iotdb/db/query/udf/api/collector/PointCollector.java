@@ -37,13 +37,13 @@ public interface PointCollector {
 
   /**
    * Collects an int data point with timestamp.
-   * <p>
-   * Before calling this method, you need to ensure that the UDF output data type is set to {@code
-   * TSDataType.INT32} by calling {@link UDTFConfigurations#setOutputDataType(TSDataType)} in {@link
-   * UDTF#beforeStart(UDFParameters, UDTFConfigurations)}.
+   *
+   * <p>Before calling this method, you need to ensure that the UDF output data type is set to
+   * {@code TSDataType.INT32} by calling {@link UDTFConfigurations#setOutputDataType(TSDataType)} in
+   * {@link UDTF#beforeStart(UDFParameters, UDTFConfigurations)}.
    *
    * @param timestamp timestamp to collect
-   * @param value     int value to collect
+   * @param value int value to collect
    * @throws IOException if any I/O errors occur
    * @see TSDataType
    */
@@ -51,13 +51,13 @@ public interface PointCollector {
 
   /**
    * Collects a long data point with timestamp.
-   * <p>
-   * Before calling this method, you need to ensure that the UDF output data type is set to {@code
-   * TSDataType.INT64} by calling {@link UDTFConfigurations#setOutputDataType(TSDataType)} in {@link
-   * UDTF#beforeStart(UDFParameters, UDTFConfigurations)}.
+   *
+   * <p>Before calling this method, you need to ensure that the UDF output data type is set to
+   * {@code TSDataType.INT64} by calling {@link UDTFConfigurations#setOutputDataType(TSDataType)} in
+   * {@link UDTF#beforeStart(UDFParameters, UDTFConfigurations)}.
    *
    * @param timestamp timestamp to collect
-   * @param value     long value to collect
+   * @param value long value to collect
    * @throws IOException if any I/O errors occur
    * @see TSDataType
    */
@@ -65,13 +65,13 @@ public interface PointCollector {
 
   /**
    * Collects a float data point with timestamp.
-   * <p>
-   * Before calling this method, you need to ensure that the UDF output data type is set to {@code
-   * TSDataType.FLOAT} by calling {@link UDTFConfigurations#setOutputDataType(TSDataType)} in {@link
-   * UDTF#beforeStart(UDFParameters, UDTFConfigurations)}.
+   *
+   * <p>Before calling this method, you need to ensure that the UDF output data type is set to
+   * {@code TSDataType.FLOAT} by calling {@link UDTFConfigurations#setOutputDataType(TSDataType)} in
+   * {@link UDTF#beforeStart(UDFParameters, UDTFConfigurations)}.
    *
    * @param timestamp timestamp to collect
-   * @param value     float value to collect
+   * @param value float value to collect
    * @throws IOException if any I/O errors occur
    * @see TSDataType
    */
@@ -79,13 +79,13 @@ public interface PointCollector {
 
   /**
    * Collects a double data point with timestamp.
-   * <p>
-   * Before calling this method, you need to ensure that the UDF output data type is set to {@code
-   * TSDataType.DOUBLE} by calling {@link UDTFConfigurations#setOutputDataType(TSDataType)} in
-   * {@link UDTF#beforeStart(UDFParameters, UDTFConfigurations)}.
+   *
+   * <p>Before calling this method, you need to ensure that the UDF output data type is set to
+   * {@code TSDataType.DOUBLE} by calling {@link UDTFConfigurations#setOutputDataType(TSDataType)}
+   * in {@link UDTF#beforeStart(UDFParameters, UDTFConfigurations)}.
    *
    * @param timestamp timestamp to collect
-   * @param value     double value to collect
+   * @param value double value to collect
    * @throws IOException if any I/O errors occur
    * @see TSDataType
    */
@@ -93,13 +93,13 @@ public interface PointCollector {
 
   /**
    * Collects a boolean data point with timestamp.
-   * <p>
-   * Before calling this method, you need to ensure that the UDF output data type is set to {@code
-   * TSDataType.BOOLEAN} by calling {@link UDTFConfigurations#setOutputDataType(TSDataType)} in
-   * {@link UDTF#beforeStart(UDFParameters, UDTFConfigurations)}.
+   *
+   * <p>Before calling this method, you need to ensure that the UDF output data type is set to
+   * {@code TSDataType.BOOLEAN} by calling {@link UDTFConfigurations#setOutputDataType(TSDataType)}
+   * in {@link UDTF#beforeStart(UDFParameters, UDTFConfigurations)}.
    *
    * @param timestamp timestamp to collect
-   * @param value     boolean value to collect
+   * @param value boolean value to collect
    * @throws IOException if any I/O errors occur
    * @see TSDataType
    */
@@ -107,14 +107,14 @@ public interface PointCollector {
 
   /**
    * Collects a Binary data point with timestamp.
-   * <p>
-   * Before calling this method, you need to ensure that the UDF output data type is set to {@code
-   * TSDataType.TEXT} by calling {@link UDTFConfigurations#setOutputDataType(TSDataType)} in {@link
-   * UDTF#beforeStart(UDFParameters, UDTFConfigurations)}.
+   *
+   * <p>Before calling this method, you need to ensure that the UDF output data type is set to
+   * {@code TSDataType.TEXT} by calling {@link UDTFConfigurations#setOutputDataType(TSDataType)} in
+   * {@link UDTF#beforeStart(UDFParameters, UDTFConfigurations)}.
    *
    * @param timestamp timestamp to collect
-   * @param value     Binary value to collect
-   * @throws IOException           if any I/O errors occur
+   * @param value Binary value to collect
+   * @throws IOException if any I/O errors occur
    * @throws QueryProcessException if memory is not enough to continue collecting data points
    * @see TSDataType
    */
@@ -122,14 +122,14 @@ public interface PointCollector {
 
   /**
    * Collects a String data point with timestamp.
-   * <p>
-   * Before calling this method, you need to ensure that the UDF output data type is set to {@code
-   * TSDataType.TEXT} by calling {@link UDTFConfigurations#setOutputDataType(TSDataType)} in {@link
-   * UDTF#beforeStart(UDFParameters, UDTFConfigurations)}.
+   *
+   * <p>Before calling this method, you need to ensure that the UDF output data type is set to
+   * {@code TSDataType.TEXT} by calling {@link UDTFConfigurations#setOutputDataType(TSDataType)} in
+   * {@link UDTF#beforeStart(UDFParameters, UDTFConfigurations)}.
    *
    * @param timestamp timestamp to collect
-   * @param value     String value to collect
-   * @throws IOException           if any I/O errors occur
+   * @param value String value to collect
+   * @throws IOException if any I/O errors occur
    * @throws QueryProcessException if memory is not enough to continue collecting data points
    * @see TSDataType
    */

@@ -24,9 +24,7 @@ import java.util.List;
 import org.apache.iotdb.db.metadata.PartialPath;
 
 /**
- * IMergePathSelector select paths to be merged at a time if all paths of a device cannot be
- * merged at the same time.
+ * IMergePathSelector select paths to be merged at a time if all paths of a device cannot be merged
+ * at the same time.
  */
-public interface IMergePathSelector extends Iterator<List<PartialPath>> {
-
-}
+public interface IMergePathSelector extends Iterator<List<PartialPath>> {}

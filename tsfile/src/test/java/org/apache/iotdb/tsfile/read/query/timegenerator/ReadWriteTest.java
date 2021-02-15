@@ -72,25 +72,25 @@ public class ReadWriteTest {
     Filter timeFilter = FilterFactory.and(TimeFilter.gtEq(1L), TimeFilter.ltEq(8L));
     IExpression timeExpression = new GlobalTimeExpression(timeFilter);
 
-    IExpression valueExpression = BinaryExpression
-        .and(new SingleSeriesExpression(new Path("d1", "s1"), ValueFilter.gt(1.0f)),
+    IExpression valueExpression =
+        BinaryExpression.and(
+            new SingleSeriesExpression(new Path("d1", "s1"), ValueFilter.gt(1.0f)),
             new SingleSeriesExpression(new Path("d1", "s2"), ValueFilter.lt(22)));
 
     IExpression finalExpression = BinaryExpression.and(valueExpression, timeExpression);
 
-    QueryExpression queryExpression = QueryExpression.create().addSelectedPath(new Path("d1", "s1"))
-        .addSelectedPath(new Path("d1", "s2")).setExpression(finalExpression);
+    QueryExpression queryExpression =
+        QueryExpression.create()
+            .addSelectedPath(new Path("d1", "s1"))
+            .addSelectedPath(new Path("d1", "s2"))
+            .setExpression(finalExpression);
 
     try (TsFileSequenceReader fileReader = new TsFileSequenceReader(tsfilePath)) {
       ReadOnlyTsFile readOnlyTsFile = new ReadOnlyTsFile(fileReader);
       QueryDataSet dataSet = readOnlyTsFile.query(queryExpression);
       int i = 0;
-      String[] expected = new String[]{
-          "1\t1.2\t20",
-          "3\t1.4\t21",
-          "4\t1.2\t20",
-          "6\t7.2\t10",
-          "7\t6.2\t20"};
+      String[] expected =
+          new String[] {"1\t1.2\t20", "3\t1.4\t21", "4\t1.2\t20", "6\t7.2\t10", "7\t6.2\t20"};
       while (dataSet.hasNext()) {
         Assert.assertEquals(expected[i], dataSet.next().toString());
         i++;
@@ -99,8 +99,6 @@ public class ReadWriteTest {
     }
   }
 
-
-
   private void writeFile(String tsfilePath) throws IOException, WriteProcessException {
     File f = new File(tsfilePath);
     if (f.exists()) {
@@ -108,9 +106,12 @@ public class ReadWriteTest {
     }
 
     Schema schema = new Schema();
-    schema.extendTemplate(TEMPLATE_NAME, new MeasurementSchema("s1", TSDataType.FLOAT, TSEncoding.RLE));
-    schema.extendTemplate(TEMPLATE_NAME, new MeasurementSchema("s2", TSDataType.INT32, TSEncoding.TS_2DIFF));
-    schema.extendTemplate(TEMPLATE_NAME, new MeasurementSchema("s3", TSDataType.INT32, TSEncoding.TS_2DIFF));
+    schema.extendTemplate(
+        TEMPLATE_NAME, new MeasurementSchema("s1", TSDataType.FLOAT, TSEncoding.RLE));
+    schema.extendTemplate(
+        TEMPLATE_NAME, new MeasurementSchema("s2", TSDataType.INT32, TSEncoding.TS_2DIFF));
+    schema.extendTemplate(
+        TEMPLATE_NAME, new MeasurementSchema("s3", TSDataType.INT32, TSEncoding.TS_2DIFF));
 
     TsFileWriter tsFileWriter = new TsFileWriter(f, schema);
 

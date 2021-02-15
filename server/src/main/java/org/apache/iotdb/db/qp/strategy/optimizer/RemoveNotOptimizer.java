@@ -53,15 +53,17 @@ public class RemoveNotOptimizer implements IFilterOptimizer {
       case KW_OR:
         // replace children in-place for efficiency
         List<FilterOperator> children = filter.getChildren();
-        if(children.size() < 2){
-         throw new LogicalOptimizeException("Filter has some time series don't correspond to any known time series");
+        if (children.size() < 2) {
+          throw new LogicalOptimizeException(
+              "Filter has some time series don't correspond to any known time series");
         }
         children.set(0, removeNot(children.get(0)));
         children.set(1, removeNot(children.get(1)));
         return filter;
       case KW_NOT:
-        if(filter.getChildren().size() < 1){
-          throw new LogicalOptimizeException("Filter has some time series don't correspond to any known time series");
+        if (filter.getChildren().size() < 1) {
+          throw new LogicalOptimizeException(
+              "Filter has some time series don't correspond to any known time series");
         }
         return reverseFilter(filter.getChildren().get(0));
       default:
@@ -79,7 +81,7 @@ public class RemoveNotOptimizer implements IFilterOptimizer {
   private FilterOperator reverseFilter(FilterOperator filter) throws LogicalOperatorException {
     int tokenInt = filter.getTokenIntType();
     if (filter.isLeaf()) {
-      ((FunctionOperator)filter).reverseFunc();
+      ((FunctionOperator) filter).reverseFunc();
       return filter;
     }
     switch (tokenInt) {
@@ -96,5 +98,4 @@ public class RemoveNotOptimizer implements IFilterOptimizer {
         throw new LogicalOptimizeException("reverseFilter", tokenInt);
     }
   }
-
 }

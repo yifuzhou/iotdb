@@ -36,13 +36,14 @@ public class IoTDBDatabaseMetadata implements DatabaseMetaData {
 
   private IoTDBConnection connection;
   private TSIService.Iface client;
-  private static final Logger logger = LoggerFactory
-          .getLogger(IoTDBDatabaseMetadata.class);
+  private static final Logger logger = LoggerFactory.getLogger(IoTDBDatabaseMetadata.class);
   private static final String METHOD_NOT_SUPPORTED_STRING = "Method not supported";
-  //when running the program in IDE, we can not get the version info using getImplementationVersion()
+  // when running the program in IDE, we can not get the version info using
+  // getImplementationVersion()
   private static final String DATABASE_VERSION =
       IoTDBDatabaseMetadata.class.getPackage().getImplementationVersion() != null
-          ? IoTDBDatabaseMetadata.class.getPackage().getImplementationVersion() : "UNKNOWN";
+          ? IoTDBDatabaseMetadata.class.getPackage().getImplementationVersion()
+          : "UNKNOWN";
   private long sessionId;
 
   IoTDBDatabaseMetadata(IoTDBConnection connection, TSIService.Iface client, long sessionId) {
@@ -118,9 +119,8 @@ public class IoTDBDatabaseMetadata implements DatabaseMetaData {
   }
 
   @Override
-  public ResultSet getBestRowIdentifier(String arg0, String arg1, String arg2, int arg3,
-      boolean arg4)
-      throws SQLException {
+  public ResultSet getBestRowIdentifier(
+      String arg0, String arg1, String arg2, int arg3, boolean arg4) throws SQLException {
     throw new SQLException(METHOD_NOT_SUPPORTED_STRING);
   }
 
@@ -145,8 +145,8 @@ public class IoTDBDatabaseMetadata implements DatabaseMetaData {
   }
 
   @Override
-  public ResultSet getColumnPrivileges(String arg0, String arg1, String arg2,
-      String arg3) throws SQLException {
+  public ResultSet getColumnPrivileges(String arg0, String arg1, String arg2, String arg3)
+      throws SQLException {
     throw new SQLException(METHOD_NOT_SUPPORTED_STRING);
   }
 
@@ -156,8 +156,8 @@ public class IoTDBDatabaseMetadata implements DatabaseMetaData {
   }
 
   @Override
-  public ResultSet getCrossReference(String arg0, String arg1, String arg2, String arg3,
-      String arg4, String arg5)
+  public ResultSet getCrossReference(
+      String arg0, String arg1, String arg2, String arg3, String arg4, String arg5)
       throws SQLException {
     throw new SQLException(METHOD_NOT_SUPPORTED_STRING);
   }
@@ -179,7 +179,7 @@ public class IoTDBDatabaseMetadata implements DatabaseMetaData {
 
   @Override
   public String getDatabaseProductVersion() throws SQLException {
-   return DATABASE_VERSION;
+    return DATABASE_VERSION;
   }
 
   @Override
@@ -381,8 +381,9 @@ public class IoTDBDatabaseMetadata implements DatabaseMetaData {
   }
 
   @Override
-  public ResultSet getPseudoColumns(String catalog, String schemaPattern, String tableNamePattern,
-      String columnNamePattern) throws SQLException {
+  public ResultSet getPseudoColumns(
+      String catalog, String schemaPattern, String tableNamePattern, String columnNamePattern)
+      throws SQLException {
     throw new SQLException(METHOD_NOT_SUPPORTED_STRING);
   }
 
@@ -460,14 +461,14 @@ public class IoTDBDatabaseMetadata implements DatabaseMetaData {
   }
 
   @Override
-  public ResultSet getColumns(String catalog, String schemaPattern, String tableNamePattern,
-      String columnNamePattern) {
+  public ResultSet getColumns(
+      String catalog, String schemaPattern, String tableNamePattern, String columnNamePattern) {
     return null;
   }
 
   @Override
-  public ResultSet getTables(String catalog, String schemaPattern, String tableNamePattern,
-      String[] types)
+  public ResultSet getTables(
+      String catalog, String schemaPattern, String tableNamePattern, String[] types)
       throws SQLException {
     throw new SQLException(METHOD_NOT_SUPPORTED_STRING);
   }
@@ -483,8 +484,8 @@ public class IoTDBDatabaseMetadata implements DatabaseMetaData {
   }
 
   @Override
-  public ResultSet getUDTs(String catalog, String schemaPattern, String typeNamePattern,
-      int[] types)
+  public ResultSet getUDTs(
+      String catalog, String schemaPattern, String typeNamePattern, int[] types)
       throws SQLException {
     throw new SQLException(METHOD_NOT_SUPPORTED_STRING);
   }
@@ -961,10 +962,7 @@ public class IoTDBDatabaseMetadata implements DatabaseMetaData {
     throw new SQLException(METHOD_NOT_SUPPORTED_STRING);
   }
 
-  /**
-   * @deprecated
-   * recommend using getMetadataInJson() instead of toString()
-   */
+  /** @deprecated recommend using getMetadataInJson() instead of toString() */
   @Deprecated
   @Override
   public String toString() {
@@ -979,13 +977,17 @@ public class IoTDBDatabaseMetadata implements DatabaseMetaData {
         try {
           return getMetadataInJsonFunc();
         } catch (TException e2) {
-          logger.error("Fail to get all timeseries " + "info after reconnecting."
-                  + " please check server status", e2);
+          logger.error(
+              "Fail to get all timeseries "
+                  + "info after reconnecting."
+                  + " please check server status",
+              e2);
         } catch (IoTDBSQLException e1) {
           // ignored
         }
       } else {
-        logger.error("Fail to reconnect to server "
+        logger.error(
+            "Fail to reconnect to server "
                 + "when getting all timeseries info. please check server status");
       }
     }
@@ -1005,12 +1007,14 @@ public class IoTDBDatabaseMetadata implements DatabaseMetaData {
         try {
           return getMetadataInJsonFunc();
         } catch (TException e2) {
-          throw new SQLException("Failed to fetch all metadata in json "
-              + "after reconnecting. Please check the server status.");
+          throw new SQLException(
+              "Failed to fetch all metadata in json "
+                  + "after reconnecting. Please check the server status.");
         }
       } else {
-        throw new SQLException("Failed to reconnect to the server "
-            + "when fetching all metadata in json. Please check the server status.");
+        throw new SQLException(
+            "Failed to reconnect to the server "
+                + "when fetching all metadata in json. Please check the server status.");
       }
     }
   }

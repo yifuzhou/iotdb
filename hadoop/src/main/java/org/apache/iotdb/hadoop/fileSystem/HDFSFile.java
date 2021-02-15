@@ -50,7 +50,6 @@ public class HDFSFile extends File {
   private static final Logger logger = LoggerFactory.getLogger(HDFSFile.class);
   private static final String UNSUPPORT_OPERATION = "Unsupported operation.";
 
-
   public HDFSFile(String pathname) {
     super(pathname);
     hdfsPath = new Path(pathname);

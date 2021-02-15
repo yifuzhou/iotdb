@@ -36,14 +36,12 @@ import org.slf4j.LoggerFactory;
 
 public class SlidingTimeWindowConstructionTester implements UDTF {
 
-  private static final Logger logger = LoggerFactory
-      .getLogger(SlidingTimeWindowConstructionTester.class);
+  private static final Logger logger =
+      LoggerFactory.getLogger(SlidingTimeWindowConstructionTester.class);
 
   @Override
   public void validate(UDFParameterValidator validator) throws Exception {
-    validator
-        .validateInputSeriesNumber(1)
-        .validateInputSeriesDataType(0, TSDataType.INT32);
+    validator.validateInputSeriesNumber(1).validateInputSeriesDataType(0, TSDataType.INT32);
   }
 
   @Override

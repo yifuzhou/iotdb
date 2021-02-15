@@ -37,8 +37,8 @@ import org.apache.iotdb.tsfile.read.expression.impl.GlobalTimeExpression;
 import org.apache.iotdb.tsfile.read.expression.util.ExpressionOptimizer;
 import org.apache.iotdb.tsfile.read.query.dataset.DataSetWithoutTimeGenerator;
 import org.apache.iotdb.tsfile.read.query.dataset.QueryDataSet;
-import org.apache.iotdb.tsfile.read.reader.series.EmptyFileSeriesReader;
 import org.apache.iotdb.tsfile.read.reader.series.AbstractFileSeriesReader;
+import org.apache.iotdb.tsfile.read.reader.series.EmptyFileSeriesReader;
 import org.apache.iotdb.tsfile.read.reader.series.FileSeriesReader;
 import org.apache.iotdb.tsfile.utils.BloomFilter;
 
@@ -70,13 +70,14 @@ public class TsFileExecutor implements QueryExecutor {
     if (queryExpression.hasQueryFilter()) {
       try {
         IExpression expression = queryExpression.getExpression();
-        IExpression regularIExpression = ExpressionOptimizer.getInstance().optimize(expression,
-            queryExpression.getSelectedSeries());
+        IExpression regularIExpression =
+            ExpressionOptimizer.getInstance()
+                .optimize(expression, queryExpression.getSelectedSeries());
         queryExpression.setExpression(regularIExpression);
 
         if (regularIExpression instanceof GlobalTimeExpression) {
-          return execute(queryExpression.getSelectedSeries(),
-              (GlobalTimeExpression) regularIExpression);
+          return execute(
+              queryExpression.getSelectedSeries(), (GlobalTimeExpression) regularIExpression);
         } else {
           return new ExecutorWithTimeGenerator(metadataQuerier, chunkLoader)
               .execute(queryExpression);
@@ -101,36 +102,41 @@ public class TsFileExecutor implements QueryExecutor {
    * @param spacePartitionEndPos the end position of the space partition
    * @return QueryDataSet
    */
-  public QueryDataSet execute(QueryExpression queryExpression, long spacePartitionStartPos,
-      long spacePartitionEndPos) throws IOException {
+  public QueryDataSet execute(
+      QueryExpression queryExpression, long spacePartitionStartPos, long spacePartitionEndPos)
+      throws IOException {
     // convert the space partition constraint to the time partition constraint
-    ArrayList<TimeRange> resTimeRanges = new ArrayList<>(metadataQuerier
-        .convertSpace2TimePartition(queryExpression.getSelectedSeries(), spacePartitionStartPos,
-            spacePartitionEndPos));
+    ArrayList<TimeRange> resTimeRanges =
+        new ArrayList<>(
+            metadataQuerier.convertSpace2TimePartition(
+                queryExpression.getSelectedSeries(), spacePartitionStartPos, spacePartitionEndPos));
 
     // check if resTimeRanges is empty
     if (resTimeRanges.isEmpty()) {
-      return new DataSetWithoutTimeGenerator(Collections.emptyList(), Collections.emptyList(),
+      return new DataSetWithoutTimeGenerator(
+          Collections.emptyList(),
+          Collections.emptyList(),
           Collections.emptyList()); // return an empty QueryDataSet
     }
 
     // construct an additional time filter based on the time partition constraint
     IExpression addTimeExpression = resTimeRanges.get(0).getExpression();
     for (int i = 1; i < resTimeRanges.size(); i++) {
-      addTimeExpression = BinaryExpression
-          .or(addTimeExpression, resTimeRanges.get(i).getExpression());
+      addTimeExpression =
+          BinaryExpression.or(addTimeExpression, resTimeRanges.get(i).getExpression());
     }
 
     // combine the original query expression and the additional time filter
     if (queryExpression.hasQueryFilter()) {
-      IExpression combinedExpression = BinaryExpression
-          .and(queryExpression.getExpression(), addTimeExpression);
+      IExpression combinedExpression =
+          BinaryExpression.and(queryExpression.getExpression(), addTimeExpression);
       queryExpression.setExpression(combinedExpression);
     } else {
       queryExpression.setExpression(addTimeExpression);
     }
 
-    // Having converted the space partition constraint to an additional time filter, we can now query as normal.
+    // Having converted the space partition constraint to an additional time filter, we can now
+    // query as normal.
     return execute(queryExpression);
   }
 
@@ -162,8 +168,9 @@ public class TsFileExecutor implements QueryExecutor {
    * @param timeExpression a GlobalTimeExpression or null
    * @return DataSetWithoutTimeGenerator
    */
-  private QueryDataSet executeMayAttachTimeFiler(List<Path> selectedPathList,
-      GlobalTimeExpression timeExpression) throws IOException, NoMeasurementException {
+  private QueryDataSet executeMayAttachTimeFiler(
+      List<Path> selectedPathList, GlobalTimeExpression timeExpression)
+      throws IOException, NoMeasurementException {
     List<AbstractFileSeriesReader> readersOfSelectedSeries = new ArrayList<>();
     List<TSDataType> dataTypes = new ArrayList<>();
 
@@ -177,7 +184,8 @@ public class TsFileExecutor implements QueryExecutor {
         if (timeExpression == null) {
           seriesReader = new FileSeriesReader(chunkLoader, chunkMetadataList, null);
         } else {
-          seriesReader = new FileSeriesReader(chunkLoader, chunkMetadataList, timeExpression.getFilter());
+          seriesReader =
+              new FileSeriesReader(chunkLoader, chunkMetadataList, timeExpression.getFilter());
         }
         dataTypes.add(chunkMetadataList.get(0).getDataType());
       }
@@ -185,5 +193,4 @@ public class TsFileExecutor implements QueryExecutor {
     }
     return new DataSetWithoutTimeGenerator(selectedPathList, dataTypes, readersOfSelectedSeries);
   }
-
 }

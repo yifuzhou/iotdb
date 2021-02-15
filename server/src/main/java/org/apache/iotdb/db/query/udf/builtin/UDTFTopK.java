@@ -47,8 +47,14 @@ public class UDTFTopK extends UDTFSelectK {
         break;
       default:
         // This will not happen.
-        throw new UDFInputSeriesDataTypeNotValidException(0, dataType, TSDataType.INT32,
-            TSDataType.INT64, TSDataType.FLOAT, TSDataType.DOUBLE, TSDataType.TEXT);
+        throw new UDFInputSeriesDataTypeNotValidException(
+            0,
+            dataType,
+            TSDataType.INT32,
+            TSDataType.INT64,
+            TSDataType.FLOAT,
+            TSDataType.DOUBLE,
+            TSDataType.TEXT);
     }
   }
 

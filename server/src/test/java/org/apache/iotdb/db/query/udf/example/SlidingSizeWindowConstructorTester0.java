@@ -31,8 +31,8 @@ import org.slf4j.LoggerFactory;
 
 public class SlidingSizeWindowConstructorTester0 implements UDTF {
 
-  private static final Logger logger = LoggerFactory
-      .getLogger(SlidingSizeWindowConstructorTester0.class);
+  private static final Logger logger =
+      LoggerFactory.getLogger(SlidingSizeWindowConstructorTester0.class);
 
   @Override
   public void beforeStart(UDFParameters parameters, UDTFConfigurations configurations) {

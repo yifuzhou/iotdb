@@ -19,18 +19,18 @@
 
 package org.apache.iotdb.cluster.log.logtypes;
 
-import org.apache.iotdb.cluster.log.Log;
+import static org.apache.iotdb.cluster.log.Log.Types.TEST_LARGE_CONTENT;
 
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.Objects;
-
-import static org.apache.iotdb.cluster.log.Log.Types.TEST_LARGE_CONTENT;
+import org.apache.iotdb.cluster.log.Log;
 
 public class LargeTestLog extends Log {
   private ByteBuffer data;
+
   public LargeTestLog() {
     data = ByteBuffer.wrap(new byte[8192]);
   }
@@ -62,8 +62,7 @@ public class LargeTestLog extends Log {
       return false;
     }
     LargeTestLog obj1 = (LargeTestLog) obj;
-    return getCurrLogIndex() == obj1.getCurrLogIndex() &&
-      getCurrLogTerm() == obj1.getCurrLogTerm();
+    return getCurrLogIndex() == obj1.getCurrLogIndex() && getCurrLogTerm() == obj1.getCurrLogTerm();
   }
 
   @Override

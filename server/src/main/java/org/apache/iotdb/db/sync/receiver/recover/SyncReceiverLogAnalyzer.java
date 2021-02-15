@@ -38,9 +38,7 @@ public class SyncReceiverLogAnalyzer implements ISyncReceiverLogAnalyzer {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(SyncReceiverLogAnalyzer.class);
 
-  private SyncReceiverLogAnalyzer() {
-
-  }
+  private SyncReceiverLogAnalyzer() {}
 
   public static SyncReceiverLogAnalyzer getInstance() {
     return SyncReceiverLogAnalyzerHolder.INSTANCE;
@@ -54,9 +52,9 @@ public class SyncReceiverLogAnalyzer implements ISyncReceiverLogAnalyzer {
       if (!new File(FilePathUtils.regularizePath(dataDir) + SyncConstant.SYNC_RECEIVER).exists()) {
         continue;
       }
-      for (File syncFolder : new File(
-          FilePathUtils.regularizePath(dataDir) + SyncConstant.SYNC_RECEIVER)
-          .listFiles()) {
+      for (File syncFolder :
+          new File(FilePathUtils.regularizePath(dataDir) + SyncConstant.SYNC_RECEIVER)
+              .listFiles()) {
         recover(syncFolder);
       }
     }
@@ -79,7 +77,8 @@ public class SyncReceiverLogAnalyzer implements ISyncReceiverLogAnalyzer {
         Thread.currentThread().interrupt();
       }
     } else {
-      scanLogger(FileLoader.createFileLoader(senderFolder),
+      scanLogger(
+          FileLoader.createFileLoader(senderFolder),
           new File(senderFolder, SyncConstant.SYNC_LOG_NAME),
           new File(senderFolder, SyncConstant.LOAD_LOG_NAME));
     }
@@ -94,9 +93,9 @@ public class SyncReceiverLogAnalyzer implements ISyncReceiverLogAnalyzer {
       if (!new File(FilePathUtils.regularizePath(dataDir) + SyncConstant.SYNC_RECEIVER).exists()) {
         continue;
       }
-      for (File syncFolder : new File(
-          FilePathUtils.regularizePath(dataDir) + SyncConstant.SYNC_RECEIVER)
-          .listFiles()) {
+      for (File syncFolder :
+          new File(FilePathUtils.regularizePath(dataDir) + SyncConstant.SYNC_RECEIVER)
+              .listFiles()) {
         if (syncFolder.getName().equals(senderName)) {
           recoverComplete &= recover(syncFolder);
         }
@@ -117,8 +116,7 @@ public class SyncReceiverLogAnalyzer implements ISyncReceiverLogAnalyzer {
           } else if (line.equals(LoadLogger.LOAD_TSFILE_START)) {
             loadType = LoadType.ADD;
           } else {
-            while (!syncReader.readLine().equals(line)) {
-            }
+            while (!syncReader.readLine().equals(line)) {}
           }
         }
       }

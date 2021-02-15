@@ -76,9 +76,8 @@ public class SyncSenderLogAnalyzer implements ISyncSenderLogAnalyzer {
         lastLocalFiles.add(line);
       }
     } catch (IOException e) {
-      LOGGER
-          .error("Can not load last local file list from file {}", lastLocalFile.getAbsoluteFile(),
-              e);
+      LOGGER.error(
+          "Can not load last local file list from file {}", lastLocalFile.getAbsoluteFile(), e);
     }
   }
 
@@ -105,9 +104,8 @@ public class SyncSenderLogAnalyzer implements ISyncSenderLogAnalyzer {
         }
       }
     } catch (IOException e) {
-      LOGGER
-          .error("Can not load last local file list from file {}", lastLocalFile.getAbsoluteFile(),
-              e);
+      LOGGER.error(
+          "Can not load last local file list from file {}", lastLocalFile.getAbsoluteFile(), e);
     }
   }
 

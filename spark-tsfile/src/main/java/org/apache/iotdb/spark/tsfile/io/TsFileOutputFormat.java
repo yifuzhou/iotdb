@@ -41,5 +41,4 @@ public class TsFileOutputFormat extends FileOutputFormat<NullWritable, TSRecord>
     Path path = getDefaultWorkFile(job, "");
     return new TsFileRecordWriter(job, path, schema);
   }
-
 }

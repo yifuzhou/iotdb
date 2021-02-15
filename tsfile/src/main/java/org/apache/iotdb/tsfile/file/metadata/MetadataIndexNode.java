@@ -37,9 +37,7 @@ public class MetadataIndexNode {
   private final List<MetadataIndexEntry> children;
   private long endOffset;
 
-  /**
-   * type of the child node at offset
-   */
+  /** type of the child node at offset */
   private final MetadataIndexNodeType nodeType;
 
   public MetadataIndexNode(MetadataIndexNodeType nodeType) {
@@ -48,8 +46,8 @@ public class MetadataIndexNode {
     this.nodeType = nodeType;
   }
 
-  public MetadataIndexNode(List<MetadataIndexEntry> children, long endOffset,
-      MetadataIndexNodeType nodeType) {
+  public MetadataIndexNode(
+      List<MetadataIndexEntry> children, long endOffset, MetadataIndexNodeType nodeType) {
     this.children = children;
     this.endOffset = endOffset;
     this.nodeType = nodeType;
@@ -104,8 +102,8 @@ public class MetadataIndexNode {
       children.add(MetadataIndexEntry.deserializeFrom(buffer));
     }
     long offset = ReadWriteIOUtils.readLong(buffer);
-    MetadataIndexNodeType nodeType = MetadataIndexNodeType
-        .deserialize(ReadWriteIOUtils.readByte(buffer));
+    MetadataIndexNodeType nodeType =
+        MetadataIndexNodeType.deserialize(ReadWriteIOUtils.readByte(buffer));
     return new MetadataIndexNode(children, offset, nodeType);
   }
 

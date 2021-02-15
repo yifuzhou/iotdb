@@ -39,12 +39,10 @@ public class LZ4Test {
   }
 
   @Before
-  public void setUp() {
-  }
+  public void setUp() {}
 
   @After
-  public void tearDown() {
-  }
+  public void tearDown() {}
 
   @Test
   public void testBytes() throws IOException {
@@ -65,5 +63,4 @@ public class LZ4Test {
 
     Assert.assertArrayEquals(uncom, uncompressed);
   }
-
 }

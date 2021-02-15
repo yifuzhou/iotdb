@@ -35,9 +35,7 @@ import org.apache.iotdb.cluster.server.member.RaftMember;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * SimpleSnapshot keeps the committed logs in a memory list.
- */
+/** SimpleSnapshot keeps the committed logs in a memory list. */
 public class SimpleSnapshot extends Snapshot {
 
   private static final Logger logger = LoggerFactory.getLogger(SimpleSnapshot.class);

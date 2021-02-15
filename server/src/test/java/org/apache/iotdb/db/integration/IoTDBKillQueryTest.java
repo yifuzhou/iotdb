@@ -45,13 +45,11 @@ public class IoTDBKillQueryTest {
     EnvironmentUtils.cleanEnv();
   }
 
-  /**
-   * Test killing query with specified query id which is not exist.
-   */
+  /** Test killing query with specified query id which is not exist. */
   @Test
   public void killQueryTest1() {
-    try (Connection connection = DriverManager.
-        getConnection("jdbc:iotdb://127.0.0.1:6667/", "root", "root");
+    try (Connection connection =
+            DriverManager.getConnection("jdbc:iotdb://127.0.0.1:6667/", "root", "root");
         Statement statement = connection.createStatement()) {
 
       statement.execute("kill query 998");
@@ -64,13 +62,11 @@ public class IoTDBKillQueryTest {
     }
   }
 
-  /**
-   * Test killing query without explicit query id. It's supposed to run successfully.
-   */
+  /** Test killing query without explicit query id. It's supposed to run successfully. */
   @Test
   public void killQueryTest2() {
-    try (Connection connection = DriverManager.
-        getConnection("jdbc:iotdb://127.0.0.1:6667/", "root", "root");
+    try (Connection connection =
+            DriverManager.getConnection("jdbc:iotdb://127.0.0.1:6667/", "root", "root");
         Statement statement = connection.createStatement()) {
 
       boolean hasResultSet = statement.execute("kill query");
@@ -80,5 +76,4 @@ public class IoTDBKillQueryTest {
       fail(e.getMessage());
     }
   }
-
 }

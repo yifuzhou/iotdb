@@ -41,7 +41,6 @@ public class MergeManagerTest extends MergeTest {
     assertTrue((System.currentTimeMillis() - startTime) >= 9000);
   }
 
-
   @Test
   public void testGenMergeReport() {
     FakedMergeMultiChunkTask chunkTask = new FakedMergeMultiChunkTask();
@@ -69,8 +68,7 @@ public class MergeManagerTest extends MergeTest {
 
     MergeManager.getINSTANCE().abortMerge("test");
     report = MergeManager.getINSTANCE().genMergeTaskReport();
-    assertEquals(String.format("Main tasks:%n"
-        + "Sub tasks:%n"), report);
+    assertEquals(String.format("Main tasks:%n" + "Sub tasks:%n"), report);
   }
 
   private void checkReport(String report) {
@@ -99,9 +97,7 @@ public class MergeManagerTest extends MergeTest {
     private String progress = "0";
 
     public FakedMainMergeTask(int serialNum) {
-      super(null, null, null, null, false,
-          0,
-          null);
+      super(null, null, null, null, false, 0, null);
       this.serialNum = serialNum;
     }
 
@@ -133,8 +129,7 @@ public class MergeManagerTest extends MergeTest {
   static class FakedMergeMultiChunkTask extends MergeMultiChunkTask {
 
     public FakedMergeMultiChunkTask() {
-      super(null, null, null, null, false, null,
-          0, null);
+      super(null, null, null, null, false, null, 0, null);
     }
 
     public MergeChunkHeapTask createSubTask(int serialNum) {
@@ -176,5 +171,4 @@ public class MergeManagerTest extends MergeTest {
       }
     }
   }
-
 }

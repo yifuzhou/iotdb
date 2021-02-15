@@ -19,6 +19,10 @@
 
 package org.apache.iotdb.tsfile.file.header;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.ByteBuffer;
 import org.apache.iotdb.tsfile.common.conf.TSFileConfig;
 import org.apache.iotdb.tsfile.file.MetaMarker;
 import org.apache.iotdb.tsfile.file.metadata.enums.CompressionType;
@@ -27,19 +31,15 @@ import org.apache.iotdb.tsfile.file.metadata.enums.TSEncoding;
 import org.apache.iotdb.tsfile.read.reader.TsFileInput;
 import org.apache.iotdb.tsfile.utils.ReadWriteForEncodingUtils;
 import org.apache.iotdb.tsfile.utils.ReadWriteIOUtils;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.nio.ByteBuffer;
 
 public class ChunkHeader {
-
 
   /**
    * 1 means this chunk has more than one page, so each page has its own page statistic 5 means this
    * chunk has only one page, and this page has no page statistic
    */
   private byte chunkType;
+
   private String measurementID;
   private int dataSize;
   private TSDataType dataType;
@@ -50,23 +50,49 @@ public class ChunkHeader {
   private int numOfPages;
   private int serializedSize;
 
-  public ChunkHeader(String measurementID, int dataSize, TSDataType dataType,
-      CompressionType compressionType, TSEncoding encoding, int numOfPages) {
-    this(numOfPages <= 1 ? MetaMarker.ONLY_ONE_PAGE_CHUNK_HEADER : MetaMarker.CHUNK_HEADER,
-        measurementID, dataSize, getSerializedSize(measurementID, dataSize), dataType,
+  public ChunkHeader(
+      String measurementID,
+      int dataSize,
+      TSDataType dataType,
+      CompressionType compressionType,
+      TSEncoding encoding,
+      int numOfPages) {
+    this(
+        numOfPages <= 1 ? MetaMarker.ONLY_ONE_PAGE_CHUNK_HEADER : MetaMarker.CHUNK_HEADER,
+        measurementID,
+        dataSize,
+        getSerializedSize(measurementID, dataSize),
+        dataType,
         compressionType,
         encoding);
     this.numOfPages = numOfPages;
   }
 
-  public ChunkHeader(byte chunkType, String measurementID, int dataSize, TSDataType dataType,
-      CompressionType compressionType, TSEncoding encoding) {
-    this(chunkType, measurementID, dataSize, getSerializedSize(measurementID, dataSize), dataType,
-        compressionType, encoding);
+  public ChunkHeader(
+      byte chunkType,
+      String measurementID,
+      int dataSize,
+      TSDataType dataType,
+      CompressionType compressionType,
+      TSEncoding encoding) {
+    this(
+        chunkType,
+        measurementID,
+        dataSize,
+        getSerializedSize(measurementID, dataSize),
+        dataType,
+        compressionType,
+        encoding);
   }
 
-  public ChunkHeader(byte chunkType, String measurementID, int dataSize, int headerSize,
-      TSDataType dataType, CompressionType compressionType, TSEncoding encoding) {
+  public ChunkHeader(
+      byte chunkType,
+      String measurementID,
+      int dataSize,
+      int headerSize,
+      TSDataType dataType,
+      CompressionType compressionType,
+      TSEncoding encoding) {
     this.chunkType = chunkType;
     this.measurementID = measurementID;
     this.dataSize = dataSize;
@@ -76,9 +102,7 @@ public class ChunkHeader {
     this.serializedSize = headerSize;
   }
 
-  /**
-   * the exact serialized size of chunk header
-   */
+  /** the exact serialized size of chunk header */
   public static int getSerializedSize(String measurementID, int dataSize) {
     int measurementIdLength = measurementID.getBytes(TSFileConfig.STRING_CHARSET).length;
     return Byte.BYTES // chunkType
@@ -97,18 +121,17 @@ public class ChunkHeader {
   public static int getSerializedSize(String measurementID) {
 
     int measurementIdLength = measurementID.getBytes(TSFileConfig.STRING_CHARSET).length;
-    return  Byte.BYTES // chunkType
+    return Byte.BYTES // chunkType
         + ReadWriteForEncodingUtils.varIntSize(measurementIdLength) // measurementID length
         + measurementIdLength // measurementID
-        + Integer.BYTES + 1 // uVarInt dataSize
+        + Integer.BYTES
+        + 1 // uVarInt dataSize
         + TSDataType.getSerializedSize() // dataType
         + CompressionType.getSerializedSize() // compressionType
         + TSEncoding.getSerializedSize(); // encodingType
   }
 
-  /**
-   * deserialize from inputStream, the marker has already been read.
-   */
+  /** deserialize from inputStream, the marker has already been read. */
   public static ChunkHeader deserializeFrom(InputStream inputStream, byte chunkType)
       throws IOException {
     // read measurementID
@@ -123,13 +146,14 @@ public class ChunkHeader {
   /**
    * deserialize from TsFileInput, the marker has not been read.
    *
-   * @param input           TsFileInput
-   * @param offset          offset
+   * @param input TsFileInput
+   * @param offset offset
    * @param chunkHeaderSize the estimated size of chunk's header
    * @return CHUNK_HEADER object
    * @throws IOException IOException
    */
-  public static ChunkHeader deserializeFrom(TsFileInput input, long offset, int chunkHeaderSize) throws IOException {
+  public static ChunkHeader deserializeFrom(TsFileInput input, long offset, int chunkHeaderSize)
+      throws IOException {
 
     // read chunk header from input to buffer
     ByteBuffer buffer = ByteBuffer.allocate(chunkHeaderSize);
@@ -145,8 +169,8 @@ public class ChunkHeader {
     TSEncoding encoding = ReadWriteIOUtils.readEncoding(buffer);
     chunkHeaderSize =
         chunkHeaderSize - Integer.BYTES - 1 + ReadWriteForEncodingUtils.uVarIntSize(dataSize);
-    return new ChunkHeader(chunkType, measurementID, dataSize, chunkHeaderSize, dataType, type,
-        encoding);
+    return new ChunkHeader(
+        chunkType, measurementID, dataSize, chunkHeaderSize, dataType, type, encoding);
   }
 
   public int getSerializedSize() {
@@ -214,11 +238,23 @@ public class ChunkHeader {
 
   @Override
   public String toString() {
-    return "CHUNK_HEADER{" + "measurementID='" + measurementID + '\'' + ", dataSize=" + dataSize
+    return "CHUNK_HEADER{"
+        + "measurementID='"
+        + measurementID
+        + '\''
+        + ", dataSize="
+        + dataSize
         + ", dataType="
-        + dataType + ", compressionType=" + compressionType + ", encodingType=" + encodingType
+        + dataType
+        + ", compressionType="
+        + compressionType
+        + ", encodingType="
+        + encodingType
         + ", numOfPages="
-        + numOfPages + ", serializedSize=" + serializedSize + '}';
+        + numOfPages
+        + ", serializedSize="
+        + serializedSize
+        + '}';
   }
 
   public void mergeChunkHeader(ChunkHeader chunkHeader) {

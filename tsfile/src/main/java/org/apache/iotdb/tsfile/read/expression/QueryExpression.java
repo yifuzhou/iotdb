@@ -40,8 +40,7 @@ public class QueryExpression implements Serializable {
     return new QueryExpression();
   }
 
-  public static QueryExpression create(List<Path> selectedSeries,
-      IExpression expression) {
+  public static QueryExpression create(List<Path> selectedSeries, IExpression expression) {
     QueryExpression ret = new QueryExpression();
     ret.selectedSeries = selectedSeries;
     ret.expression = expression;
@@ -77,9 +76,13 @@ public class QueryExpression implements Serializable {
 
   @Override
   public String toString() {
-    StringBuilder stringBuilder = new StringBuilder("\n\t[Selected Series]:").append(selectedSeries)
-        .append("\n\t[TSDataType]:").append(dataTypes).append("\n\t[expression]:")
-        .append(expression);
+    StringBuilder stringBuilder =
+        new StringBuilder("\n\t[Selected Series]:")
+            .append(selectedSeries)
+            .append("\n\t[TSDataType]:")
+            .append(dataTypes)
+            .append("\n\t[expression]:")
+            .append(expression);
     return stringBuilder.toString();
   }
 

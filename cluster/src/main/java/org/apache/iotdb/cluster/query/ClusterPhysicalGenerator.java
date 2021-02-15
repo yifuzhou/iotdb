@@ -53,8 +53,8 @@ public class ClusterPhysicalGenerator extends PhysicalGenerator {
   }
 
   @Override
-  protected Pair<List<TSDataType>, List<TSDataType>> getSeriesTypes(List<PartialPath> paths,
-      String aggregation) throws MetadataException {
+  protected Pair<List<TSDataType>, List<TSDataType>> getSeriesTypes(
+      List<PartialPath> paths, String aggregation) throws MetadataException {
     return getCMManager().getSeriesTypesByPaths(paths, aggregation);
   }
 

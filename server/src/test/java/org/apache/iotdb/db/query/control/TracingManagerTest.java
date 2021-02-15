@@ -64,18 +64,18 @@ public class TracingManagerTest {
   @Test
   public void tracingQueryTest() throws IOException {
     String[] ans = {
-        "Query Id: 10 - Query Statement: " + sql,
-        "Query Id: 10 - Start time: 2020-12-",
-        "Query Id: 10 - Number of series paths: 3",
-        "Query Id: 10 - Query Statement: " + sql,
-        "Query Id: 10 - Start time: 2020-12-",
-        "Query Id: 10 - Number of series paths: 3",
-        "Query Id: 10 - Number of sequence files: 1",
-        "Query Id: 10 - SeqFile_1-1-0.tsfile root.sg.d1[1, 999], root.sg.d2[2, 998]",
-        "Query Id: 10 - Number of unSequence files: 0",
-        "Query Id: 10 - Number of chunks: 3",
-        "Query Id: 10 - Average size of chunks: 1371",
-        "Query Id: 10 - Total cost time: "
+      "Query Id: 10 - Query Statement: " + sql,
+      "Query Id: 10 - Start time: 2020-12-",
+      "Query Id: 10 - Number of series paths: 3",
+      "Query Id: 10 - Query Statement: " + sql,
+      "Query Id: 10 - Start time: 2020-12-",
+      "Query Id: 10 - Number of series paths: 3",
+      "Query Id: 10 - Number of sequence files: 1",
+      "Query Id: 10 - SeqFile_1-1-0.tsfile root.sg.d1[1, 999], root.sg.d2[2, 998]",
+      "Query Id: 10 - Number of unSequence files: 0",
+      "Query Id: 10 - Number of chunks: 3",
+      "Query Id: 10 - Average size of chunks: 1371",
+      "Query Id: 10 - Total cost time: "
     };
     tracingManager.writeQueryInfo(queryId, sql, 1607529600000L);
     tracingManager.writePathsNum(queryId, 3);
@@ -85,8 +85,8 @@ public class TracingManagerTest {
     tracingManager.writeEndTime(queryId);
     tracingManager.close();
 
-    File tracingFile = SystemFileFactory.INSTANCE
-        .getFile(tracingDir + File.separator + IoTDBConstant.TRACING_LOG);
+    File tracingFile =
+        SystemFileFactory.INSTANCE.getFile(tracingDir + File.separator + IoTDBConstant.TRACING_LOG);
     BufferedReader bufferedReader = new BufferedReader(new FileReader(tracingFile));
     String str;
     int cnt = 0;

@@ -64,8 +64,8 @@ public class MetaAsyncService extends BaseAsyncService implements TSMetaService.
   }
 
   @Override
-  public void addNode(Node node, StartUpStatus startUpStatus,
-      AsyncMethodCallback<AddNodeResponse> resultHandler) {
+  public void addNode(
+      Node node, StartUpStatus startUpStatus, AsyncMethodCallback<AddNodeResponse> resultHandler) {
     AddNodeResponse addNodeResponse = null;
     try {
       addNodeResponse = metaGroupMember.addNode(node, startUpStatus);
@@ -98,10 +98,10 @@ public class MetaAsyncService extends BaseAsyncService implements TSMetaService.
   }
 
   @Override
-  public void checkStatus(StartUpStatus startUpStatus,
-      AsyncMethodCallback<CheckStatusResponse> resultHandler) {
-    CheckStatusResponse response = ClusterUtils
-        .checkStatus(startUpStatus, metaGroupMember.getNewStartUpStatus());
+  public void checkStatus(
+      StartUpStatus startUpStatus, AsyncMethodCallback<CheckStatusResponse> resultHandler) {
+    CheckStatusResponse response =
+        ClusterUtils.checkStatus(startUpStatus, metaGroupMember.getNewStartUpStatus());
     resultHandler.onComplete(response);
   }
 
@@ -110,8 +110,8 @@ public class MetaAsyncService extends BaseAsyncService implements TSMetaService.
    *
    * @return true if the forwarding succeeds, false otherwise.
    */
-  private boolean forwardAddNode(Node node, StartUpStatus startUpStatus,
-      AsyncMethodCallback<AddNodeResponse> resultHandler) {
+  private boolean forwardAddNode(
+      Node node, StartUpStatus startUpStatus, AsyncMethodCallback<AddNodeResponse> resultHandler) {
     TSMetaService.AsyncClient client =
         (TSMetaService.AsyncClient) metaGroupMember.getAsyncClient(metaGroupMember.getLeader());
     if (client != null) {
@@ -157,8 +157,8 @@ public class MetaAsyncService extends BaseAsyncService implements TSMetaService.
 
     if (metaGroupMember.getCharacter() == NodeCharacter.FOLLOWER
         && metaGroupMember.getLeader() != null) {
-      logger.info("Forward the node removal request of {} to leader {}", node,
-          metaGroupMember.getLeader());
+      logger.info(
+          "Forward the node removal request of {} to leader {}", node, metaGroupMember.getLeader());
       if (forwardRemoveNode(node, resultHandler)) {
         return;
       }
@@ -169,7 +169,7 @@ public class MetaAsyncService extends BaseAsyncService implements TSMetaService.
   /**
    * Forward a node removal request to the leader.
    *
-   * @param node          the node to be removed
+   * @param node the node to be removed
    * @param resultHandler
    * @return true if the request is successfully forwarded, false otherwise
    */

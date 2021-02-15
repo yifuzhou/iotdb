@@ -35,7 +35,8 @@ public class ClusterFillExecutor extends FillQueryExecutor {
 
   private MetaGroupMember metaGroupMember;
 
-  public ClusterFillExecutor(List<PartialPath> selectedSeries,
+  public ClusterFillExecutor(
+      List<PartialPath> selectedSeries,
       List<TSDataType> dataTypes,
       long queryTime,
       Map<TSDataType, IFill> typeIFillMap,
@@ -45,8 +46,13 @@ public class ClusterFillExecutor extends FillQueryExecutor {
   }
 
   @Override
-  protected IFill configureFill(IFill fill, PartialPath path, TSDataType dataType, long queryTime,
-      Set<String> deviceMeasurements, QueryContext context) {
+  protected IFill configureFill(
+      IFill fill,
+      PartialPath path,
+      TSDataType dataType,
+      long queryTime,
+      Set<String> deviceMeasurements,
+      QueryContext context) {
     if (fill instanceof LinearFill) {
       IFill clusterFill = new ClusterLinearFill((LinearFill) fill, metaGroupMember);
       clusterFill.configureFill(path, dataType, queryTime, deviceMeasurements, context);

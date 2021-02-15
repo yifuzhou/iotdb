@@ -49,15 +49,17 @@ public class DataClientProviderTest {
     Node node = new Node();
     node.setDataPort(9003).setIp("localhost");
     ServerSocket serverSocket = new ServerSocket(node.getDataPort());
-    Thread listenThread = new Thread(() -> {
-      while (!Thread.interrupted()) {
-        try {
-          serverSocket.accept();
-        } catch (IOException e) {
-          return;
-        }
-      }
-    });
+    Thread listenThread =
+        new Thread(
+            () -> {
+              while (!Thread.interrupted()) {
+                try {
+                  serverSocket.accept();
+                } catch (IOException e) {
+                  return;
+                }
+              }
+            });
     listenThread.start();
 
     try {

@@ -22,9 +22,7 @@ import java.util.Map;
 import org.apache.iotdb.db.index.common.IndexType;
 import org.apache.iotdb.db.qp.logical.crud.SFWOperator;
 
-/**
- * this operator is to create a certain index on some time series.
- */
+/** this operator is to create a certain index on some time series. */
 public class CreateIndexOperator extends SFWOperator {
 
   private Map<String, String> props;

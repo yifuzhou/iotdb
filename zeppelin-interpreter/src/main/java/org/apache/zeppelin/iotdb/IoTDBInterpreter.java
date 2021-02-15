@@ -16,7 +16,6 @@
  */
 package org.apache.zeppelin.iotdb;
 
-
 import static org.apache.iotdb.rpc.IoTDBRpcDataSet.TIMESTAMP_STR;
 import static org.apache.iotdb.rpc.RpcUtils.setTimeFormat;
 
@@ -75,11 +74,9 @@ public class IoTDBInterpreter extends AbstractInterpreter {
   private static final String SEMICOLON = ";";
   private static final String EQUAL_SIGN = "=";
 
-
-  /**
-   * should be consistent with IoTDB client
-   */
+  /** should be consistent with IoTDB client */
   private static final String QUIT_COMMAND = "quit";
+
   private static final String EXIT_COMMAND = "exit";
   private static final String HELP = "help";
   private static final String IMPORT_CMD = "import";
@@ -91,9 +88,20 @@ public class IoTDBInterpreter extends AbstractInterpreter {
   private static final String SET_FETCH_SIZE = "set fetch_size";
   private static final String SHOW_FETCH_SIZE = "show fetch_size";
 
-  private static final Set<String> nonSupportCommandSet = new HashSet<>(
-      Arrays.asList(QUIT_COMMAND, EXIT_COMMAND, HELP, IMPORT_CMD, SET_TIME_ZONE, SET_FETCH_SIZE,
-          SET_MAX_DISPLAY_NUM, SHOW_TIMEZONE, SHOW_TIMESTAMP_DISPLAY, SHOW_FETCH_SIZE, IMPORT_CMD));
+  private static final Set<String> nonSupportCommandSet =
+      new HashSet<>(
+          Arrays.asList(
+              QUIT_COMMAND,
+              EXIT_COMMAND,
+              HELP,
+              IMPORT_CMD,
+              SET_TIME_ZONE,
+              SET_FETCH_SIZE,
+              SET_MAX_DISPLAY_NUM,
+              SHOW_TIMEZONE,
+              SHOW_TIMESTAMP_DISPLAY,
+              SHOW_FETCH_SIZE,
+              IMPORT_CMD));
 
   private String timeFormat;
 
@@ -101,7 +109,6 @@ public class IoTDBInterpreter extends AbstractInterpreter {
   private IoTDBConnection connection = null;
   private int fetchSize;
   private ZoneId zoneId;
-
 
   public IoTDBInterpreter(Properties property) {
     super(property);
@@ -117,19 +124,24 @@ public class IoTDBInterpreter extends AbstractInterpreter {
       port = Integer.parseInt(getProperty(IOTDB_PORT, DEFAULT_PORT).trim());
       userName = properties.getProperty(IOTDB_USERNAME, NONE_VALUE).trim();
       passWord = properties.getProperty(IOTDB_PASSWORD, NONE_VALUE).trim();
-      this.fetchSize = Integer
-          .parseInt(properties.getProperty(IOTDB_FETCH_SIZE, DEFAULT_FETCH_SIZE).trim());
+      this.fetchSize =
+          Integer.parseInt(properties.getProperty(IOTDB_FETCH_SIZE, DEFAULT_FETCH_SIZE).trim());
 
-      String timeDisplayType = properties.getProperty(IOTDB_TIME_DISPLAY_TYPE,
-          DEFAULT_TIME_DISPLAY_TYPE).trim();
+      String timeDisplayType =
+          properties.getProperty(IOTDB_TIME_DISPLAY_TYPE, DEFAULT_TIME_DISPLAY_TYPE).trim();
       this.timeFormat = setTimeFormat(timeDisplayType);
-      Config.rpcThriftCompressionEnable = "true".equalsIgnoreCase(
-          properties.getProperty(IOTDB_ENABLE_RPC_COMPRESSION,
-              DEFAULT_ENABLE_RPC_COMPRESSION).trim());
+      Config.rpcThriftCompressionEnable =
+          "true"
+              .equalsIgnoreCase(
+                  properties
+                      .getProperty(IOTDB_ENABLE_RPC_COMPRESSION, DEFAULT_ENABLE_RPC_COMPRESSION)
+                      .trim());
 
       Class.forName(Config.JDBC_DRIVER_NAME);
-      this.connection = (IoTDBConnection) DriverManager
-          .getConnection(Config.IOTDB_URL_PREFIX + host + ":" + port + "/", userName, passWord);
+      this.connection =
+          (IoTDBConnection)
+              DriverManager.getConnection(
+                  Config.IOTDB_URL_PREFIX + host + ":" + port + "/", userName, passWord);
       String zoneStr = properties.getProperty(IOTDB_ZONE_ID);
       if (!NONE_VALUE.equalsIgnoreCase(zoneStr) && StringUtils.isNotBlank(zoneStr)) {
         this.zoneId = ZoneId.of(zoneStr.trim());
@@ -169,8 +181,8 @@ public class IoTDBInterpreter extends AbstractInterpreter {
   @Override
   protected InterpreterResult internalInterpret(String st, InterpreterContext context) {
     if (connectionException != null) {
-      return new InterpreterResult(Code.ERROR,
-          "IoTDBConnectionException: " + connectionException.getMessage());
+      return new InterpreterResult(
+          Code.ERROR, "IoTDBConnectionException: " + connectionException.getMessage());
     }
     try {
       String[] scriptLines = parseMultiLinesSQL(st);
@@ -195,13 +207,12 @@ public class IoTDBInterpreter extends AbstractInterpreter {
       String[] values = cmd.split(EQUAL_SIGN);
       if (values.length != 2) {
         throw new StatementExecutionException(
-            String.format("Time display format error, please input like %s=ISO8601",
-                SET_TIMESTAMP_DISPLAY));
+            String.format(
+                "Time display format error, please input like %s=ISO8601", SET_TIMESTAMP_DISPLAY));
       }
       String timeDisplayType = values[1].trim();
       this.timeFormat = setTimeFormat(values[1]);
-      return new InterpreterResult(Code.SUCCESS, "Time display type has set to " +
-          timeDisplayType);
+      return new InterpreterResult(Code.SUCCESS, "Time display type has set to " + timeDisplayType);
     }
     return executeQuery(connection, cmd);
   }
@@ -214,8 +225,9 @@ public class IoTDBInterpreter extends AbstractInterpreter {
       InterpreterResult interpreterResult;
       if (hasResultSet) {
         try (ResultSet resultSet = statement.getResultSet()) {
-          boolean printTimestamp = resultSet instanceof IoTDBJDBCResultSet &&
-              !((IoTDBJDBCResultSet) resultSet).isIgnoreTimeStamp();
+          boolean printTimestamp =
+              resultSet instanceof IoTDBJDBCResultSet
+                  && !((IoTDBJDBCResultSet) resultSet).isIgnoreTimeStamp();
           final ResultSetMetaData metaData = resultSet.getMetaData();
           final int columnCount = metaData.getColumnCount();
 
@@ -228,12 +240,15 @@ public class IoTDBInterpreter extends AbstractInterpreter {
           while (resultSet.next()) {
             for (int i = 1; i <= columnCount; i++) {
               if (printTimestamp && i == 1) {
-                stringBuilder.append(RpcUtils.formatDatetime(timeFormat,
-                    RpcUtils.DEFAULT_TIMESTAMP_PRECISION, resultSet.getLong(TIMESTAMP_STR),
-                    zoneId));
+                stringBuilder.append(
+                    RpcUtils.formatDatetime(
+                        timeFormat,
+                        RpcUtils.DEFAULT_TIMESTAMP_PRECISION,
+                        resultSet.getLong(TIMESTAMP_STR),
+                        zoneId));
               } else {
-                stringBuilder
-                    .append(Optional.ofNullable(resultSet.getString(i)).orElse(NULL_ITEM).trim());
+                stringBuilder.append(
+                    Optional.ofNullable(resultSet.getString(i)).orElse(NULL_ITEM).trim());
               }
               stringBuilder.append(TAB);
             }
@@ -272,10 +287,8 @@ public class IoTDBInterpreter extends AbstractInterpreter {
   }
 
   static String[] parseMultiLinesSQL(String sql) {
-    String[] tmp = sql.replace(TAB, WHITESPACE).replace(NEWLINE, WHITESPACE).trim()
-        .split(SEMICOLON);
+    String[] tmp =
+        sql.replace(TAB, WHITESPACE).replace(NEWLINE, WHITESPACE).trim().split(SEMICOLON);
     return Arrays.stream(tmp).map(String::trim).toArray(String[]::new);
   }
-
 }
-

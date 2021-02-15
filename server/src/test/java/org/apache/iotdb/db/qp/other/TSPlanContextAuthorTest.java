@@ -23,8 +23,6 @@ import static org.junit.Assert.fail;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.stream.Collector;
-import java.util.stream.Collectors;
 import org.apache.iotdb.db.exception.query.QueryProcessException;
 import org.apache.iotdb.db.metadata.PartialPath;
 import org.apache.iotdb.db.qp.Planner;
@@ -35,14 +33,12 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
-/**
- * test ast node parsing on authorization
- */
+/** test ast node parsing on authorization */
 @RunWith(Parameterized.class)
 public class TSPlanContextAuthorTest {
 
-  private static Path[] emptyPaths = new Path[]{};
-  private static Path[] testPaths = new Path[]{new Path("root.node1.a", "b")};
+  private static Path[] emptyPaths = new Path[] {};
+  private static Path[] testPaths = new Path[] {new Path("root.node1.a", "b")};
 
   private String inputSQL;
   private Path[] paths;
@@ -54,18 +50,31 @@ public class TSPlanContextAuthorTest {
 
   @Parameters
   public static Collection<Object[]> data() {
-    return Arrays.asList(new Object[][]{{"CREATE USER username1 'password1'", emptyPaths},
-        {"DROP USER username", emptyPaths}, {"CREATE ROLE rolename", emptyPaths},
-        {"DROP ROLE rolename", emptyPaths},
-        {"GRANT USER username PRIVILEGES 'SET_STORAGE_GROUP','INSERT_TIMESERIES' ON root.node1.a.b",
-            testPaths},
-        {"REVOKE USER username PRIVILEGES 'SET_STORAGE_GROUP','INSERT_TIMESERIES' ON root.node1.a.b",
-            testPaths},
-        {"GRANT ROLE rolename PRIVILEGES 'SET_STORAGE_GROUP','INSERT_TIMESERIES' ON root.node1.a.b",
-            testPaths},
-        {"REVOKE ROLE rolename PRIVILEGES 'SET_STORAGE_GROUP','INSERT_TIMESERIES' ON root.node1.a.b",
-            testPaths},
-        {"GRANT rolename TO username", emptyPaths}, {"REVOKE rolename FROM username", emptyPaths}});
+    return Arrays.asList(
+        new Object[][] {
+          {"CREATE USER username1 'password1'", emptyPaths},
+          {"DROP USER username", emptyPaths},
+          {"CREATE ROLE rolename", emptyPaths},
+          {"DROP ROLE rolename", emptyPaths},
+          {
+            "GRANT USER username PRIVILEGES 'SET_STORAGE_GROUP','INSERT_TIMESERIES' ON root.node1.a.b",
+            testPaths
+          },
+          {
+            "REVOKE USER username PRIVILEGES 'SET_STORAGE_GROUP','INSERT_TIMESERIES' ON root.node1.a.b",
+            testPaths
+          },
+          {
+            "GRANT ROLE rolename PRIVILEGES 'SET_STORAGE_GROUP','INSERT_TIMESERIES' ON root.node1.a.b",
+            testPaths
+          },
+          {
+            "REVOKE ROLE rolename PRIVILEGES 'SET_STORAGE_GROUP','INSERT_TIMESERIES' ON root.node1.a.b",
+            testPaths
+          },
+          {"GRANT rolename TO username", emptyPaths},
+          {"REVOKE rolename FROM username", emptyPaths}
+        });
   }
 
   @Test
@@ -77,5 +86,4 @@ public class TSPlanContextAuthorTest {
     }
     assertArrayEquals(paths, author.getPaths().stream().map(PartialPath::toTSFilePath).toArray());
   }
-
 }

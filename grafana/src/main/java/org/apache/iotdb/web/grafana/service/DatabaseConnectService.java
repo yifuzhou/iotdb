@@ -30,5 +30,4 @@ public interface DatabaseConnectService {
   List<TimeValues> querySeries(String s, Pair<ZonedDateTime, ZonedDateTime> timeRange);
 
   List<String> getMetaData();
-
 }

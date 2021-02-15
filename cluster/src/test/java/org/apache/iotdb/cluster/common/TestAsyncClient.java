@@ -37,8 +37,11 @@ public class TestAsyncClient extends AsyncClient {
     this.serialNum = serialNum;
   }
 
-  TestAsyncClient(TProtocolFactory protocolFactory, TAsyncClientManager clientManager,
-      TNonblockingTransport transport, int serialNum) {
+  TestAsyncClient(
+      TProtocolFactory protocolFactory,
+      TAsyncClientManager clientManager,
+      TNonblockingTransport transport,
+      int serialNum) {
     super(protocolFactory, clientManager, transport);
     this.serialNum = serialNum;
   }
@@ -46,5 +49,4 @@ public class TestAsyncClient extends AsyncClient {
   public int getSerialNum() {
     return serialNum;
   }
-
 }

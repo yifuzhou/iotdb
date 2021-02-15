@@ -70,7 +70,6 @@ public class CachedPriorityMergeReader extends PriorityMergeReader {
     }
   }
 
-
   @Override
   public TimeValuePair nextTimeValuePair() throws IOException {
     TimeValuePair ret;

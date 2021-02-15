@@ -17,7 +17,6 @@
  * under the License.
  */
 
-
 package org.apache.iotdb.cluster.server.heartbeat;
 
 import java.net.InetSocketAddress;
@@ -37,17 +36,13 @@ public class DataHeartbeatServer extends HeartbeatServer {
 
   private DataClusterServer dataClusterServer;
 
-  /**
-   * Do not use this method for initialization
-   */
-  private DataHeartbeatServer() {
-  }
+  /** Do not use this method for initialization */
+  private DataHeartbeatServer() {}
 
   public DataHeartbeatServer(Node thisNode, DataClusterServer dataClusterServer) {
     super(thisNode);
     this.dataClusterServer = dataClusterServer;
   }
-
 
   @Override
   TProcessor getProcessor() {
@@ -61,12 +56,16 @@ public class DataHeartbeatServer extends HeartbeatServer {
   @Override
   TServerTransport getHeartbeatServerSocket() throws TTransportException {
     if (ClusterDescriptor.getInstance().getConfig().isUseAsyncServer()) {
-      return new TNonblockingServerSocket(new InetSocketAddress(config.getClusterRpcIp(),
-          thisNode.getDataPort() + ClusterUtils.DATA_HEARTBEAT_PORT_OFFSET),
+      return new TNonblockingServerSocket(
+          new InetSocketAddress(
+              config.getClusterRpcIp(),
+              thisNode.getDataPort() + ClusterUtils.DATA_HEARTBEAT_PORT_OFFSET),
           getConnectionTimeoutInMS());
     } else {
-      return new TServerSocket(new InetSocketAddress(config.getClusterRpcIp(),
-          thisNode.getDataPort() + ClusterUtils.DATA_HEARTBEAT_PORT_OFFSET));
+      return new TServerSocket(
+          new InetSocketAddress(
+              config.getClusterRpcIp(),
+              thisNode.getDataPort() + ClusterUtils.DATA_HEARTBEAT_PORT_OFFSET));
     }
   }
 

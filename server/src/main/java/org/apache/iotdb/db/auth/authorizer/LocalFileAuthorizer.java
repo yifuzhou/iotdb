@@ -31,7 +31,8 @@ public class LocalFileAuthorizer extends BasicAuthorizer {
   private static final IoTDBConfig config = IoTDBDescriptor.getInstance().getConfig();
 
   public LocalFileAuthorizer() throws AuthException {
-    super(new LocalFileUserManager(config.getSystemDir() + File.separator + "users"),
+    super(
+        new LocalFileUserManager(config.getSystemDir() + File.separator + "users"),
         new LocalFileRoleManager(config.getSystemDir() + File.separator + "roles"));
   }
 
@@ -39,6 +40,4 @@ public class LocalFileAuthorizer extends BasicAuthorizer {
   boolean isAdmin(String username) {
     return IoTDBConstant.ADMIN_NAME.equals(username);
   }
-
-
 }

@@ -34,35 +34,43 @@ public class InsertRowsOfOneDevicePlan extends InsertPlan {
 
   private InsertRowPlan[] rowPlans;
 
-  public InsertRowsOfOneDevicePlan(PartialPath deviceId, Long[] insertTimes,
+  public InsertRowsOfOneDevicePlan(
+      PartialPath deviceId,
+      Long[] insertTimes,
       List<List<String>> measurements,
-      ByteBuffer[] insertValues) throws QueryProcessException {
+      ByteBuffer[] insertValues)
+      throws QueryProcessException {
     super(OperatorType.BATCH_INSERT_ONE_DEVICE);
     this.deviceId = deviceId;
     rowPlans = new InsertRowPlan[insertTimes.length];
     for (int i = 0; i < insertTimes.length; i++) {
-      for(ByteBuffer b : insertValues){
+      for (ByteBuffer b : insertValues) {
         b.toString();
       }
-      rowPlans[i] = new InsertRowPlan(deviceId, insertTimes[i], measurements.get(i).toArray(new String[0]), insertValues[i]);
+      rowPlans[i] =
+          new InsertRowPlan(
+              deviceId,
+              insertTimes[i],
+              measurements.get(i).toArray(new String[0]),
+              insertValues[i]);
       if (rowPlans[i].getMeasurements().length == 0) {
         throw new QueryProcessException(
-            "The measurements are null, deviceId:" + deviceId
-                + ", time:" + insertTimes[i]);
+            "The measurements are null, deviceId:" + deviceId + ", time:" + insertTimes[i]);
       }
       if (rowPlans[i].getValues().length == 0) {
         throw new QueryProcessException(
-            "The size of values in InsertRowsOfOneDevicePlan is 0, deviceId:" + deviceId
-                + ", time:" + insertTimes[i]);
+            "The size of values in InsertRowsOfOneDevicePlan is 0, deviceId:"
+                + deviceId
+                + ", time:"
+                + insertTimes[i]);
       }
     }
   }
 
   @Override
-  public void checkIntegrity() {
-  }
+  public void checkIntegrity() {}
 
-  //TODO I see InsertRowPlan rewrites the hashCode, but do we need to rewrite hashCode?
+  // TODO I see InsertRowPlan rewrites the hashCode, but do we need to rewrite hashCode?
 
   @Override
   public List<PartialPath> getPaths() {
@@ -97,7 +105,6 @@ public class InsertRowsOfOneDevicePlan extends InsertPlan {
     }
   }
 
-
   @Override
   public void serialize(ByteBuffer buffer) {
     int type = PhysicalPlanType.INSERT.ordinal();
@@ -117,7 +124,7 @@ public class InsertRowsOfOneDevicePlan extends InsertPlan {
 
     this.deviceId = new PartialPath(readString(buffer));
     this.rowPlans = new InsertRowPlan[buffer.getInt()];
-    for (int i = 0; i < rowPlans.length; i ++) {
+    for (int i = 0; i < rowPlans.length; i++) {
       rowPlans[i] = new InsertRowPlan();
       rowPlans[i].setDeviceId(deviceId);
       rowPlans[i].setTime(buffer.getLong());
@@ -127,9 +134,8 @@ public class InsertRowsOfOneDevicePlan extends InsertPlan {
 
   @Override
   public String toString() {
-    return "deviceId: " + deviceId + ", times: " + rowPlans.length ;
+    return "deviceId: " + deviceId + ", times: " + rowPlans.length;
   }
-
 
   @Override
   public InsertPlan getPlanFromFailed() {
@@ -146,9 +152,7 @@ public class InsertRowsOfOneDevicePlan extends InsertPlan {
     return this;
   }
 
-
   public InsertRowPlan[] getRowPlans() {
     return rowPlans;
   }
-
 }

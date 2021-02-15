@@ -19,7 +19,6 @@
 
 package org.apache.iotdb.db.engine.version;
 
-
 import static org.junit.Assert.assertEquals;
 
 import java.io.File;
@@ -43,11 +42,11 @@ public class SimpleFileVersionControllerTest {
       for (int i = 0; i < 150; i++) {
         versionController.nextVersion();
       }
-      assertEquals(SimpleFileVersionController.getSaveInterval() + 150,
-          versionController.currVersion());
+      assertEquals(
+          SimpleFileVersionController.getSaveInterval() + 150, versionController.currVersion());
       versionController = new SimpleFileVersionController(tempFilePath, 1);
-      assertEquals(SimpleFileVersionController.getSaveInterval() + 200,
-          versionController.currVersion());
+      assertEquals(
+          SimpleFileVersionController.getSaveInterval() + 200, versionController.currVersion());
     } finally {
       FileUtils.deleteDirectory(new File(tempFilePath));
     }

@@ -25,9 +25,7 @@ import org.apache.iotdb.db.metadata.PartialPath;
 import org.apache.iotdb.db.qp.logical.Operator;
 import org.apache.iotdb.db.query.udf.core.context.UDFContext;
 
-/**
- * this class maintains information from select clause.
- */
+/** this class maintains information from select clause. */
 public final class SelectOperator extends Operator {
 
   private final ZoneId zoneId;
@@ -39,9 +37,7 @@ public final class SelectOperator extends Operator {
   private boolean udfQuery;
   private boolean hasBuiltinAggregation;
 
-  /**
-   * init with tokenIntType, default operatorType is <code>OperatorType.SELECT</code>.
-   */
+  /** init with tokenIntType, default operatorType is <code>OperatorType.SELECT</code>. */
   public SelectOperator(int tokenIntType, ZoneId zoneId) {
     super(tokenIntType);
     this.zoneId = zoneId;

@@ -18,9 +18,8 @@
  */
 package org.apache.iotdb.tsfile.read.reader;
 
-import org.apache.iotdb.tsfile.read.TimeValuePair;
-
 import java.io.IOException;
+import org.apache.iotdb.tsfile.read.TimeValuePair;
 
 public interface IPointReader {
 

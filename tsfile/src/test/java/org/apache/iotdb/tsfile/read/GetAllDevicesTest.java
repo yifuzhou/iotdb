@@ -71,14 +71,13 @@ public class GetAllDevicesTest {
     FileGenerator.generateFile(10000, deviceNum, measurementNum);
     try (TsFileSequenceReader fileReader = new TsFileSequenceReader(FILE_PATH)) {
 
-        List<String> devices = fileReader.getAllDevices();
-        Assert.assertEquals(deviceNum, devices.size());
-        for (int i = 0; i < deviceNum; i++) {
-          Assert.assertTrue(devices.contains("d" + i));
-        }
+      List<String> devices = fileReader.getAllDevices();
+      Assert.assertEquals(deviceNum, devices.size());
+      for (int i = 0; i < deviceNum; i++) {
+        Assert.assertTrue(devices.contains("d" + i));
+      }
 
       FileGenerator.after();
     }
   }
-
 }

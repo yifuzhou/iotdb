@@ -58,9 +58,13 @@ public abstract class PartitionedSnapshotLogManager<T extends Snapshot> extends 
   Node thisNode;
   DataGroupMember dataGroupMember;
 
-
-  protected PartitionedSnapshotLogManager(LogApplier logApplier, PartitionTable partitionTable,
-      Node header, Node thisNode, SnapshotFactory<T> factory, DataGroupMember dataGroupMember) {
+  protected PartitionedSnapshotLogManager(
+      LogApplier logApplier,
+      PartitionTable partitionTable,
+      Node header,
+      Node thisNode,
+      SnapshotFactory<T> factory,
+      DataGroupMember dataGroupMember) {
     super(new SyncLogDequeSerializer(header.nodeIdentifier), logApplier, header.toString());
     this.partitionTable = partitionTable;
     this.factory = factory;
@@ -88,11 +92,13 @@ public abstract class PartitionedSnapshotLogManager<T extends Snapshot> extends 
     List<StorageGroupMNode> allSgNodes = IoTDB.metaManager.getAllStorageGroupNodes();
     for (MNode sgNode : allSgNodes) {
       String storageGroupName = sgNode.getFullPath();
-      int slot = SlotPartitionTable.getSlotStrategy().calculateSlotByTime(storageGroupName, 0,
-          ((SlotPartitionTable) partitionTable).getTotalSlotNumbers());
+      int slot =
+          SlotPartitionTable.getSlotStrategy()
+              .calculateSlotByTime(
+                  storageGroupName, 0, ((SlotPartitionTable) partitionTable).getTotalSlotNumbers());
 
-      Collection<TimeseriesSchema> schemas = slotTimeseries.computeIfAbsent(slot,
-          s -> new HashSet<>());
+      Collection<TimeseriesSchema> schemas =
+          slotTimeseries.computeIfAbsent(slot, s -> new HashSet<>());
       IoTDB.metaManager.collectTimeseriesSchema(sgNode, schemas);
       logger.debug("{}: {} timeseries are snapshot in slot {}", getName(), schemas.size(), slot);
     }

@@ -31,12 +31,13 @@ public class QueryDataSource {
   private List<TsFileResource> seqResources;
   private List<TsFileResource> unseqResources;
 
-  /**
-   * data older than currentTime - dataTTL should be ignored.
-   */
+  /** data older than currentTime - dataTTL should be ignored. */
   private long dataTTL = Long.MAX_VALUE;
 
-  public QueryDataSource(PartialPath seriesPath, List<TsFileResource> seqResources, List<TsFileResource> unseqResources) {
+  public QueryDataSource(
+      PartialPath seriesPath,
+      List<TsFileResource> seqResources,
+      List<TsFileResource> unseqResources) {
     this.seriesPath = seriesPath;
     this.seqResources = seqResources;
     this.unseqResources = unseqResources;
@@ -62,14 +63,11 @@ public class QueryDataSource {
     this.dataTTL = dataTTL;
   }
 
-  /**
-   * @return an updated filter concerning TTL
-   */
+  /** @return an updated filter concerning TTL */
   public Filter updateFilterUsingTTL(Filter filter) {
     if (dataTTL != Long.MAX_VALUE) {
       if (filter != null) {
-        filter = new AndFilter(filter, TimeFilter.gtEq(System.currentTimeMillis() -
-            dataTTL));
+        filter = new AndFilter(filter, TimeFilter.gtEq(System.currentTimeMillis() - dataTTL));
       } else {
         filter = TimeFilter.gtEq(System.currentTimeMillis() - dataTTL);
       }

@@ -54,20 +54,25 @@ public class ClusterQueryRouter extends QueryRouter {
   }
 
   @Override
-  protected FillQueryExecutor getFillExecutor(List<PartialPath> fillPaths, List<TSDataType> dataTypes,
-      long queryTime, Map<TSDataType, IFill> fillType) {
+  protected FillQueryExecutor getFillExecutor(
+      List<PartialPath> fillPaths,
+      List<TSDataType> dataTypes,
+      long queryTime,
+      Map<TSDataType, IFill> fillType) {
     return new ClusterFillExecutor(fillPaths, dataTypes, queryTime, fillType, metaGroupMember);
   }
 
   @Override
   protected GroupByWithoutValueFilterDataSet getGroupByWithoutValueFilterDataSet(
-      QueryContext context, GroupByTimePlan plan) throws StorageEngineException, QueryProcessException {
+      QueryContext context, GroupByTimePlan plan)
+      throws StorageEngineException, QueryProcessException {
     return new ClusterGroupByNoVFilterDataSet(context, plan, metaGroupMember);
   }
 
   @Override
-  protected GroupByWithValueFilterDataSet getGroupByWithValueFilterDataSet(QueryContext context,
-      GroupByTimePlan plan) throws StorageEngineException, QueryProcessException {
+  protected GroupByWithValueFilterDataSet getGroupByWithValueFilterDataSet(
+      QueryContext context, GroupByTimePlan plan)
+      throws StorageEngineException, QueryProcessException {
     return new ClusterGroupByVFilterDataSet(context, plan, metaGroupMember);
   }
 

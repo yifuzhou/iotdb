@@ -28,12 +28,12 @@ import static org.junit.Assert.assertNull;
 
 import java.io.File;
 import java.io.IOException;
-import org.apache.iotdb.db.utils.EnvironmentUtils;
 import org.apache.iotdb.cluster.common.TestUtils;
 import org.apache.iotdb.cluster.config.ClusterDescriptor;
 import org.apache.iotdb.cluster.partition.slot.SlotManager;
 import org.apache.iotdb.cluster.rpc.thrift.Node;
 import org.apache.iotdb.db.exception.StorageEngineException;
+import org.apache.iotdb.db.utils.EnvironmentUtils;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -59,16 +59,19 @@ public class SlotManagerTest {
   public void waitSlot() {
     slotManager.waitSlot(0);
     slotManager.setToPulling(0, null);
-    new Thread(() -> {
-      try {
-        Thread.sleep(200);
-        slotManager.setToNull(0);
-      } catch (InterruptedException e) {
-        e.printStackTrace();
-      }
-    }).start();
+    new Thread(
+            () -> {
+              try {
+                Thread.sleep(200);
+                slotManager.setToNull(0);
+              } catch (InterruptedException e) {
+                e.printStackTrace();
+              }
+            })
+        .start();
     slotManager.waitSlot(0);
-    ClusterDescriptor.getInstance().getConfig()
+    ClusterDescriptor.getInstance()
+        .getConfig()
         .setEnableRaftLogPersistence(prevEnableLogPersistence);
     ClusterDescriptor.getInstance().getConfig().setReplicationNum(prevReplicaNum);
   }
@@ -79,14 +82,16 @@ public class SlotManagerTest {
     slotManager.setToPullingWritable(0);
     slotManager.waitSlotForWrite(0);
     slotManager.setToPulling(0, null);
-    new Thread(() -> {
-      try {
-        Thread.sleep(200);
-        slotManager.setToNull(0);
-      } catch (InterruptedException e) {
-        e.printStackTrace();
-      }
-    }).start();
+    new Thread(
+            () -> {
+              try {
+                Thread.sleep(200);
+                slotManager.setToNull(0);
+              } catch (InterruptedException e) {
+                e.printStackTrace();
+              }
+            })
+        .start();
     slotManager.waitSlotForWrite(0);
   }
 
@@ -139,11 +144,10 @@ public class SlotManagerTest {
     } finally {
       EnvironmentUtils.cleanDir(dummyMemberDir.getPath());
     }
-
   }
-//
-//  @After
-//  public void tearDown() throws Exception {
-//    EnvironmentUtils.cleanAllDir();
-//  }
+  //
+  //  @After
+  //  public void tearDown() throws Exception {
+  //    EnvironmentUtils.cleanAllDir();
+  //  }
 }

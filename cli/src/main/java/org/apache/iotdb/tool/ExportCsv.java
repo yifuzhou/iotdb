@@ -72,9 +72,7 @@ public class ExportCsv extends AbstractCsvTool {
 
   private static final int EXPORT_PER_LINE_COUNT = 10000;
 
-  /**
-   * main function of export csv tool.
-   */
+  /** main function of export csv tool. */
   public static void main(String[] args) throws IOException {
     Options options = createOptions();
     HelpFormatter hf = new HelpFormatter();
@@ -137,15 +135,14 @@ public class ExportCsv extends AbstractCsvTool {
         try {
           session.close();
         } catch (IoTDBConnectionException e) {
-          System.out
-              .println("Encounter an error when closing session, error is: " + e.getMessage());
+          System.out.println(
+              "Encounter an error when closing session, error is: " + e.getMessage());
         }
       }
     }
   }
 
-  private static void parseSpecialParams(CommandLine commandLine)
-      throws ArgsErrorException {
+  private static void parseSpecialParams(CommandLine commandLine) throws ArgsErrorException {
     targetDirectory = checkRequiredArg(TARGET_DIR_ARGS, TARGET_DIR_NAME, commandLine);
     targetFile = commandLine.getOptionValue(TARGET_FILE_ARGS);
     if (targetFile == null) {
@@ -169,33 +166,56 @@ public class ExportCsv extends AbstractCsvTool {
   private static Options createOptions() {
     Options options = createNewOptions();
 
-    Option opTargetFile = Option.builder(TARGET_DIR_ARGS).required().argName(TARGET_DIR_NAME)
-        .hasArg()
-        .desc("Target File Directory (required)").build();
+    Option opTargetFile =
+        Option.builder(TARGET_DIR_ARGS)
+            .required()
+            .argName(TARGET_DIR_NAME)
+            .hasArg()
+            .desc("Target File Directory (required)")
+            .build();
     options.addOption(opTargetFile);
 
-    Option targetFileName = Option.builder(TARGET_FILE_ARGS).argName(TARGET_FILE_NAME).hasArg()
-        .desc("Export file name (optional)").build();
+    Option targetFileName =
+        Option.builder(TARGET_FILE_ARGS)
+            .argName(TARGET_FILE_NAME)
+            .hasArg()
+            .desc("Export file name (optional)")
+            .build();
     options.addOption(targetFileName);
 
-    Option opSqlFile = Option.builder(SQL_FILE_ARGS).argName(SQL_FILE_NAME).hasArg()
-        .desc("SQL File Path (optional)").build();
+    Option opSqlFile =
+        Option.builder(SQL_FILE_ARGS)
+            .argName(SQL_FILE_NAME)
+            .hasArg()
+            .desc("SQL File Path (optional)")
+            .build();
     options.addOption(opSqlFile);
 
-    Option opTimeFormat = Option.builder(TIME_FORMAT_ARGS).argName(TIME_FORMAT_NAME).hasArg()
-        .desc("Output time Format in csv file. "
-            + "You can choose 1) timestamp, number, long 2) ISO8601, default 3) "
-            + "user-defined pattern like yyyy-MM-dd\\ HH:mm:ss, default ISO8601 (optional)")
-        .build();
+    Option opTimeFormat =
+        Option.builder(TIME_FORMAT_ARGS)
+            .argName(TIME_FORMAT_NAME)
+            .hasArg()
+            .desc(
+                "Output time Format in csv file. "
+                    + "You can choose 1) timestamp, number, long 2) ISO8601, default 3) "
+                    + "user-defined pattern like yyyy-MM-dd\\ HH:mm:ss, default ISO8601 (optional)")
+            .build();
     options.addOption(opTimeFormat);
 
-    Option opTimeZone = Option.builder(TIME_ZONE_ARGS).argName(TIME_ZONE_NAME).hasArg()
-        .desc("Time Zone eg. +08:00 or -01:00 (optional)").build();
+    Option opTimeZone =
+        Option.builder(TIME_ZONE_ARGS)
+            .argName(TIME_ZONE_NAME)
+            .hasArg()
+            .desc("Time Zone eg. +08:00 or -01:00 (optional)")
+            .build();
     options.addOption(opTimeZone);
 
-    Option opHelp = Option.builder(HELP_ARGS).longOpt(HELP_ARGS).hasArg(false)
-        .desc("Display help information")
-        .build();
+    Option opHelp =
+        Option.builder(HELP_ARGS)
+            .longOpt(HELP_ARGS)
+            .hasArg(false)
+            .desc("Display help information")
+            .build();
     options.addOption(opHelp);
 
     return options;
@@ -215,7 +235,7 @@ public class ExportCsv extends AbstractCsvTool {
   /**
    * Dump files from database to CSV file.
    *
-   * @param sql   export the result of executing the sql
+   * @param sql export the result of executing the sql
    * @param index use to create dump file name
    */
   private static void dumpResult(String sql, int index) {
@@ -239,10 +259,10 @@ public class ExportCsv extends AbstractCsvTool {
       writeMetadata(bw, sessionDataSet.getColumnNames());
 
       int line = writeResultSet(sessionDataSet, bw);
-      System.out
-          .printf("Statement [%s] has dumped to file %s successfully! It costs "
-                  + "%dms to export %d lines.%n", sql, path, System.currentTimeMillis() - startTime,
-              line);
+      System.out.printf(
+          "Statement [%s] has dumped to file %s successfully! It costs "
+              + "%dms to export %d lines.%n",
+          sql, path, System.currentTimeMillis() - startTime, line);
     } catch (IOException | StatementExecutionException | IoTDBConnectionException e) {
       System.out.println("Cannot dump result because: " + e.getMessage());
     }
@@ -283,9 +303,9 @@ public class ExportCsv extends AbstractCsvTool {
     String timestampPrecision = "ms";
     switch (timeFormat) {
       case "default":
-        String str = RpcUtils
-            .parseLongToDateWithPrecision(DateTimeFormatter.ISO_OFFSET_DATE_TIME, time, zoneId,
-                timestampPrecision);
+        String str =
+            RpcUtils.parseLongToDateWithPrecision(
+                DateTimeFormatter.ISO_OFFSET_DATE_TIME, time, zoneId, timestampPrecision);
         bw.write(str + ",");
         break;
       case "timestamp":
@@ -294,8 +314,7 @@ public class ExportCsv extends AbstractCsvTool {
         bw.write(time + ",");
         break;
       default:
-        dateTime = ZonedDateTime.ofInstant(Instant.ofEpochMilli(time),
-            zoneId);
+        dateTime = ZonedDateTime.ofInstant(Instant.ofEpochMilli(time), zoneId);
         bw.write(dateTime.format(DateTimeFormatter.ofPattern(timeFormat)) + ",");
         break;
     }

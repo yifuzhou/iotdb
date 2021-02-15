@@ -32,9 +32,11 @@ public class SerializableIntTVList extends SerializableTVList {
 
   protected static int calculateCapacity(float memoryLimitInMB) {
     float memoryLimitInB = memoryLimitInMB * MB / 2;
-    return TSFileConfig.ARRAY_CAPACITY_THRESHOLD *
-        (int) (memoryLimitInB / ((ReadWriteIOUtils.LONG_LEN + ReadWriteIOUtils.INT_LEN)
-            * TSFileConfig.ARRAY_CAPACITY_THRESHOLD));
+    return TSFileConfig.ARRAY_CAPACITY_THRESHOLD
+        * (int)
+            (memoryLimitInB
+                / ((ReadWriteIOUtils.LONG_LEN + ReadWriteIOUtils.INT_LEN)
+                    * TSFileConfig.ARRAY_CAPACITY_THRESHOLD));
   }
 
   protected SerializableIntTVList(SerializationRecorder serializationRecorder) {

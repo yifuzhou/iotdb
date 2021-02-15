@@ -94,9 +94,7 @@ public abstract class InsertPlan extends PhysicalPlan {
 
   public abstract long getMinTime();
 
-  /**
-   * @param index failed measurement index
-   */
+  /** @param index failed measurement index */
   public void markFailedMeasurementInsertion(int index, Exception e) {
     if (measurements[index] == null) {
       return;
@@ -114,6 +112,7 @@ public abstract class InsertPlan extends PhysicalPlan {
 
   /**
    * Reconstruct this plan with the failed measurements.
+   *
    * @return the plan itself, with measurements replaced with the previously failed ones.
    */
   public InsertPlan getPlanFromFailed() {
@@ -142,9 +141,7 @@ public abstract class InsertPlan extends PhysicalPlan {
     return this;
   }
 
-  /**
-   * Reset measurements from failed measurements (if any), as if no failure had ever happened.
-   */
+  /** Reset measurements from failed measurements (if any), as if no failure had ever happened. */
   public void recoverFromFailure() {
     if (failedMeasurements == null) {
       return;
@@ -169,7 +166,8 @@ public abstract class InsertPlan extends PhysicalPlan {
     }
     for (String measurement : measurements) {
       if (measurement == null || measurement.isEmpty()) {
-        throw new QueryProcessException("Measurement contains null or empty string: " + Arrays.toString(measurements));
+        throw new QueryProcessException(
+            "Measurement contains null or empty string: " + Arrays.toString(measurements));
       }
     }
   }

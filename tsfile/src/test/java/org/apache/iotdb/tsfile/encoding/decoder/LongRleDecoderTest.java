@@ -101,8 +101,7 @@ public class LongRleDecoderTest {
   }
 
   @After
-  public void tearDown() throws Exception {
-  }
+  public void tearDown() throws Exception {}
 
   @Test
   public void testRleReadBigLong() throws IOException {
@@ -195,8 +194,7 @@ public class LongRleDecoderTest {
     }
   }
 
-  public void testLength(List<Long> list, boolean isDebug, int repeatCount)
-      throws IOException {
+  public void testLength(List<Long> list, boolean isDebug, int repeatCount) throws IOException {
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
     RleEncoder<Long> encoder = new LongRleEncoder();
     for (int i = 0; i < repeatCount; i++) {

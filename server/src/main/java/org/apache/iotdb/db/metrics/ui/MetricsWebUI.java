@@ -55,7 +55,7 @@ public class MetricsWebUI {
     MetricsPage masterPage = new MetricsPage(metricRegistry);
     QueryServlet queryServlet = new QueryServlet(masterPage);
     ServletContextHandler staticHandler = JettyUtil.createStaticHandler();
-    ServletContextHandler queryHandler = JettyUtil.createServletHandler("/",queryServlet);
+    ServletContextHandler queryHandler = JettyUtil.createServletHandler("/", queryServlet);
     handlers.add(staticHandler);
     handlers.add(queryHandler);
   }

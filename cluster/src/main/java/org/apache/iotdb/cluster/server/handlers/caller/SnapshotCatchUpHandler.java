@@ -26,9 +26,7 @@ import org.apache.thrift.async.AsyncMethodCallback;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * SnapshotCatchUpHandler receives the result of sending a snapshot to a stale node.
- */
+/** SnapshotCatchUpHandler receives the result of sending a snapshot to a stale node. */
 public class SnapshotCatchUpHandler implements AsyncMethodCallback<Void> {
 
   private static final Logger logger = LoggerFactory.getLogger(SnapshotCatchUpHandler.class);
@@ -37,8 +35,7 @@ public class SnapshotCatchUpHandler implements AsyncMethodCallback<Void> {
   private Node receiver;
   private Snapshot snapshot;
 
-  public SnapshotCatchUpHandler(AtomicBoolean succeed,
-      Node receiver, Snapshot snapshot) {
+  public SnapshotCatchUpHandler(AtomicBoolean succeed, Node receiver, Snapshot snapshot) {
     this.succeed = succeed;
     this.receiver = receiver;
     this.snapshot = snapshot;

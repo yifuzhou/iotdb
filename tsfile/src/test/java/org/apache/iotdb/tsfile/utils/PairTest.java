@@ -24,10 +24,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.HashMap;
 import java.util.Map;
-
 import org.junit.Test;
-
-import org.apache.iotdb.tsfile.utils.Pair;
 
 public class PairTest {
 
@@ -71,5 +68,4 @@ public class PairTest {
     Pair<Float, Double> p2 = new Pair<Float, Double>(32.5f, 123.123d);
     assertEquals("<32.5,123.123>", p2.toString());
   }
-
 }

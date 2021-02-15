@@ -31,18 +31,18 @@ import org.apache.iotdb.db.query.control.QueryResourceManager;
 
 public class ClusterPlanner extends Planner {
 
-  /**
-   * @param fetchSize this parameter only take effect when it is a query plan
-   */
+  /** @param fetchSize this parameter only take effect when it is a query plan */
   @Override
   public PhysicalPlan parseSQLToPhysicalPlan(String sqlStr, ZoneId zoneId, int fetchSize)
       throws QueryProcessException {
     Operator operator = logicalGenerator.generate(sqlStr, zoneId);
-    int maxDeduplicatedPathNum = QueryResourceManager.getInstance()
-        .getMaxDeduplicatedPathNum(fetchSize);
+    int maxDeduplicatedPathNum =
+        QueryResourceManager.getInstance().getMaxDeduplicatedPathNum(fetchSize);
     if (operator instanceof SFWOperator && ((SFWOperator) operator).isLastQuery()) {
-      // Dataset of last query actually has only three columns, so we shouldn't limit the path num while constructing logical plan
-      // To avoid overflowing because logicalOptimize function may do maxDeduplicatedPathNum + 1, we set it to Integer.MAX_VALUE - 1
+      // Dataset of last query actually has only three columns, so we shouldn't limit the path num
+      // while constructing logical plan
+      // To avoid overflowing because logicalOptimize function may do maxDeduplicatedPathNum + 1, we
+      // set it to Integer.MAX_VALUE - 1
       maxDeduplicatedPathNum = Integer.MAX_VALUE - 1;
     }
     operator = logicalOptimize(operator, maxDeduplicatedPathNum);

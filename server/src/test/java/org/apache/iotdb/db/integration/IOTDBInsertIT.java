@@ -19,7 +19,14 @@
 
 package org.apache.iotdb.db.integration;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 import org.apache.iotdb.db.utils.EnvironmentUtils;
 import org.apache.iotdb.jdbc.Config;
 import org.junit.AfterClass;
@@ -27,25 +34,16 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.List;
-import java.util.Objects;
-
 /**
  * @author yuqi
  * @mail yuqi4733@gmail.com
- * @description This class is initially intend to test the issue of IOTDB-920, that is:
- * Disable insert row thats only contains time/timestamp column
+ * @description This class is initially intend to test the issue of IOTDB-920, that is: Disable
+ *     insert row thats only contains time/timestamp column
  * @time 27/9/20 20:56
- **/
+ */
 public class IOTDBInsertIT {
   private static List<String> sqls = new ArrayList<>();
   private static Connection connection;
-
 
   @BeforeClass
   public static void setUp() throws Exception {
@@ -77,10 +75,10 @@ public class IOTDBInsertIT {
     sqls.add("CREATE TIMESERIES root.t1.wf01.wt01.temperature WITH DATATYPE=FLOAT, ENCODING=RLE");
   }
 
-
   private static void insertData() throws ClassNotFoundException, SQLException {
     Class.forName(Config.JDBC_DRIVER_NAME);
-    connection = DriverManager.getConnection(Config.IOTDB_URL_PREFIX + "127.0.0.1:6667/", "root", "root");
+    connection =
+        DriverManager.getConnection(Config.IOTDB_URL_PREFIX + "127.0.0.1:6667/", "root", "root");
     Statement statement = connection.createStatement();
 
     for (String sql : sqls) {
@@ -96,9 +94,12 @@ public class IOTDBInsertIT {
     st0.execute("insert into root.t1.wf01.wt01(timestamp, status) values (1000, true)");
     st0.execute("insert into root.t1.wf01.wt01(timestamp, status) values (2000, false)");
     st0.execute("insert into root.t1.wf01.wt01(timestamp, status) values (3000, true)");
-    st0.execute("insert into root.t1.wf01.wt01(timestamp, status, temperature) values (4000, true, 17.1)");
-    st0.execute("insert into root.t1.wf01.wt01(timestamp, status, temperature) values (5000, true, 20.1)");
-    st0.execute("insert into root.t1.wf01.wt01(timestamp, status, temperature) values (6000, true, 22)");
+    st0.execute(
+        "insert into root.t1.wf01.wt01(timestamp, status, temperature) values (4000, true, 17.1)");
+    st0.execute(
+        "insert into root.t1.wf01.wt01(timestamp, status, temperature) values (5000, true, 20.1)");
+    st0.execute(
+        "insert into root.t1.wf01.wt01(timestamp, status, temperature) values (6000, true, 22)");
     st0.close();
 
     Statement st1 = connection.createStatement();

@@ -39,10 +39,9 @@ public class MinTimeDescAggrResult extends MinTimeAggrResult {
     }
   }
 
-
   @Override
-  public void updateResultUsingTimestamps(long[] timestamps, int length,
-      IReaderByTimestamp dataReader) throws IOException {
+  public void updateResultUsingTimestamps(
+      long[] timestamps, int length, IReaderByTimestamp dataReader) throws IOException {
     for (int i = 0; i < length; i++) {
       Object value = dataReader.getValueInTimestamp(timestamps[i]);
       if (value != null) {
@@ -55,5 +54,4 @@ public class MinTimeDescAggrResult extends MinTimeAggrResult {
   public boolean hasFinalResult() {
     return false;
   }
-
 }

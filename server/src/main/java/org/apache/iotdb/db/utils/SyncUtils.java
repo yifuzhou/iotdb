@@ -29,8 +29,7 @@ public class SyncUtils {
 
   private static final String IP_SEPARATOR = "\\.";
 
-  private SyncUtils() {
-  }
+  private SyncUtils() {}
 
   /**
    * This method is to get a snapshot file seriesPath according to a tsfile seriesPath. Due to
@@ -46,12 +45,10 @@ public class SyncUtils {
     return new File(snapshotDir, relativeFilePath);
   }
 
-  /**
-   * Verify sending list is empty or not It's used by sync sender.
-   */
+  /** Verify sending list is empty or not It's used by sync sender. */
   public static boolean isEmpty(Map<String, Map<Long, Set<File>>> sendingFileList) {
-    for (Entry<String, Map<Long, Set<File>>> entry: sendingFileList.entrySet()) {
-      for(Entry<Long, Set<File>> innerEntry: entry.getValue().entrySet()) {
+    for (Entry<String, Map<Long, Set<File>>> entry : sendingFileList.entrySet()) {
+      for (Entry<Long, Set<File>> innerEntry : entry.getValue().entrySet()) {
         if (!innerEntry.getValue().isEmpty()) {
           return false;
         }
@@ -76,9 +73,7 @@ public class SyncUtils {
     return false;
   }
 
-  /**
-   * Verify IP address with IP segment.
-   */
+  /** Verify IP address with IP segment. */
   private static boolean verifyIP(String ipSegment, String ipAddress, int subnetMark) {
     String ipSegmentBinary;
     String ipAddressBinary;
@@ -86,16 +81,16 @@ public class SyncUtils {
     DecimalFormat df = new DecimalFormat("00000000");
     StringBuilder ipSegmentBuilder = new StringBuilder();
     for (String IPsplit : ipSplits) {
-      ipSegmentBuilder.append(df.format(
-          Integer.parseInt(Integer.toBinaryString(Integer.parseInt(IPsplit)))));
+      ipSegmentBuilder.append(
+          df.format(Integer.parseInt(Integer.toBinaryString(Integer.parseInt(IPsplit)))));
     }
     ipSegmentBinary = ipSegmentBuilder.toString();
     ipSegmentBinary = ipSegmentBinary.substring(0, subnetMark);
     ipSplits = ipAddress.split(IP_SEPARATOR);
     StringBuilder ipAddressBuilder = new StringBuilder();
     for (String IPsplit : ipSplits) {
-      ipAddressBuilder.append(df.format(
-          Integer.parseInt(Integer.toBinaryString(Integer.parseInt(IPsplit)))));
+      ipAddressBuilder.append(
+          df.format(Integer.parseInt(Integer.toBinaryString(Integer.parseInt(IPsplit)))));
     }
     ipAddressBinary = ipAddressBuilder.toString();
     ipAddressBinary = ipAddressBinary.substring(0, subnetMark);

@@ -86,5 +86,4 @@ public class FilterFactory {
     filter.deserialize(buffer);
     return filter;
   }
-
 }

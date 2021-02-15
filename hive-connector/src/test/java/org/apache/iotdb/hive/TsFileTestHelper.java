@@ -37,7 +37,6 @@ import org.slf4j.LoggerFactory;
 
 public class TsFileTestHelper {
 
-
   private static final Logger logger = LoggerFactory.getLogger(TsFileTestHelper.class);
 
   public static boolean deleteTsFile(String filePath) {
@@ -64,10 +63,13 @@ public class TsFileTestHelper {
 
       // add measurements into file schema (all with INT64 data type)
       for (int i = 0; i < sensorNum; i++) {
-        MeasurementSchema measurementSchema = new MeasurementSchema("sensor_" + (i + 1),
-            TSDataType.INT64, TSEncoding.TS_2DIFF, CompressionType.UNCOMPRESSED);
-        schema.registerTimeseries(new Path("device_1", "sensor_" + (i + 1)),
-            measurementSchema);
+        MeasurementSchema measurementSchema =
+            new MeasurementSchema(
+                "sensor_" + (i + 1),
+                TSDataType.INT64,
+                TSEncoding.TS_2DIFF,
+                CompressionType.UNCOMPRESSED);
+        schema.registerTimeseries(new Path("device_1", "sensor_" + (i + 1)), measurementSchema);
         schemaList.add(measurementSchema);
       }
 

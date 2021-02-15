@@ -32,9 +32,10 @@ import org.slf4j.LoggerFactory;
 /**
  * Each subclass of TSEncodingBuilder responds a enumerate value in {@linkplain TSEncoding
  * TSEncoding}, which stores several configuration related to responding encoding type to generate
- * {@linkplain Encoder Encoder} instance.<br> Each TSEncoding has a responding TSEncodingBuilder.
- * The design referring to visit pattern provides same outer interface for different TSEncodings and
- * gets rid of the duplicate switch-case code.
+ * {@linkplain Encoder Encoder} instance.<br>
+ * Each TSEncoding has a responding TSEncodingBuilder. The design referring to visit pattern
+ * provides same outer interface for different TSEncodings and gets rid of the duplicate switch-case
+ * code.
  */
 public abstract class TSEncodingBuilder {
 
@@ -81,8 +82,8 @@ public abstract class TSEncodingBuilder {
 
   /**
    * for TSEncoding, JSON is a kind of type for initialization. {@code InitFromJsonObject} gets
-   * values from JSON object which will be used latter.<br> if this type has extra parameters to
-   * construct, override it.
+   * values from JSON object which will be used latter.<br>
+   * if this type has extra parameters to construct, override it.
    *
    * @param props - properties of encoding
    */
@@ -93,9 +94,7 @@ public abstract class TSEncodingBuilder {
     return "";
   }
 
-  /**
-   * for all TSDataType.
-   */
+  /** for all TSDataType. */
   public static class Plain extends TSEncodingBuilder {
 
     private int maxStringLength = TSFileDescriptor.getInstance().getConfig().getMaxStringLength();
@@ -122,9 +121,7 @@ public abstract class TSEncodingBuilder {
     }
   }
 
-  /**
-   * for ENUMS, INT32, BOOLEAN, INT64, FLOAT, DOUBLE.
-   */
+  /** for ENUMS, INT32, BOOLEAN, INT64, FLOAT, DOUBLE. */
   public static class Rle extends TSEncodingBuilder {
 
     private int maxPointNumber = TSFileDescriptor.getInstance().getConfig().getFloatPrecision();
@@ -158,14 +155,16 @@ public abstract class TSEncodingBuilder {
         try {
           this.maxPointNumber = Integer.parseInt(props.get(Encoder.MAX_POINT_NUMBER));
         } catch (NumberFormatException e) {
-          logger.warn("The format of max point number {} is not correct."
-              + " Using default float precision.", props.get(Encoder.MAX_POINT_NUMBER));
+          logger.warn(
+              "The format of max point number {} is not correct."
+                  + " Using default float precision.",
+              props.get(Encoder.MAX_POINT_NUMBER));
         }
         if (maxPointNumber < 0) {
           maxPointNumber = TSFileDescriptor.getInstance().getConfig().getFloatPrecision();
-          logger
-              .warn("cannot set max point number to negative value, replaced with default value:{}",
-                  maxPointNumber);
+          logger.warn(
+              "cannot set max point number to negative value, replaced with default value:{}",
+              maxPointNumber);
         }
       }
     }
@@ -176,9 +175,7 @@ public abstract class TSEncodingBuilder {
     }
   }
 
-  /**
-   * for INT32, INT64, FLOAT, DOUBLE.
-   */
+  /** for INT32, INT64, FLOAT, DOUBLE. */
   public static class Ts2Diff extends TSEncodingBuilder {
 
     private int maxPointNumber = 0;
@@ -200,8 +197,8 @@ public abstract class TSEncodingBuilder {
 
     @Override
     /**
-     * TS_2DIFF could specify <b>max_point_number</b> in given JSON Object, which
-     * means the maximum decimal digits for float or double data.
+     * TS_2DIFF could specify <b>max_point_number</b> in given JSON Object, which means the maximum
+     * decimal digits for float or double data.
      */
     public void initFromProps(Map<String, String> props) {
       // set max error from initialized map or default value if not set
@@ -211,14 +208,16 @@ public abstract class TSEncodingBuilder {
         try {
           this.maxPointNumber = Integer.parseInt(props.get(Encoder.MAX_POINT_NUMBER));
         } catch (NumberFormatException e) {
-          logger.warn("The format of max point number {} is not correct."
-              + " Using default float precision.", props.get(Encoder.MAX_POINT_NUMBER));
+          logger.warn(
+              "The format of max point number {} is not correct."
+                  + " Using default float precision.",
+              props.get(Encoder.MAX_POINT_NUMBER));
         }
         if (maxPointNumber < 0) {
           maxPointNumber = TSFileDescriptor.getInstance().getConfig().getFloatPrecision();
-          logger
-              .warn("cannot set max point number to negative value, replaced with default value:{}",
-                  maxPointNumber);
+          logger.warn(
+              "cannot set max point number to negative value, replaced with default value:{}",
+              maxPointNumber);
         }
       }
     }
@@ -229,9 +228,7 @@ public abstract class TSEncodingBuilder {
     }
   }
 
-  /**
-   * for FLOAT, DOUBLE.
-   */
+  /** for FLOAT, DOUBLE. */
   public static class GorillaV1 extends TSEncodingBuilder {
 
     @Override
@@ -252,9 +249,7 @@ public abstract class TSEncodingBuilder {
     }
   }
 
-  /**
-   * for INT32, INT64
-   */
+  /** for INT32, INT64 */
   public static class Regular extends TSEncodingBuilder {
 
     @Override
@@ -275,9 +270,7 @@ public abstract class TSEncodingBuilder {
     }
   }
 
-  /**
-   * for FLOAT, DOUBLE, INT, LONG.
-   */
+  /** for FLOAT, DOUBLE, INT, LONG. */
   public static class GorillaV2 extends TSEncodingBuilder {
 
     @Override

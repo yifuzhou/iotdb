@@ -44,13 +44,20 @@ public class UDTFBottomK extends UDTFSelectK {
         doublePQ = new PriorityQueue<>(k, Comparator.comparing(o -> -o.right));
         break;
       case TEXT:
-        stringPQ = new PriorityQueue<>(k,
-            ComparatorUtils.reversedComparator(Comparator.comparing(o -> o.right)));
+        stringPQ =
+            new PriorityQueue<>(
+                k, ComparatorUtils.reversedComparator(Comparator.comparing(o -> o.right)));
         break;
       default:
         // This will not happen.
-        throw new UDFInputSeriesDataTypeNotValidException(0, dataType, TSDataType.INT32,
-            TSDataType.INT64, TSDataType.FLOAT, TSDataType.DOUBLE, TSDataType.TEXT);
+        throw new UDFInputSeriesDataTypeNotValidException(
+            0,
+            dataType,
+            TSDataType.INT32,
+            TSDataType.INT64,
+            TSDataType.FLOAT,
+            TSDataType.DOUBLE,
+            TSDataType.TEXT);
     }
   }
 

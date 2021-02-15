@@ -34,11 +34,19 @@ import org.apache.thrift.transport.TNonblockingSocket;
  */
 public class AsyncMetaHeartbeatClient extends AsyncMetaClient {
 
-  private AsyncMetaHeartbeatClient(TProtocolFactory protocolFactory,
-      TAsyncClientManager clientManager, Node node, AsyncClientPool pool) throws IOException {
-    super(protocolFactory, clientManager, new TNonblockingSocket(node.getIp(),
-        node.getMetaPort() + ClusterUtils.DATA_HEARTBEAT_PORT_OFFSET
-        , RaftServer.getConnectionTimeoutInMS()));
+  private AsyncMetaHeartbeatClient(
+      TProtocolFactory protocolFactory,
+      TAsyncClientManager clientManager,
+      Node node,
+      AsyncClientPool pool)
+      throws IOException {
+    super(
+        protocolFactory,
+        clientManager,
+        new TNonblockingSocket(
+            node.getIp(),
+            node.getMetaPort() + ClusterUtils.DATA_HEARTBEAT_PORT_OFFSET,
+            RaftServer.getConnectionTimeoutInMS()));
     this.node = node;
     this.pool = pool;
   }
@@ -60,11 +68,12 @@ public class AsyncMetaHeartbeatClient extends AsyncMetaClient {
 
   @Override
   public String toString() {
-    return "AsyncMetaHeartbeatClient{" +
-        "node=" + super.getNode() + "," +
-        "metaHeartbeatPort=" + (super.getNode().getMetaPort()
-        + ClusterUtils.META_HEARTBEAT_PORT_OFFSET) +
-        '}';
+    return "AsyncMetaHeartbeatClient{"
+        + "node="
+        + super.getNode()
+        + ","
+        + "metaHeartbeatPort="
+        + (super.getNode().getMetaPort() + ClusterUtils.META_HEARTBEAT_PORT_OFFSET)
+        + '}';
   }
-
 }

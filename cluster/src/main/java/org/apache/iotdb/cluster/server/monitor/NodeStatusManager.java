@@ -106,7 +106,7 @@ public class NodeStatusManager {
    *
    * @param node
    * @param tryUpdate when set to true, the manager will try to update the status of the node if it
-   *                  is old enough, otherwise, it will just return the last recorded status.
+   *     is old enough, otherwise, it will just return the last recorded status.
    * @return
    */
   public NodeStatus getNodeStatus(Node node, boolean tryUpdate) {
@@ -145,8 +145,11 @@ public class NodeStatusManager {
     } else {
       nodeStatus.setLastResponseLatency(Long.MAX_VALUE);
     }
-    logger.info("NodeStatus of {} is updated, status: {}, response time: {}", node,
-        nodeStatus.getStatus(), nodeStatus.getLastResponseLatency());
+    logger.info(
+        "NodeStatus of {} is updated, status: {}, response time: {}",
+        node,
+        nodeStatus.getStatus(),
+        nodeStatus.getLastResponseLatency());
   }
 
   public long getLastResponseLatency(Node node) {
@@ -170,7 +173,7 @@ public class NodeStatusManager {
   /**
    * @param node
    * @return whether the node is CURRENTLY available, this method will not try to update its status
-   * to avoid deadlock
+   *     to avoid deadlock
    */
   public boolean isActivated(Node node) {
     return getNodeStatus(node, false).isActivated();

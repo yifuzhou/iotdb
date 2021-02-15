@@ -23,11 +23,8 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
-
 import org.junit.Assert;
 import org.junit.Test;
-
-import org.apache.iotdb.tsfile.read.common.TimeRange;
 
 public class TimeRangeTest {
 
@@ -431,5 +428,4 @@ public class TimeRangeTest {
     assertEquals(remainRanges.get(0).getLeftClose(), true);
     assertEquals(remainRanges.get(0).getRightClose(), true);
   }
-
 }

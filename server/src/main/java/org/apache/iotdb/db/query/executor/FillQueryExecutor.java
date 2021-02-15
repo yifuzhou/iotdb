@@ -47,7 +47,8 @@ public class FillQueryExecutor {
   private long queryTime;
   private Map<TSDataType, IFill> typeIFillMap;
 
-  public FillQueryExecutor(List<PartialPath> selectedSeries,
+  public FillQueryExecutor(
+      List<PartialPath> selectedSeries,
       List<TSDataType> dataTypes,
       long queryTime,
       Map<TSDataType, IFill> typeIFillMap) {
@@ -72,7 +73,8 @@ public class FillQueryExecutor {
         PartialPath path = selectedSeries.get(i);
         TSDataType dataType = dataTypes.get(i);
         IFill fill;
-        long defaultFillInterval = IoTDBDescriptor.getInstance().getConfig().getDefaultFillInterval();
+        long defaultFillInterval =
+            IoTDBDescriptor.getInstance().getConfig().getDefaultFillInterval();
         if (!typeIFillMap.containsKey(dataType)) {
           switch (dataType) {
             case INT32:
@@ -89,8 +91,14 @@ public class FillQueryExecutor {
         } else {
           fill = typeIFillMap.get(dataType).copy();
         }
-        fill = configureFill(fill, path, dataType, queryTime,
-            fillQueryPlan.getAllMeasurementsInDevice(path.getDevice()), context);
+        fill =
+            configureFill(
+                fill,
+                path,
+                dataType,
+                queryTime,
+                fillQueryPlan.getAllMeasurementsInDevice(path.getDevice()),
+                context);
 
         TimeValuePair timeValuePair = fill.getFillResult();
         if (timeValuePair == null || timeValuePair.getValue() == null) {
@@ -108,8 +116,13 @@ public class FillQueryExecutor {
     return dataSet;
   }
 
-  protected IFill configureFill(IFill fill, PartialPath path, TSDataType dataType, long queryTime,
-      Set<String> deviceMeasurements, QueryContext context) {
+  protected IFill configureFill(
+      IFill fill,
+      PartialPath path,
+      TSDataType dataType,
+      long queryTime,
+      Set<String> deviceMeasurements,
+      QueryContext context) {
     fill.configureFill(path, dataType, queryTime, deviceMeasurements, context);
     return fill;
   }

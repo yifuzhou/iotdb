@@ -25,24 +25,22 @@ import org.apache.iotdb.db.auth.authorizer.IAuthorizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * The MQTT broker authenticator.
- */
+/** The MQTT broker authenticator. */
 public class BrokerAuthenticator implements IAuthenticator {
-    private static final Logger LOG = LoggerFactory.getLogger(BrokerAuthenticator.class);
+  private static final Logger LOG = LoggerFactory.getLogger(BrokerAuthenticator.class);
 
-    @Override
-    public boolean checkValid(String clientId, String username, byte[] password) {
-        if (StringUtils.isBlank(username) || password == null) {
-            return false;
-        }
-
-        try {
-            IAuthorizer authorizer = BasicAuthorizer.getInstance();
-            return authorizer.login(username, new String(password));
-        } catch (AuthException e) {
-            LOG.info("meet error while logging in.", e);
-            return false;
-        }
+  @Override
+  public boolean checkValid(String clientId, String username, byte[] password) {
+    if (StringUtils.isBlank(username) || password == null) {
+      return false;
     }
+
+    try {
+      IAuthorizer authorizer = BasicAuthorizer.getInstance();
+      return authorizer.login(username, new String(password));
+    } catch (AuthException e) {
+      LOG.info("meet error while logging in.", e);
+      return false;
+    }
+  }
 }

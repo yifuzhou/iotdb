@@ -27,7 +27,6 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.iotdb.tsfile.write.writer.TsFileOutput;
 
-
 /**
  * This class is used to wrap the {@link}FSDataOutputStream and implement the interface
  * {@link}TsFileOutput
@@ -49,8 +48,7 @@ public class HDFSOutput implements TsFileOutput {
     path = new Path(filePath);
   }
 
-  public HDFSOutput(Path path, Configuration configuration, boolean overwrite)
-      throws IOException {
+  public HDFSOutput(Path path, Configuration configuration, boolean overwrite) throws IOException {
     fs = path.getFileSystem(HDFSConfUtil.setConf(configuration));
     fsDataOutputStream = fs.exists(path) ? fs.append(path) : fs.create(path, overwrite);
     this.path = path;

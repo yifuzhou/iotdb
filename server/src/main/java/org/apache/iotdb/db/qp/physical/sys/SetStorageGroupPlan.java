@@ -41,7 +41,7 @@ public class SetStorageGroupPlan extends PhysicalPlan {
     super(false, Operator.OperatorType.SET_STORAGE_GROUP);
     this.path = path;
   }
-  
+
   public PartialPath getPath() {
     return path;
   }

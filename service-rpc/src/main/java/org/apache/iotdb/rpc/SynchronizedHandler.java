@@ -44,8 +44,7 @@ public class SynchronizedHandler implements InvocationHandler {
         throw e.getTargetException();
       } else {
         // should not happen
-        throw new TException("Error in calling method " + method.getName(),
-            e.getTargetException());
+        throw new TException("Error in calling method " + method.getName(), e.getTargetException());
       }
     } catch (Exception e) {
       throw new TException("Error in calling method " + method.getName(), e);

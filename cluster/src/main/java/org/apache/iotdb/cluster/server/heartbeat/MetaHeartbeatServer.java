@@ -17,7 +17,6 @@
  * under the License.
  */
 
-
 package org.apache.iotdb.cluster.server.heartbeat;
 
 import java.net.InetSocketAddress;
@@ -37,18 +36,13 @@ public class MetaHeartbeatServer extends HeartbeatServer {
 
   private MetaClusterServer metaClusterServer;
 
-
-  /**
-   * Do not use this method for initialization
-   */
-  private MetaHeartbeatServer() {
-  }
+  /** Do not use this method for initialization */
+  private MetaHeartbeatServer() {}
 
   public MetaHeartbeatServer(Node thisNode, MetaClusterServer metaClusterServer) {
     super(thisNode);
     this.metaClusterServer = metaClusterServer;
   }
-
 
   @Override
   TProcessor getProcessor() {
@@ -62,12 +56,16 @@ public class MetaHeartbeatServer extends HeartbeatServer {
   @Override
   TServerTransport getHeartbeatServerSocket() throws TTransportException {
     if (ClusterDescriptor.getInstance().getConfig().isUseAsyncServer()) {
-      return new TNonblockingServerSocket(new InetSocketAddress(config.getClusterRpcIp(),
-          config.getInternalMetaPort() + ClusterUtils.META_HEARTBEAT_PORT_OFFSET),
+      return new TNonblockingServerSocket(
+          new InetSocketAddress(
+              config.getClusterRpcIp(),
+              config.getInternalMetaPort() + ClusterUtils.META_HEARTBEAT_PORT_OFFSET),
           getConnectionTimeoutInMS());
     } else {
-      return new TServerSocket(new InetSocketAddress(config.getClusterRpcIp(),
-          config.getInternalMetaPort() + ClusterUtils.META_HEARTBEAT_PORT_OFFSET));
+      return new TServerSocket(
+          new InetSocketAddress(
+              config.getClusterRpcIp(),
+              config.getInternalMetaPort() + ClusterUtils.META_HEARTBEAT_PORT_OFFSET));
     }
   }
 

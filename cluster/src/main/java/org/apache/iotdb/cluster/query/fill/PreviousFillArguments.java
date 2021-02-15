@@ -24,9 +24,8 @@ import org.apache.iotdb.db.metadata.PartialPath;
 import org.apache.iotdb.tsfile.file.metadata.enums.TSDataType;
 
 /**
- * PreviousFillParameter records necessary parameters of a previous fill over a single
- * timeseries, avoiding the corresponding method call having too many arguments and increasing
- * flexibility.
+ * PreviousFillParameter records necessary parameters of a previous fill over a single timeseries,
+ * avoiding the corresponding method call having too many arguments and increasing flexibility.
  */
 public class PreviousFillArguments {
   private PartialPath path;
@@ -35,8 +34,11 @@ public class PreviousFillArguments {
   private long beforeRange;
   private Set<String> deviceMeasurements;
 
-  public PreviousFillArguments(PartialPath path,
-      TSDataType dataType, long queryTime, long beforeRange,
+  public PreviousFillArguments(
+      PartialPath path,
+      TSDataType dataType,
+      long queryTime,
+      long beforeRange,
       Set<String> deviceMeasurements) {
     this.path = path;
     this.dataType = dataType;

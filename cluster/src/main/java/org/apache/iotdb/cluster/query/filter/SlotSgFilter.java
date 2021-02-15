@@ -38,8 +38,9 @@ public class SlotSgFilter implements StorageGroupFilter {
   }
 
   private static boolean satisfy(String storageGroup, List<Integer> nodeSlots) {
-    int slot = SlotPartitionTable.getSlotStrategy().calculateSlotByPartitionNum(storageGroup,0,
-        ClusterConstant.SLOT_NUM);
+    int slot =
+        SlotPartitionTable.getSlotStrategy()
+            .calculateSlotByPartitionNum(storageGroup, 0, ClusterConstant.SLOT_NUM);
     return nodeSlots.contains(slot);
   }
 }

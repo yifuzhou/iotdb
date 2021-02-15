@@ -37,8 +37,7 @@ public class TsFileMetadataTest {
   final String PATH = TestConstant.BASE_OUTPUT_PATH.concat("output1.tsfile");
 
   @Before
-  public void setUp() {
-  }
+  public void setUp() {}
 
   @After
   public void tearDown() {

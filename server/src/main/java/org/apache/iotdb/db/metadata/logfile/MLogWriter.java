@@ -18,6 +18,15 @@
  */
 package org.apache.iotdb.db.metadata.logfile;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.BufferOverflowException;
+import java.nio.ByteBuffer;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import org.apache.commons.io.FileUtils;
 import org.apache.iotdb.db.conf.IoTDBDescriptor;
 import org.apache.iotdb.db.engine.fileSystem.SystemFileFactory;
@@ -48,16 +57,6 @@ import org.apache.iotdb.tsfile.write.schema.MeasurementSchema;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.BufferOverflowException;
-import java.nio.ByteBuffer;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-
 public class MLogWriter implements AutoCloseable {
 
   private static final Logger logger = LoggerFactory.getLogger(MLogWriter.class);
@@ -65,10 +64,11 @@ public class MLogWriter implements AutoCloseable {
   private LogWriter logWriter;
   private int logNum;
   private static final String DELETE_FAILED_FORMAT = "Deleting %s failed with exception %s";
-  private final ByteBuffer mlogBuffer = ByteBuffer.allocate(
-    IoTDBDescriptor.getInstance().getConfig().getMlogBufferSize());
+  private final ByteBuffer mlogBuffer =
+      ByteBuffer.allocate(IoTDBDescriptor.getInstance().getConfig().getMlogBufferSize());
 
-  private static final String LOG_TOO_LARGE_INFO = "Log cannot fit into buffer, please increase mlog_buffer_size";
+  private static final String LOG_TOO_LARGE_INFO =
+      "Log cannot fit into buffer, please increase mlog_buffer_size";
 
   public MLogWriter(String schemaDir, String logFileName) throws IOException {
     File metadataDir = SystemFileFactory.INSTANCE.getFile(schemaDir);
@@ -98,7 +98,8 @@ public class MLogWriter implements AutoCloseable {
     try {
       logWriter.write(mlogBuffer);
     } catch (IOException e) {
-      logger.error("MLog {} sync failed, change system mode to read-only", logFile.getAbsoluteFile(), e);
+      logger.error(
+          "MLog {} sync failed, change system mode to read-only", logFile.getAbsoluteFile(), e);
       IoTDBDescriptor.getInstance().getConfig().setReadOnly(true);
     }
     mlogBuffer.clear();
@@ -108,10 +109,9 @@ public class MLogWriter implements AutoCloseable {
     try {
       plan.serialize(mlogBuffer);
       sync();
-      logNum ++;
+      logNum++;
     } catch (BufferOverflowException e) {
-      throw new IOException(
-          LOG_TOO_LARGE_INFO, e);
+      throw new IOException(LOG_TOO_LARGE_INFO, e);
     }
   }
 
@@ -129,7 +129,8 @@ public class MLogWriter implements AutoCloseable {
   }
 
   public void deleteStorageGroup(PartialPath storageGroup) throws IOException {
-    DeleteStorageGroupPlan plan = new DeleteStorageGroupPlan(Collections.singletonList(storageGroup));
+    DeleteStorageGroupPlan plan =
+        new DeleteStorageGroupPlan(Collections.singletonList(storageGroup));
     putLog(plan);
   }
 
@@ -162,8 +163,9 @@ public class MLogWriter implements AutoCloseable {
     if (node.getChildren() != null) {
       childSize = node.getChildren().size();
     }
-    MeasurementMNodePlan plan = new MeasurementMNodePlan(node.getName(), node.getAlias(),
-      node.getOffset(), childSize, node.getSchema());
+    MeasurementMNodePlan plan =
+        new MeasurementMNodePlan(
+            node.getName(), node.getAlias(), node.getOffset(), childSize, node.getSchema());
     putLog(plan);
   }
 
@@ -172,19 +174,19 @@ public class MLogWriter implements AutoCloseable {
     if (node.getChildren() != null) {
       childSize = node.getChildren().size();
     }
-    StorageGroupMNodePlan plan = new StorageGroupMNodePlan(node.getName(), node.getDataTTL(), childSize);
+    StorageGroupMNodePlan plan =
+        new StorageGroupMNodePlan(node.getName(), node.getDataTTL(), childSize);
     putLog(plan);
   }
 
   @SuppressWarnings("squid:S3776") // Suppress high Cognitive Complexity warning
-  public static void upgradeTxtToBin(String schemaDir, String oldFileName,
-                                     String newFileName, boolean isSnapshot) throws IOException {
+  public static void upgradeTxtToBin(
+      String schemaDir, String oldFileName, String newFileName, boolean isSnapshot)
+      throws IOException {
     File logFile = SystemFileFactory.INSTANCE.getFile(schemaDir + File.separator + newFileName);
     File tmpLogFile = SystemFileFactory.INSTANCE.getFile(logFile.getAbsolutePath() + ".tmp");
-    File oldLogFile = SystemFileFactory.INSTANCE.getFile(
-      schemaDir + File.separator + oldFileName);
-    File tmpOldLogFile = SystemFileFactory.INSTANCE.getFile(oldLogFile.getAbsolutePath()
-      + ".tmp");
+    File oldLogFile = SystemFileFactory.INSTANCE.getFile(schemaDir + File.separator + oldFileName);
+    File tmpOldLogFile = SystemFileFactory.INSTANCE.getFile(oldLogFile.getAbsolutePath() + ".tmp");
 
     if (oldLogFile.exists() || tmpOldLogFile.exists()) {
 
@@ -193,7 +195,7 @@ public class MLogWriter implements AutoCloseable {
       }
 
       try (MLogWriter mLogWriter = new MLogWriter(schemaDir, newFileName + ".tmp");
-           MLogTxtReader mLogTxtReader = new MLogTxtReader(schemaDir, oldFileName)) {
+          MLogTxtReader mLogTxtReader = new MLogTxtReader(schemaDir, oldFileName)) {
         // upgrade from old character log file to new binary mlog
         while (mLogTxtReader.hasNext()) {
           String cmd = mLogTxtReader.next();
@@ -246,8 +248,10 @@ public class MLogWriter implements AutoCloseable {
 
   public static void upgradeMLog() throws IOException {
     String schemaDir = IoTDBDescriptor.getInstance().getConfig().getSchemaDir();
-    upgradeTxtToBin(schemaDir, MetadataConstant.METADATA_TXT_LOG, MetadataConstant.METADATA_LOG, false);
-    upgradeTxtToBin(schemaDir, MetadataConstant.MTREE_TXT_SNAPSHOT, MetadataConstant.MTREE_SNAPSHOT, true);
+    upgradeTxtToBin(
+        schemaDir, MetadataConstant.METADATA_TXT_LOG, MetadataConstant.METADATA_LOG, false);
+    upgradeTxtToBin(
+        schemaDir, MetadataConstant.MTREE_TXT_SNAPSHOT, MetadataConstant.MTREE_SNAPSHOT, true);
   }
 
   public synchronized void clear() throws IOException {
@@ -265,9 +269,7 @@ public class MLogWriter implements AutoCloseable {
     return logNum;
   }
 
-  /**
-   * only used for initialize a mlog file writer.
-   */
+  /** only used for initialize a mlog file writer. */
   public void setLogNum(int number) {
     logNum = number;
   }
@@ -285,6 +287,7 @@ public class MLogWriter implements AutoCloseable {
 
   /**
    * upgrade from mlog.txt to mlog.bin
+   *
    * @param cmd the old meta operation
    * @throws IOException
    * @throws MetadataException
@@ -329,10 +332,16 @@ public class MLogWriter implements AutoCloseable {
           offset = Long.parseLong(args[7]);
         }
 
-        CreateTimeSeriesPlan plan = new CreateTimeSeriesPlan(new PartialPath(args[1]),
-          TSDataType.deserialize((byte) Short.parseShort(args[2])),
-          TSEncoding.deserialize((byte) Short.parseShort(args[3])),
-          CompressionType.deserialize((byte) Short.parseShort(args[4])), props, null, null, alias);
+        CreateTimeSeriesPlan plan =
+            new CreateTimeSeriesPlan(
+                new PartialPath(args[1]),
+                TSDataType.deserialize((byte) Short.parseShort(args[2])),
+                TSEncoding.deserialize((byte) Short.parseShort(args[3])),
+                CompressionType.deserialize((byte) Short.parseShort(args[4])),
+                props,
+                null,
+                null,
+                alias);
 
         plan.setTagOffset(offset);
         createTimeseries(plan);
@@ -346,7 +355,8 @@ public class MLogWriter implements AutoCloseable {
           tmp.append(args[args.length - 1]);
           args[1] = tmp.toString();
         }
-        deleteTimeseries(new DeleteTimeSeriesPlan(Collections.singletonList(new PartialPath(args[1]))));
+        deleteTimeseries(
+            new DeleteTimeSeriesPlan(Collections.singletonList(new PartialPath(args[1]))));
         break;
       case MetadataOperationType.SET_STORAGE_GROUP:
         try {
@@ -354,7 +364,7 @@ public class MLogWriter implements AutoCloseable {
         }
         // two time series may set one storage group concurrently,
         // that's normal in our concurrency control protocol
-        catch (MetadataException e){
+        catch (MetadataException e) {
           logger.info("concurrently operate set storage group cmd {} twice", cmd);
         }
         break;
@@ -383,13 +393,19 @@ public class MLogWriter implements AutoCloseable {
     String[] words = str.split(",");
     switch (words[0]) {
       case "2":
-        return new MeasurementMNodePlan(words[1], words[2].equals("") ? null :  words[2], Long.parseLong(words[words.length - 2]),
-          Integer.parseInt(words[words.length - 1]),
-          new MeasurementSchema(words[1], TSDataType.values()[Integer.parseInt(words[3])],
-            TSEncoding.values()[Integer.parseInt(words[4])], CompressionType.values()[Integer.parseInt(words[5])]
-          ));
+        return new MeasurementMNodePlan(
+            words[1],
+            words[2].equals("") ? null : words[2],
+            Long.parseLong(words[words.length - 2]),
+            Integer.parseInt(words[words.length - 1]),
+            new MeasurementSchema(
+                words[1],
+                TSDataType.values()[Integer.parseInt(words[3])],
+                TSEncoding.values()[Integer.parseInt(words[4])],
+                CompressionType.values()[Integer.parseInt(words[5])]));
       case "1":
-        return new StorageGroupMNodePlan(words[1], Long.parseLong(words[2]), Integer.parseInt(words[3]));
+        return new StorageGroupMNodePlan(
+            words[1], Long.parseLong(words[2]), Integer.parseInt(words[3]));
       case "0":
         return new MNodePlan(words[1], Integer.parseInt(words[2]));
       default:

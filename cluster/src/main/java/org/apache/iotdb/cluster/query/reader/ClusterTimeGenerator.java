@@ -39,12 +39,13 @@ public class ClusterTimeGenerator extends ServerTimeGenerator {
 
   private ClusterReaderFactory readerFactory;
 
-  /**
-   * Constructor of EngineTimeGenerator.
-   */
-  public ClusterTimeGenerator(IExpression expression,
-      QueryContext context, MetaGroupMember metaGroupMember,
-      RawDataQueryPlan rawDataQueryPlan) throws StorageEngineException {
+  /** Constructor of EngineTimeGenerator. */
+  public ClusterTimeGenerator(
+      IExpression expression,
+      QueryContext context,
+      MetaGroupMember metaGroupMember,
+      RawDataQueryPlan rawDataQueryPlan)
+      throws StorageEngineException {
     super(context);
     this.queryPlan = rawDataQueryPlan;
     this.readerFactory = new ClusterReaderFactory(metaGroupMember);
@@ -63,11 +64,18 @@ public class ClusterTimeGenerator extends ServerTimeGenerator {
     TSDataType dataType;
     try {
       dataType =
-          ((CMManager) IoTDB.metaManager).getSeriesTypesByPaths(Collections.singletonList(path),
-              null).left.get(0);
-      return readerFactory.getSeriesReader(path,
-          queryPlan.getAllMeasurementsInDevice(path.getDevice()), dataType,
-          null, filter, context, queryPlan.isAscending());
+          ((CMManager) IoTDB.metaManager)
+              .getSeriesTypesByPaths(Collections.singletonList(path), null)
+              .left
+              .get(0);
+      return readerFactory.getSeriesReader(
+          path,
+          queryPlan.getAllMeasurementsInDevice(path.getDevice()),
+          dataType,
+          null,
+          filter,
+          context,
+          queryPlan.isAscending());
     } catch (Exception e) {
       throw new IOException(e);
     }

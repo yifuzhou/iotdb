@@ -60,7 +60,6 @@ public class MergeUpgradeTest {
   private boolean changeVersion = true;
   private String deviceName = "root.MergeUpgrade.device0";
 
-
   @Before
   public void setUp() throws IOException, WriteProcessException {
     prepareSeries();
@@ -77,8 +76,8 @@ public class MergeUpgradeTest {
   @Test
   public void testMergeUpgradeSelect() throws MergeException {
     MergeResource resource = new MergeResource(seqResources, unseqResources);
-    MaxFileMergeFileSelector mergeFileSelector = new MaxFileMergeFileSelector(resource,
-        Long.MAX_VALUE);
+    MaxFileMergeFileSelector mergeFileSelector =
+        new MaxFileMergeFileSelector(resource, Long.MAX_VALUE);
     List[] result = mergeFileSelector.select();
     assertEquals(0, result.length);
   }
@@ -86,19 +85,35 @@ public class MergeUpgradeTest {
   private void prepareFiles() throws IOException, WriteProcessException {
     // prepare seqFiles
     for (int i = 0; i < seqFileNum; i++) {
-      File seqfile = FSFactoryProducer.getFSFactory().getFile(TestConstant.BASE_OUTPUT_PATH.concat(
-              "seq" + IoTDBConstant.FILE_NAME_SEPARATOR + i + IoTDBConstant.FILE_NAME_SEPARATOR
-              + i + IoTDBConstant.FILE_NAME_SEPARATOR + 0
-              + ".tsfile"));
+      File seqfile =
+          FSFactoryProducer.getFSFactory()
+              .getFile(
+                  TestConstant.BASE_OUTPUT_PATH.concat(
+                      "seq"
+                          + IoTDBConstant.FILE_NAME_SEPARATOR
+                          + i
+                          + IoTDBConstant.FILE_NAME_SEPARATOR
+                          + i
+                          + IoTDBConstant.FILE_NAME_SEPARATOR
+                          + 0
+                          + ".tsfile"));
       TsFileResource seqTsFileResource = new TsFileResource(seqfile);
       seqResources.add(seqTsFileResource);
       prepareOldFile(seqTsFileResource, i * ptNum, ptNum, 0);
     }
     // prepare unseqFile
-    File unseqfile = FSFactoryProducer.getFSFactory().getFile(TestConstant.BASE_OUTPUT_PATH.concat(
-            "unseq" + IoTDBConstant.FILE_NAME_SEPARATOR + 0 + IoTDBConstant.FILE_NAME_SEPARATOR
-            + 0 + IoTDBConstant.FILE_NAME_SEPARATOR + 0
-            + ".tsfile"));
+    File unseqfile =
+        FSFactoryProducer.getFSFactory()
+            .getFile(
+                TestConstant.BASE_OUTPUT_PATH.concat(
+                    "unseq"
+                        + IoTDBConstant.FILE_NAME_SEPARATOR
+                        + 0
+                        + IoTDBConstant.FILE_NAME_SEPARATOR
+                        + 0
+                        + IoTDBConstant.FILE_NAME_SEPARATOR
+                        + 0
+                        + ".tsfile"));
     TsFileResource unseqTsFileResource = new TsFileResource(unseqfile);
     unseqResources.add(unseqTsFileResource);
     prepareFile(unseqTsFileResource, 0, 2 * ptNum, 10);
@@ -107,13 +122,14 @@ public class MergeUpgradeTest {
   private void prepareSeries() {
     measurementSchemas = new MeasurementSchema[timeseriesNum];
     for (int i = 0; i < timeseriesNum; i++) {
-      measurementSchemas[i] = new MeasurementSchema("sensor" + i, TSDataType.DOUBLE,
-          encoding, CompressionType.UNCOMPRESSED);
+      measurementSchemas[i] =
+          new MeasurementSchema(
+              "sensor" + i, TSDataType.DOUBLE, encoding, CompressionType.UNCOMPRESSED);
     }
   }
 
-  private void prepareOldFile(TsFileResource tsFileResource, long timeOffset, long ptNum,
-      long valueOffset)
+  private void prepareOldFile(
+      TsFileResource tsFileResource, long timeOffset, long ptNum, long valueOffset)
       throws IOException, WriteProcessException {
     TsFileWriter fileWriter = new TsFileWriter(tsFileResource.getTsFile());
     prepareData(tsFileResource, fileWriter, timeOffset, ptNum, valueOffset);
@@ -127,8 +143,9 @@ public class MergeUpgradeTest {
     }
   }
 
-  private void prepareFile(TsFileResource tsFileResource, long timeOffset, long ptNum,
-      long valueOffset) throws IOException, WriteProcessException {
+  private void prepareFile(
+      TsFileResource tsFileResource, long timeOffset, long ptNum, long valueOffset)
+      throws IOException, WriteProcessException {
     TsFileWriter fileWriter = new TsFileWriter(tsFileResource.getTsFile());
     prepareData(tsFileResource, fileWriter, timeOffset, ptNum, valueOffset);
     fileWriter.close();
@@ -143,16 +160,25 @@ public class MergeUpgradeTest {
     }
   }
 
-  private void prepareData(TsFileResource tsFileResource, TsFileWriter fileWriter, long timeOffset,
-      long ptNum, long valueOffset) throws WriteProcessException, IOException {
+  private void prepareData(
+      TsFileResource tsFileResource,
+      TsFileWriter fileWriter,
+      long timeOffset,
+      long ptNum,
+      long valueOffset)
+      throws WriteProcessException, IOException {
     for (MeasurementSchema MeasurementSchema : measurementSchemas) {
-      fileWriter.registerTimeseries(new Path(deviceName, MeasurementSchema.getMeasurementId()), MeasurementSchema);
+      fileWriter.registerTimeseries(
+          new Path(deviceName, MeasurementSchema.getMeasurementId()), MeasurementSchema);
     }
     for (long i = timeOffset; i < timeOffset + ptNum; i++) {
       TSRecord record = new TSRecord(i, deviceName);
       for (int k = 0; k < timeseriesNum; k++) {
-        record.addTuple(DataPoint.getDataPoint(measurementSchemas[k].getType(),
-            measurementSchemas[k].getMeasurementId(), String.valueOf(i + valueOffset)));
+        record.addTuple(
+            DataPoint.getDataPoint(
+                measurementSchemas[k].getType(),
+                measurementSchemas[k].getMeasurementId(),
+                String.valueOf(i + valueOffset)));
       }
       fileWriter.write(record);
       tsFileResource.updateStartTime(deviceName, i);

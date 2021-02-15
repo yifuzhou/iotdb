@@ -96,15 +96,12 @@ public class DefaultDeviceTemplateTest {
       int count = 0;
       while (queryDataSet.hasNext()) {
         queryDataSet.next();
-        count ++;
+        count++;
       }
 
       Assert.assertEquals(10, count);
     }
 
-
     Files.deleteIfExists(file.toPath());
-
   }
-
 }

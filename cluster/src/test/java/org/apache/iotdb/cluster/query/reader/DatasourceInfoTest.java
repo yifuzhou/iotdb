@@ -17,7 +17,6 @@
  * under the License.
  */
 
-
 package org.apache.iotdb.cluster.query.reader;
 
 import static org.junit.Assert.assertFalse;
@@ -47,17 +46,20 @@ public class DatasourceInfoTest {
   @Before
   public void setUp() {
     metaGroupMember = new TestMetaGroupMember();
-    metaGroupMember.setClientProvider(new DataClientProvider(new Factory()) {
-      @Override
-      public AsyncDataClient getAsyncDataClient(Node node, int timeout) throws IOException {
-        return new AsyncDataClient(null, null, TestUtils.getNode(0), null) {
+    metaGroupMember.setClientProvider(
+        new DataClientProvider(new Factory()) {
           @Override
-          public void querySingleSeries(SingleSeriesQueryRequest request, AsyncMethodCallback<Long> resultHandler) throws TException {
-            throw new TException("Don't worry, this is the exception I constructed.");
+          public AsyncDataClient getAsyncDataClient(Node node, int timeout) throws IOException {
+            return new AsyncDataClient(null, null, TestUtils.getNode(0), null) {
+              @Override
+              public void querySingleSeries(
+                  SingleSeriesQueryRequest request, AsyncMethodCallback<Long> resultHandler)
+                  throws TException {
+                throw new TException("Don't worry, this is the exception I constructed.");
+              }
+            };
           }
-        };
-      }
-    });
+        });
   }
 
   @Test
@@ -71,8 +73,8 @@ public class DatasourceInfoTest {
     RemoteQueryContext context = new RemoteQueryContext(1);
 
     try {
-      DataSourceInfo sourceInfo = new DataSourceInfo(group, TSDataType.DOUBLE,
-        request, context, metaGroupMember, group);
+      DataSourceInfo sourceInfo =
+          new DataSourceInfo(group, TSDataType.DOUBLE, request, context, metaGroupMember, group);
       boolean hasClient = sourceInfo.hasNextDataClient(false, Long.MIN_VALUE);
 
       assertFalse(hasClient);

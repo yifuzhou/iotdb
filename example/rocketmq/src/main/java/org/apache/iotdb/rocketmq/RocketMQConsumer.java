@@ -44,8 +44,13 @@ public class RocketMQConsumer {
   private String producerGroup;
   private String serverAddresses;
 
-  public RocketMQConsumer(String producerGroup, String serverAddresses, String connectionHost,
-      int connectionPort, String user, String password)
+  public RocketMQConsumer(
+      String producerGroup,
+      String serverAddresses,
+      String connectionHost,
+      int connectionPort,
+      String user,
+      String password)
       throws IoTDBConnectionException, StatementExecutionException {
     this.producerGroup = producerGroup;
     this.serverAddresses = serverAddresses;
@@ -56,15 +61,15 @@ public class RocketMQConsumer {
 
   public static void main(String[] args)
       throws MQClientException, StatementExecutionException, IoTDBConnectionException {
-    /**
-     *Instantiate with specified consumer group name and specify name server addresses.
-     */
-    RocketMQConsumer consumer = new RocketMQConsumer(Constant.CONSUMER_GROUP,
-        Constant.SERVER_ADDRESS,
-        Constant.IOTDB_CONNECTION_HOST,
-        Constant.IOTDB_CONNECTION_PORT,
-        Constant.IOTDB_CONNECTION_USER,
-        Constant.IOTDB_CONNECTION_PASSWORD);
+    /** Instantiate with specified consumer group name and specify name server addresses. */
+    RocketMQConsumer consumer =
+        new RocketMQConsumer(
+            Constant.CONSUMER_GROUP,
+            Constant.SERVER_ADDRESS,
+            Constant.IOTDB_CONNECTION_HOST,
+            Constant.IOTDB_CONNECTION_PORT,
+            Constant.IOTDB_CONNECTION_USER,
+            Constant.IOTDB_CONNECTION_PASSWORD);
     consumer.prepareConsume();
     consumer.addStorageGroup(Constant.ADDITIONAL_STORAGE_GROUP);
     consumer.start();
@@ -150,31 +155,31 @@ public class RocketMQConsumer {
    * @throws MQClientException
    */
   public void prepareConsume() throws MQClientException {
-    /**
-     * Subscribe one more more topics to consume.
-     */
+    /** Subscribe one more more topics to consume. */
     consumer.subscribe(Constant.TOPIC, "*");
     /**
-     * Setting Consumer to start first from the head of the queue or from the tail of the queue
-     * If not for the first time, then continue to consume according to the position of last consumption.
+     * Setting Consumer to start first from the head of the queue or from the tail of the queue If
+     * not for the first time, then continue to consume according to the position of last
+     * consumption.
      */
     consumer.setConsumeFromWhere(ConsumeFromWhere.CONSUME_FROM_FIRST_OFFSET);
-    /**
-     * Register callback to execute on arrival of messages fetched from brokers.
-     */
-    consumer.registerMessageListener((MessageListenerOrderly) (msgs, context) -> {
-      for (MessageExt msg : msgs) {
-        logger
-            .info(String.format("%s Receive New Messages: %s %n", Thread.currentThread().getName(),
-                new String(msg.getBody())));
-        try {
-          insert(new String(msg.getBody()));
-        } catch (Exception e) {
-          logger.error(e.getMessage());
-        }
-      }
-      return ConsumeOrderlyStatus.SUCCESS;
-    });
+    /** Register callback to execute on arrival of messages fetched from brokers. */
+    consumer.registerMessageListener(
+        (MessageListenerOrderly)
+            (msgs, context) -> {
+              for (MessageExt msg : msgs) {
+                logger.info(
+                    String.format(
+                        "%s Receive New Messages: %s %n",
+                        Thread.currentThread().getName(), new String(msg.getBody())));
+                try {
+                  insert(new String(msg.getBody()));
+                } catch (Exception e) {
+                  logger.error(e.getMessage());
+                }
+              }
+              return ConsumeOrderlyStatus.SUCCESS;
+            });
   }
 
   public void shutdown() {

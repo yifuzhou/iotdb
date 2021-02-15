@@ -26,7 +26,6 @@ import org.apache.iotdb.cluster.rpc.thrift.Node;
 import org.apache.iotdb.db.utils.SerializeUtils;
 import org.apache.iotdb.tsfile.utils.ReadWriteIOUtils;
 
-
 public class HardState {
 
   private long currentTerm;
@@ -57,11 +56,17 @@ public class HardState {
   public ByteBuffer serialize() {
     int totalSize = Long.BYTES + Byte.BYTES;
     // currentTerm(long), marker(byte)
-    // (optional) ipLength(int), ipBytes(byte[]), port(int), identifier(int), dataPort(int), clientPort(int)
+    // (optional) ipLength(int), ipBytes(byte[]), port(int), identifier(int), dataPort(int),
+    // clientPort(int)
     if (voteFor != null) {
       byte[] ipBytes = voteFor.getIp().getBytes();
       totalSize +=
-          Integer.BYTES + ipBytes.length + Integer.BYTES + Integer.BYTES + Integer.BYTES + Integer.BYTES;
+          Integer.BYTES
+              + ipBytes.length
+              + Integer.BYTES
+              + Integer.BYTES
+              + Integer.BYTES
+              + Integer.BYTES;
       byte[] buffer = new byte[totalSize];
       ByteBuffer byteBuffer = ByteBuffer.wrap(buffer);
       byteBuffer.putLong(currentTerm);
@@ -117,17 +122,11 @@ public class HardState {
 
   @Override
   public int hashCode() {
-    return new HashCodeBuilder(17, 37)
-        .append(currentTerm)
-        .append(voteFor)
-        .toHashCode();
+    return new HashCodeBuilder(17, 37).append(currentTerm).append(voteFor).toHashCode();
   }
 
   @Override
   public String toString() {
-    return "HardState{" +
-        "currentTerm=" + currentTerm +
-        ", voteFor=" + voteFor +
-        '}';
+    return "HardState{" + "currentTerm=" + currentTerm + ", voteFor=" + voteFor + '}';
   }
 }

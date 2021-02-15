@@ -34,7 +34,7 @@ public class MManagerWhiteBox {
       new File(logFilePath).getParentFile().mkdirs();
       Whitebox.setInternalState(manager, "logFilePath", logFilePath);
       manager.init();
-      return  manager;
+      return manager;
     } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
       e.printStackTrace();
     }
@@ -42,12 +42,11 @@ public class MManagerWhiteBox {
   }
 
   private static Constructor<MManager> getMManagerConstructor() {
-      try {
-        return MManager.class.getDeclaredConstructor();
-      } catch (NoSuchMethodException e) {
-        e.printStackTrace();
-      }
+    try {
+      return MManager.class.getDeclaredConstructor();
+    } catch (NoSuchMethodException e) {
+      e.printStackTrace();
+    }
     return null;
   }
-
 }

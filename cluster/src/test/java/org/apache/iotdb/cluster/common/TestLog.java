@@ -51,8 +51,7 @@ public class TestLog extends Log {
       return false;
     }
     TestLog obj1 = (TestLog) obj;
-    return getCurrLogIndex() == obj1.getCurrLogIndex() &&
-        getCurrLogTerm() == obj1.getCurrLogTerm();
+    return getCurrLogIndex() == obj1.getCurrLogIndex() && getCurrLogTerm() == obj1.getCurrLogTerm();
   }
 
   @Override

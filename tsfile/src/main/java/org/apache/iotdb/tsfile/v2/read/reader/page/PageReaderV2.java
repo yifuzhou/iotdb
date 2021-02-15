@@ -20,7 +20,6 @@ package org.apache.iotdb.tsfile.v2.read.reader.page;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
-
 import org.apache.iotdb.tsfile.encoding.decoder.Decoder;
 import org.apache.iotdb.tsfile.encoding.decoder.PlainDecoder;
 import org.apache.iotdb.tsfile.exception.write.UnSupportedDataTypeException;
@@ -34,19 +33,26 @@ import org.apache.iotdb.tsfile.utils.Binary;
 
 public class PageReaderV2 extends PageReader {
 
-  public PageReaderV2(ByteBuffer pageData, TSDataType dataType, Decoder valueDecoder,
-      Decoder timeDecoder, Filter filter) {
+  public PageReaderV2(
+      ByteBuffer pageData,
+      TSDataType dataType,
+      Decoder valueDecoder,
+      Decoder timeDecoder,
+      Filter filter) {
     this(null, pageData, dataType, valueDecoder, timeDecoder, filter);
   }
 
-  public PageReaderV2(PageHeader pageHeader, ByteBuffer pageData, TSDataType dataType,
-      Decoder valueDecoder, Decoder timeDecoder, Filter filter) {
+  public PageReaderV2(
+      PageHeader pageHeader,
+      ByteBuffer pageData,
+      TSDataType dataType,
+      Decoder valueDecoder,
+      Decoder timeDecoder,
+      Filter filter) {
     super(pageHeader, pageData, dataType, valueDecoder, timeDecoder, filter);
   }
 
-  /**
-   * @return the returned BatchData may be empty, but never be null
-   */
+  /** @return the returned BatchData may be empty, but never be null */
   @SuppressWarnings("squid:S3776") // Suppress high Cognitive Complexity warning
   @Override
   public BatchData getAllSatisfiedPageData(boolean ascending) throws IOException {
@@ -61,8 +67,10 @@ public class PageReaderV2 extends PageReader {
       long timestamp = timeDecoder.readLong(timeBuffer);
       switch (dataType) {
         case INT32:
-          int anInt = (valueDecoder instanceof PlainDecoder) ?
-              valueBuffer.getInt() : valueDecoder.readInt(valueBuffer);
+          int anInt =
+              (valueDecoder instanceof PlainDecoder)
+                  ? valueBuffer.getInt()
+                  : valueDecoder.readInt(valueBuffer);
           if (!isDeleted(timestamp) && (filter == null || filter.satisfy(timestamp, anInt))) {
             pageData.putInt(timestamp, anInt);
           }

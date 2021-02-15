@@ -53,9 +53,13 @@ public class GroupByFillDataSet extends QueryDataSet {
   private TimeValuePair[] firstNotNullTV;
   private boolean isPeekEnded = false;
 
-  public GroupByFillDataSet(List<PartialPath> paths, List<TSDataType> dataTypes,
+  public GroupByFillDataSet(
+      List<PartialPath> paths,
+      List<TSDataType> dataTypes,
       GroupByEngineDataSet groupByEngineDataSet,
-      Map<TSDataType, IFill> fillTypes, QueryContext context, GroupByTimeFillPlan groupByFillPlan)
+      Map<TSDataType, IFill> fillTypes,
+      QueryContext context,
+      GroupByTimeFillPlan groupByFillPlan)
       throws StorageEngineException, IOException, QueryProcessException {
     super(new ArrayList<>(paths), dataTypes, groupByFillPlan.isAscending());
     this.groupByEngineDataSet = groupByEngineDataSet;
@@ -80,15 +84,25 @@ public class GroupByFillDataSet extends QueryDataSet {
       TSDataType dataType = dataTypes.get(i);
       IFill fill;
       if (fillTypes.containsKey(dataType)) {
-        fill = new PreviousFill(dataType, groupByEngineDataSet.getStartTime(),
-            ((PreviousFill) fillTypes.get(dataType)).getBeforeRange(),
-            ((PreviousFill) fillTypes.get(dataType)).isUntilLast());
+        fill =
+            new PreviousFill(
+                dataType,
+                groupByEngineDataSet.getStartTime(),
+                ((PreviousFill) fillTypes.get(dataType)).getBeforeRange(),
+                ((PreviousFill) fillTypes.get(dataType)).isUntilLast());
       } else {
-        fill = new PreviousFill(dataType, groupByEngineDataSet.getStartTime(),
-            IoTDBDescriptor.getInstance().getConfig().getDefaultFillInterval());
+        fill =
+            new PreviousFill(
+                dataType,
+                groupByEngineDataSet.getStartTime(),
+                IoTDBDescriptor.getInstance().getConfig().getDefaultFillInterval());
       }
-      fill.configureFill(path, dataType, groupByEngineDataSet.getStartTime(),
-          groupByFillPlan.getAllMeasurementsInDevice(path.getDevice()), context);
+      fill.configureFill(
+          path,
+          dataType,
+          groupByEngineDataSet.getStartTime(),
+          groupByFillPlan.getAllMeasurementsInDevice(path.getDevice()),
+          context);
 
       firstNotNullTV[i] = fill.getFillResult();
       TimeValuePair timeValuePair = firstNotNullTV[i];
@@ -110,8 +124,8 @@ public class GroupByFillDataSet extends QueryDataSet {
       seriesPaths.add((PartialPath) paths.get(i));
     }
     List<Pair<Boolean, TimeValuePair>> lastValueContainer =
-            LastQueryExecutor.calculateLastPairForSeriesLocally(
-                    seriesPaths, dataTypes, context, null, groupByFillPlan.getDeviceToMeasurements());
+        LastQueryExecutor.calculateLastPairForSeriesLocally(
+            seriesPaths, dataTypes, context, null, groupByFillPlan.getDeviceToMeasurements());
     for (int i = 0; i < lastValueContainer.size(); i++) {
       if (Boolean.TRUE.equals(lastValueContainer.get(i).left)) {
         lastTimeArray[i] = lastValueContainer.get(i).right.getTimestamp();
@@ -134,7 +148,7 @@ public class GroupByFillDataSet extends QueryDataSet {
       // current group by result is null
       if (field == null || field.getDataType() == null) {
         TSDataType tsDataType = dataTypes.get(i);
-        //for desc query peek previous time and value
+        // for desc query peek previous time and value
         if (!ascending && !isPeekEnded && !canUseCacheData(rowRecord, tsDataType, i)) {
           fillCache(i);
         }
@@ -169,7 +183,8 @@ public class GroupByFillDataSet extends QueryDataSet {
 
   // the previous value is not null
   // and (fill type is not previous until last or now time is before last time)
-  // and (previous before range is not limited or previous before range contains the previous interval)
+  // and (previous before range is not limited or previous before range contains the previous
+  // interval)
   private boolean canUseCacheData(RowRecord rowRecord, TSDataType tsDataType, int i) {
     PreviousFill previousFill = (PreviousFill) fillTypes.get(tsDataType);
     return !cacheIsEmpty(i)
@@ -182,14 +197,15 @@ public class GroupByFillDataSet extends QueryDataSet {
     return rowRecord.getTimestamp() >= time;
   }
 
-  private boolean satisfyTime(RowRecord rowRecord, TSDataType tsDataType,
-      PreviousFill previousFill, long lastTime) {
+  private boolean satisfyTime(
+      RowRecord rowRecord, TSDataType tsDataType, PreviousFill previousFill, long lastTime) {
     return (fillTypes.containsKey(tsDataType) && !previousFill.isUntilLast())
         || rowRecord.getTimestamp() <= lastTime;
   }
 
   private boolean satisfyRange(TSDataType tsDataType, PreviousFill previousFill) {
-    return !fillTypes.containsKey(tsDataType) || previousFill.getBeforeRange() < 0
+    return !fillTypes.containsKey(tsDataType)
+        || previousFill.getBeforeRange() < 0
         || previousFill.getBeforeRange() >= groupByEngineDataSet.interval;
   }
 

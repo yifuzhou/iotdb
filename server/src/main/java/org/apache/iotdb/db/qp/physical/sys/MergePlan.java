@@ -38,5 +38,4 @@ public class MergePlan extends PhysicalPlan {
   public List<PartialPath> getPaths() {
     return Collections.emptyList();
   }
-
 }

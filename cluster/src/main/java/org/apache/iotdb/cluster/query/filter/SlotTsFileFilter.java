@@ -44,14 +44,17 @@ public class SlotTsFileFilter implements TsFileFilter {
   }
 
   private static boolean fileNotInSlots(TsFileResource resource, List<Integer> nodeSlots) {
-    Pair<String, Long> sgNameAndPartitionIdPair = FilePathUtils
-        .getLogicalSgNameAndTimePartitionIdPair(resource);
-    int slot = SlotPartitionTable.getSlotStrategy()
-        .calculateSlotByPartitionNum(sgNameAndPartitionIdPair.left, sgNameAndPartitionIdPair.right,
-            ClusterConstant.SLOT_NUM);
+    Pair<String, Long> sgNameAndPartitionIdPair =
+        FilePathUtils.getLogicalSgNameAndTimePartitionIdPair(resource);
+    int slot =
+        SlotPartitionTable.getSlotStrategy()
+            .calculateSlotByPartitionNum(
+                sgNameAndPartitionIdPair.left,
+                sgNameAndPartitionIdPair.right,
+                ClusterConstant.SLOT_NUM);
     boolean contained = nodeSlots.contains(slot);
-    logger.debug("The slot of {} is {}, contained: {}", resource.getTsFile().getPath(), slot,
-        contained);
+    logger.debug(
+        "The slot of {} is {}, contained: {}", resource.getTsFile().getPath(), slot, contained);
     return !contained;
   }
 }

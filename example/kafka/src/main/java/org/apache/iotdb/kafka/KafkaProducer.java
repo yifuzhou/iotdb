@@ -25,9 +25,7 @@ import kafka.producer.ProducerConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * The class is to show how to send data to kafka through multi-threads.
- */
+/** The class is to show how to send data to kafka through multi-threads. */
 public class KafkaProducer {
 
   private final Producer<String, String> producer;
@@ -59,7 +57,7 @@ public class KafkaProducer {
     }
   }
 
-  public void close(){
+  public void close() {
     producer.close();
   }
 }

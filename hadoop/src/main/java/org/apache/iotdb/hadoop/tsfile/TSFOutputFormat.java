@@ -18,6 +18,8 @@
  */
 package org.apache.iotdb.hadoop.tsfile;
 
+import java.io.IOException;
+import java.util.Objects;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.mapreduce.RecordWriter;
@@ -27,9 +29,6 @@ import org.apache.iotdb.hadoop.tsfile.record.HDFSTSRecord;
 import org.apache.iotdb.tsfile.write.schema.Schema;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
-import java.util.Objects;
 
 public class TSFOutputFormat extends FileOutputFormat<NullWritable, HDFSTSRecord> {
 
@@ -50,8 +49,8 @@ public class TSFOutputFormat extends FileOutputFormat<NullWritable, HDFSTSRecord
       throws IOException {
 
     Path outputPath = getDefaultWorkFile(job, extension);
-    logger.info("The task attempt id is {}, the output path is {}", job.getTaskAttemptID(),
-        outputPath);
+    logger.info(
+        "The task attempt id is {}, the output path is {}", job.getTaskAttemptID(), outputPath);
     return new TSFRecordWriter(job, outputPath, Objects.requireNonNull(schema));
   }
 }

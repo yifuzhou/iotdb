@@ -41,8 +41,8 @@ public class LoadConfigurationPlan extends PhysicalPlan {
 
   LoadConfigurationPlanType loadConfigurationPlanType;
 
-  public LoadConfigurationPlan(LoadConfigurationPlanType loadConfigurationPlanType,
-      Properties[] propertiesArray)
+  public LoadConfigurationPlan(
+      LoadConfigurationPlanType loadConfigurationPlanType, Properties[] propertiesArray)
       throws QueryProcessException {
     super(false, OperatorType.LOAD_CONFIGURATION);
     if (loadConfigurationPlanType != LoadConfigurationPlanType.GLOBAL) {
@@ -137,6 +137,7 @@ public class LoadConfigurationPlan extends PhysicalPlan {
   }
 
   public enum LoadConfigurationPlanType {
-    GLOBAL, LOCAL
+    GLOBAL,
+    LOCAL
   }
 }

@@ -60,54 +60,64 @@ public class RemoteSeriesReaderByTimestampTest {
   public void setUp() {
     prevUseAsyncServer = ClusterDescriptor.getInstance().getConfig().isUseAsyncServer();
     ClusterDescriptor.getInstance().getConfig().setUseAsyncServer(true);
-    metaGroupMember.setClientProvider(new DataClientProvider(new Factory()) {
-      @Override
-      public AsyncDataClient getAsyncDataClient(Node node, int timeout) throws IOException {
-        return new AsyncDataClient(null, null, node, null) {
+    metaGroupMember.setClientProvider(
+        new DataClientProvider(new Factory()) {
           @Override
-          public void fetchSingleSeriesByTimestamp(Node header, long readerId, long time,
-              AsyncMethodCallback<ByteBuffer> resultHandler) throws TException {
-            if (failedNodes.contains(node)) {
-              throw new TException("Node down.");
-            }
-
-            new Thread(() -> {
-              ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-              DataOutputStream dataOutputStream = new DataOutputStream(byteArrayOutputStream);
-              boolean isNull = true;
-              while (batchData.hasCurrent()) {
-                long currentTime = batchData.currentTime();
-                Object value = batchData.currentValue();
-                if (currentTime == time) {
-                  SerializeUtils.serializeObject(value, dataOutputStream);
-                  batchData.next();
-                  isNull = false;
-                  break;
-                } else if (currentTime > time) {
-                  break;
+          public AsyncDataClient getAsyncDataClient(Node node, int timeout) throws IOException {
+            return new AsyncDataClient(null, null, node, null) {
+              @Override
+              public void fetchSingleSeriesByTimestamp(
+                  Node header,
+                  long readerId,
+                  long time,
+                  AsyncMethodCallback<ByteBuffer> resultHandler)
+                  throws TException {
+                if (failedNodes.contains(node)) {
+                  throw new TException("Node down.");
                 }
-                // time < timestamp, continue
-                batchData.next();
-              }
-              if (isNull) {
-                SerializeUtils.serializeObject(null, dataOutputStream);
-              }
-              resultHandler.onComplete(ByteBuffer.wrap(byteArrayOutputStream.toByteArray()));
-            }).start();
-          }
 
-          @Override
-          public void querySingleSeriesByTimestamp(SingleSeriesQueryRequest request,
-              AsyncMethodCallback<Long> resultHandler) throws TException {
-            if (failedNodes.contains(node)) {
-              throw new TException("Node down.");
-            }
+                new Thread(
+                        () -> {
+                          ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                          DataOutputStream dataOutputStream =
+                              new DataOutputStream(byteArrayOutputStream);
+                          boolean isNull = true;
+                          while (batchData.hasCurrent()) {
+                            long currentTime = batchData.currentTime();
+                            Object value = batchData.currentValue();
+                            if (currentTime == time) {
+                              SerializeUtils.serializeObject(value, dataOutputStream);
+                              batchData.next();
+                              isNull = false;
+                              break;
+                            } else if (currentTime > time) {
+                              break;
+                            }
+                            // time < timestamp, continue
+                            batchData.next();
+                          }
+                          if (isNull) {
+                            SerializeUtils.serializeObject(null, dataOutputStream);
+                          }
+                          resultHandler.onComplete(
+                              ByteBuffer.wrap(byteArrayOutputStream.toByteArray()));
+                        })
+                    .start();
+              }
 
-            new Thread(() -> resultHandler.onComplete(1L)).start();
+              @Override
+              public void querySingleSeriesByTimestamp(
+                  SingleSeriesQueryRequest request, AsyncMethodCallback<Long> resultHandler)
+                  throws TException {
+                if (failedNodes.contains(node)) {
+                  throw new TException("Node down.");
+                }
+
+                new Thread(() -> resultHandler.onComplete(1L)).start();
+              }
+            };
           }
-        };
-      }
-    });
+        });
   }
 
   @After
@@ -128,8 +138,8 @@ public class RemoteSeriesReaderByTimestampTest {
     RemoteQueryContext context = new RemoteQueryContext(1);
 
     try {
-      DataSourceInfo sourceInfo = new DataSourceInfo(group, TSDataType.DOUBLE,
-          request, context, metaGroupMember, group);
+      DataSourceInfo sourceInfo =
+          new DataSourceInfo(group, TSDataType.DOUBLE, request, context, metaGroupMember, group);
       sourceInfo.hasNextDataClient(true, Long.MIN_VALUE);
 
       RemoteSeriesReaderByTimestamp reader = new RemoteSeriesReaderByTimestamp(sourceInfo);
@@ -155,16 +165,17 @@ public class RemoteSeriesReaderByTimestampTest {
     RemoteQueryContext context = new RemoteQueryContext(1);
 
     try {
-      DataSourceInfo sourceInfo = new DataSourceInfo(group, TSDataType.DOUBLE,
-          request, context, metaGroupMember, group);
+      DataSourceInfo sourceInfo =
+          new DataSourceInfo(group, TSDataType.DOUBLE, request, context, metaGroupMember, group);
       long startTime = System.currentTimeMillis();
       sourceInfo.hasNextDataClient(true, Long.MIN_VALUE);
       RemoteSeriesReaderByTimestamp reader = new RemoteSeriesReaderByTimestamp(sourceInfo);
 
       long endTime = System.currentTimeMillis();
       System.out.println(
-          Thread.currentThread().getStackTrace()[1].getLineNumber() + " begin: " + (endTime
-              - startTime));
+          Thread.currentThread().getStackTrace()[1].getLineNumber()
+              + " begin: "
+              + (endTime - startTime));
       // normal read
       assertEquals(TestUtils.getNode(0), sourceInfo.getCurrentNode());
       for (int i = 0; i < 50; i++) {
@@ -173,8 +184,9 @@ public class RemoteSeriesReaderByTimestampTest {
 
       endTime = System.currentTimeMillis();
       System.out.println(
-          Thread.currentThread().getStackTrace()[1].getLineNumber() + " begin: " + (endTime
-              - startTime));
+          Thread.currentThread().getStackTrace()[1].getLineNumber()
+              + " begin: "
+              + (endTime - startTime));
       failedNodes.add(TestUtils.getNode(0));
       for (int i = 50; i < 80; i++) {
         assertEquals(i * 1.0, reader.getValueInTimestamp(i));
@@ -190,8 +202,9 @@ public class RemoteSeriesReaderByTimestampTest {
 
       endTime = System.currentTimeMillis();
       System.out.println(
-          Thread.currentThread().getStackTrace()[1].getLineNumber() + " begin: " + (endTime
-              - startTime));
+          Thread.currentThread().getStackTrace()[1].getLineNumber()
+              + " begin: "
+              + (endTime - startTime));
       // all node failed
       failedNodes.add(TestUtils.getNode(2));
 
@@ -203,8 +216,9 @@ public class RemoteSeriesReaderByTimestampTest {
       }
       endTime = System.currentTimeMillis();
       System.out.println(
-          Thread.currentThread().getStackTrace()[1].getLineNumber() + " begin: " + (endTime
-              - startTime));
+          Thread.currentThread().getStackTrace()[1].getLineNumber()
+              + " begin: "
+              + (endTime - startTime));
     } finally {
       QueryResourceManager.getInstance().endQuery(context.getQueryId());
     }

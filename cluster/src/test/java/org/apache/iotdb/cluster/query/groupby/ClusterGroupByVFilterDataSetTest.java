@@ -72,21 +72,24 @@ public class ClusterGroupByVFilterDataSetTest extends BaseQueryTest {
       groupByPlan.setSlidingStep(5);
       groupByPlan.setInterval(5);
 
-      IExpression expression = BinaryExpression.and(
-          new SingleSeriesExpression(new PartialPath(TestUtils.getTestSeries(0, 0)), ValueFilter.gtEq(5.0)),
-          new SingleSeriesExpression(new PartialPath(TestUtils.getTestSeries(5, 0)), TimeFilter.ltEq(15))
-      );
+      IExpression expression =
+          BinaryExpression.and(
+              new SingleSeriesExpression(
+                  new PartialPath(TestUtils.getTestSeries(0, 0)), ValueFilter.gtEq(5.0)),
+              new SingleSeriesExpression(
+                  new PartialPath(TestUtils.getTestSeries(5, 0)), TimeFilter.ltEq(15)));
       groupByPlan.setExpression(expression);
 
-      ClusterGroupByVFilterDataSet dataSet = new ClusterGroupByVFilterDataSet(queryContext,
-          groupByPlan, testMetaMember);
+      ClusterGroupByVFilterDataSet dataSet =
+          new ClusterGroupByVFilterDataSet(queryContext, groupByPlan, testMetaMember);
 
-      Object[][] answers = new Object[][] {
-          new Object[] {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0},
-          new Object[] {5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0},
-          new Object[] {5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0},
-          new Object[] {1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0},
-      };
+      Object[][] answers =
+          new Object[][] {
+            new Object[] {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0},
+            new Object[] {5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0},
+            new Object[] {5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0},
+            new Object[] {1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0},
+          };
       for (Object[] answer : answers) {
         checkDoubleDataset(dataSet, answer);
       }

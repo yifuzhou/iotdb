@@ -38,7 +38,9 @@ public class PullMeasurementSchemaHandler implements AsyncMethodCallback<PullSch
   private List<String> prefixPaths;
   private AtomicReference<List<MeasurementSchema>> timeseriesSchemas;
 
-  public PullMeasurementSchemaHandler(Node owner, List<String> prefixPaths,
+  public PullMeasurementSchemaHandler(
+      Node owner,
+      List<String> prefixPaths,
       AtomicReference<List<MeasurementSchema>> timeseriesSchemas) {
     this.owner = owner;
     this.prefixPaths = prefixPaths;

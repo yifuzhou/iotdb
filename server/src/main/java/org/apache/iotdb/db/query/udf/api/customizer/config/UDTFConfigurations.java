@@ -28,8 +28,8 @@ import org.apache.iotdb.db.query.udf.api.collector.PointCollector;
 import org.apache.iotdb.db.query.udf.api.customizer.parameter.UDFParameters;
 import org.apache.iotdb.db.query.udf.api.customizer.strategy.AccessStrategy;
 import org.apache.iotdb.db.query.udf.api.customizer.strategy.RowByRowAccessStrategy;
-import org.apache.iotdb.db.query.udf.api.customizer.strategy.SlidingTimeWindowAccessStrategy;
 import org.apache.iotdb.db.query.udf.api.customizer.strategy.SlidingSizeWindowAccessStrategy;
+import org.apache.iotdb.db.query.udf.api.customizer.strategy.SlidingTimeWindowAccessStrategy;
 import org.apache.iotdb.tsfile.file.metadata.enums.TSDataType;
 
 /**
@@ -79,7 +79,7 @@ public class UDTFConfigurations extends UDFConfigurations {
    * Used to specify the strategy for accessing raw query data in UDTF.
    *
    * @param accessStrategy the specified access strategy. it should be an instance of {@link
-   *                       AccessStrategy}.
+   *     AccessStrategy}.
    * @return this
    * @see RowByRowAccessStrategy
    * @see SlidingTimeWindowAccessStrategy

@@ -20,7 +20,6 @@ package org.apache.iotdb.tsfile.utils;
 
 import java.io.Serializable;
 import java.util.Arrays;
-
 import org.apache.iotdb.tsfile.common.conf.TSFileConfig;
 
 /**
@@ -32,9 +31,7 @@ public class Binary implements Comparable<Binary>, Serializable {
   private static final long serialVersionUID = 6394197743397020735L;
   private byte[] values;
 
-  /**
-   * if the bytes v is modified, the modification is visible to this binary.
-   */
+  /** if the bytes v is modified, the modification is visible to this binary. */
   public Binary(byte[] v) {
     this.values = v;
   }

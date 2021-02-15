@@ -40,8 +40,9 @@ public class SerializableIntTVListTest extends SerializableTVListTest {
   public void setUp() throws Exception {
     super.setUp();
     originalList = new ArrayList<>();
-    testList = (SerializableIntTVList) SerializableTVList
-        .newSerializableTVList(TSDataType.INT32, QUERY_ID);
+    testList =
+        (SerializableIntTVList)
+            SerializableTVList.newSerializableTVList(TSDataType.INT32, QUERY_ID);
   }
 
   @Override

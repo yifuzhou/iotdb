@@ -20,7 +20,6 @@ package org.apache.iotdb.tsfile.v2.file.metadata;
 
 import java.nio.ByteBuffer;
 import java.util.List;
-
 import org.apache.iotdb.tsfile.file.metadata.TsFileMetadata;
 import org.apache.iotdb.tsfile.utils.BloomFilter;
 import org.apache.iotdb.tsfile.utils.Pair;
@@ -28,8 +27,7 @@ import org.apache.iotdb.tsfile.utils.ReadWriteIOUtils;
 
 public class TsFileMetadataV2 {
 
-  private TsFileMetadataV2() {
-  }
+  private TsFileMetadataV2() {}
 
   /**
    * deserialize data from the buffer.
@@ -37,7 +35,8 @@ public class TsFileMetadataV2 {
    * @param buffer -buffer use to deserialize
    * @return -a instance of TsFileMetaData
    */
-  public static TsFileMetadata deserializeFrom(ByteBuffer buffer, List<Pair<Long, Long>> versionInfo) {
+  public static TsFileMetadata deserializeFrom(
+      ByteBuffer buffer, List<Pair<Long, Long>> versionInfo) {
     TsFileMetadata fileMetaData = new TsFileMetadata();
 
     // metadataIndex
@@ -66,10 +65,10 @@ public class TsFileMetadataV2 {
       buffer.get(bytes);
       int filterSize = ReadWriteIOUtils.readInt(buffer);
       int hashFunctionSize = ReadWriteIOUtils.readInt(buffer);
-      fileMetaData.setBloomFilter(BloomFilter.buildBloomFilter(bytes, filterSize, hashFunctionSize));
+      fileMetaData.setBloomFilter(
+          BloomFilter.buildBloomFilter(bytes, filterSize, hashFunctionSize));
     }
 
     return fileMetaData;
   }
-
 }

@@ -35,7 +35,7 @@ import org.junit.Test;
 public class IoTDBTracingTest {
 
   @BeforeClass
-  public static void setUp(){
+  public static void setUp() {
     EnvironmentUtils.closeStatMonitor();
     EnvironmentUtils.envSetUp();
   }
@@ -48,8 +48,9 @@ public class IoTDBTracingTest {
   @Test
   public void tracingTest() throws ClassNotFoundException {
     Class.forName(Config.JDBC_DRIVER_NAME);
-    try (Connection connection = DriverManager
-        .getConnection(Config.IOTDB_URL_PREFIX + "127.0.0.1:6667/", "root", "root");
+    try (Connection connection =
+            DriverManager.getConnection(
+                Config.IOTDB_URL_PREFIX + "127.0.0.1:6667/", "root", "root");
         Statement statement = connection.createStatement()) {
       IoTDBConfig config = IoTDBDescriptor.getInstance().getConfig();
       Assert.assertEquals(false, config.isEnablePerformanceTracing());

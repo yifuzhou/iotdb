@@ -37,5 +37,4 @@ public class IoTDBSQLException extends SQLException {
   public IoTDBSQLException(Throwable cause) {
     super(cause);
   }
-
 }

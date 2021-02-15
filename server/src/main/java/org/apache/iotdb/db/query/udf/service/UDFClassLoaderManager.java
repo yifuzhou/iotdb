@@ -38,16 +38,13 @@ public class UDFClassLoaderManager implements IService {
 
   private final String libRoot;
 
-  /**
-   * The keys in the map are the query IDs of the UDF queries being executed.
-   */
+  /** The keys in the map are the query IDs of the UDF queries being executed. */
   private final Map<Long, UDFClassLoader> queryIdToUDFClassLoaderMap;
 
   /**
    * activeClassLoader is used to load all classes under libRoot. libRoot may be updated before the
    * user executes CREATE FUNCTION or after the user executes DROP FUNCTION. Therefore, we need to
-   * continuously maintain the activeClassLoader so that the classes it loads are always up to
-   * date.
+   * continuously maintain the activeClassLoader so that the classes it loads are always up to date.
    */
   @SuppressWarnings("squid:S3077")
   private volatile UDFClassLoader activeClassLoader;
@@ -69,8 +66,8 @@ public class UDFClassLoaderManager implements IService {
     try {
       classLoader.release();
     } catch (IOException e) {
-      logger
-          .warn("Failed to close UDFClassLoader (queryId: {}), because {}", queryId, e.toString());
+      logger.warn(
+          "Failed to close UDFClassLoader (queryId: {}), because {}", queryId, e.toString());
     }
   }
 
@@ -121,7 +118,6 @@ public class UDFClassLoaderManager implements IService {
 
     private static final UDFClassLoaderManager INSTANCE = new UDFClassLoaderManager();
 
-    private UDFClassLoaderManagerHelper() {
-    }
+    private UDFClassLoaderManagerHelper() {}
   }
 }

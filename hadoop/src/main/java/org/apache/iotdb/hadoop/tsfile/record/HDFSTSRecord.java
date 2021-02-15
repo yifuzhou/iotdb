@@ -18,6 +18,12 @@
  */
 package org.apache.iotdb.hadoop.tsfile.record;
 
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 import org.apache.hadoop.io.Writable;
 import org.apache.iotdb.tsfile.exception.write.UnSupportedDataTypeException;
 import org.apache.iotdb.tsfile.file.metadata.enums.TSDataType;
@@ -26,27 +32,13 @@ import org.apache.iotdb.tsfile.utils.StringContainer;
 import org.apache.iotdb.tsfile.write.record.TSRecord;
 import org.apache.iotdb.tsfile.write.record.datapoint.*;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
-
 public class HDFSTSRecord implements Writable {
 
-
-  /**
-   * timestamp of this TSRecord.
-   **/
+  /** timestamp of this TSRecord. */
   private long time;
-  /**
-   * deviceId of this TSRecord.
-   **/
+  /** deviceId of this TSRecord. */
   private String deviceId;
-  /**
-   * all value of this TSRecord.
-   **/
+  /** all value of this TSRecord. */
   private List<DataPoint> dataPointList = new ArrayList<>();
 
   public long getTime() {
@@ -73,14 +65,13 @@ public class HDFSTSRecord implements Writable {
     this.dataPointList = dataPointList;
   }
 
-  public HDFSTSRecord() {
-  }
+  public HDFSTSRecord() {}
 
   /**
    * constructor of HDFSTSRecord.
    *
    * @param timestamp timestamp of this TSRecord
-   * @param deviceId  deviceId of this TSRecord
+   * @param deviceId deviceId of this TSRecord
    */
   public HDFSTSRecord(long timestamp, String deviceId) {
     this.time = timestamp;

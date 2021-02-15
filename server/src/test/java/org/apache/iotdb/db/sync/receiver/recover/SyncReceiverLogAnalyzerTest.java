@@ -68,12 +68,15 @@ public class SyncReceiverLogAnalyzerTest {
 
   @Before
   public void setUp()
-      throws IOException, InterruptedException, StartupException, DiskSpaceInsufficientException, MetadataException {
+      throws IOException, InterruptedException, StartupException, DiskSpaceInsufficientException,
+          MetadataException {
     IoTDBDescriptor.getInstance().getConfig().setSyncEnable(true);
     EnvironmentUtils.closeStatMonitor();
     EnvironmentUtils.envSetUp();
-    dataDir = new File(DirectoryManager.getInstance().getNextFolderForSequenceFile())
-        .getParentFile().getAbsolutePath();
+    dataDir =
+        new File(DirectoryManager.getInstance().getNextFolderForSequenceFile())
+            .getParentFile()
+            .getAbsolutePath();
     logAnalyze = SyncReceiverLogAnalyzer.getInstance();
     initMetadata();
   }
@@ -95,8 +98,8 @@ public class SyncReceiverLogAnalyzerTest {
   @Test
   public void recover()
       throws IOException, StorageEngineException, InterruptedException, IllegalPathException {
-    receiverLogger = new SyncReceiverLogger(
-        new File(getReceiverFolderFile(), SyncConstant.SYNC_LOG_NAME));
+    receiverLogger =
+        new SyncReceiverLogger(new File(getReceiverFolderFile(), SyncConstant.SYNC_LOG_NAME));
     fileLoader = FileLoader.createFileLoader(getReceiverFolderFile());
     Map<String, Set<File>> allFileList = new HashMap<>();
     Map<String, Set<File>> correctSequenceLoadedFileMap = new HashMap<>();
@@ -111,18 +114,28 @@ public class SyncReceiverLogAnalyzerTest {
         correctSequenceLoadedFileMap.putIfAbsent(SG_NAME + i, new HashSet<>());
         String rand = String.valueOf(r.nextInt(10000) + i * j);
         String fileName =
-            getSnapshotFolder() + File.separator + SG_NAME + i + File.separator + "0" + File.separator + "0" + File.separator + System
-                .currentTimeMillis() + IoTDBConstant.FILE_NAME_SEPARATOR + rand
-                + IoTDBConstant.FILE_NAME_SEPARATOR + "0.tsfile";
+            getSnapshotFolder()
+                + File.separator
+                + SG_NAME
+                + i
+                + File.separator
+                + "0"
+                + File.separator
+                + "0"
+                + File.separator
+                + System.currentTimeMillis()
+                + IoTDBConstant.FILE_NAME_SEPARATOR
+                + rand
+                + IoTDBConstant.FILE_NAME_SEPARATOR
+                + "0.tsfile";
         Thread.sleep(1);
         File syncFile = new File(fileName);
-        receiverLogger
-            .finishSyncTsfile(syncFile);
+        receiverLogger.finishSyncTsfile(syncFile);
         toBeSyncedFiles.add(syncFile.getAbsolutePath());
-        File dataFile = new File(
-            DirectoryManager.getInstance().getNextFolderForSequenceFile(),
-            syncFile.getParentFile().getName() + File.separatorChar
-                + syncFile.getName());
+        File dataFile =
+            new File(
+                DirectoryManager.getInstance().getNextFolderForSequenceFile(),
+                syncFile.getParentFile().getName() + File.separatorChar + syncFile.getName());
         correctSequenceLoadedFileMap.get(SG_NAME + i).add(dataFile);
         allFileList.get(SG_NAME + i).add(syncFile);
         if (!syncFile.getParentFile().exists()) {
@@ -133,7 +146,7 @@ public class SyncReceiverLogAnalyzerTest {
         }
         if (!new File(syncFile.getAbsolutePath() + TsFileResource.RESOURCE_SUFFIX).exists()
             && !new File(syncFile.getAbsolutePath() + TsFileResource.RESOURCE_SUFFIX)
-            .createNewFile()) {
+                .createNewFile()) {
           LOGGER.error("Can not create new file {}", syncFile.getPath());
         }
         TsFileResource tsFileResource = new TsFileResource(syncFile);
@@ -144,7 +157,8 @@ public class SyncReceiverLogAnalyzerTest {
     }
 
     for (int i = 0; i < 3; i++) {
-      StorageGroupProcessor processor = StorageEngine.getInstance().getProcessor(new PartialPath(SG_NAME + i));
+      StorageGroupProcessor processor =
+          StorageEngine.getInstance().getProcessor(new PartialPath(SG_NAME + i));
       assertTrue(processor.getSequenceFileTreeSet().isEmpty());
       assertTrue(processor.getUnSequenceFileList().isEmpty());
     }
@@ -165,8 +179,9 @@ public class SyncReceiverLogAnalyzerTest {
         FileLoaderManager.getInstance().containsFileLoader(getReceiverFolderFile().getName()));
     int mode = 0;
     Set<String> toBeSyncedFilesTest = new HashSet<>();
-    try (BufferedReader br = new BufferedReader(
-        new FileReader(new File(getReceiverFolderFile(), SyncConstant.SYNC_LOG_NAME)))) {
+    try (BufferedReader br =
+        new BufferedReader(
+            new FileReader(new File(getReceiverFolderFile(), SyncConstant.SYNC_LOG_NAME)))) {
       String line;
       while ((line = br.readLine()) != null) {
         if (line.equals(SyncReceiverLogger.SYNC_DELETED_FILE_NAME_START)) {
@@ -203,10 +218,13 @@ public class SyncReceiverLogAnalyzerTest {
     assertFalse(new File(getReceiverFolderFile(), SyncConstant.SYNC_LOG_NAME).exists());
   }
 
-
   private File getReceiverFolderFile() {
-    return new File(dataDir + File.separatorChar + SyncConstant.SYNC_RECEIVER + File.separatorChar
-        + "127.0.0.1_5555");
+    return new File(
+        dataDir
+            + File.separatorChar
+            + SyncConstant.SYNC_RECEIVER
+            + File.separatorChar
+            + "127.0.0.1_5555");
   }
 
   private File getSnapshotFolder() {

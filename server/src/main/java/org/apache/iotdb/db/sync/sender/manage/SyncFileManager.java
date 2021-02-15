@@ -45,9 +45,7 @@ public class SyncFileManager implements ISyncFileManager {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(SyncFileManager.class);
 
-  /**
-   * All storage groups on the disk where the current sync task is executed
-   */
+  /** All storage groups on the disk where the current sync task is executed */
   private Map<String, Set<Long>> allSGs;
 
   /**
@@ -94,12 +92,11 @@ public class SyncFileManager implements ISyncFileManager {
     if (!new File(dataDir + File.separatorChar + IoTDBConstant.SEQUENCE_FLODER_NAME).exists()) {
       return;
     }
-    File[] allSgFolders = new File(
-        dataDir + File.separatorChar + IoTDBConstant.SEQUENCE_FLODER_NAME)
-        .listFiles();
+    File[] allSgFolders =
+        new File(dataDir + File.separatorChar + IoTDBConstant.SEQUENCE_FLODER_NAME).listFiles();
     for (File sgFolder : allSgFolders) {
-      if (!sgFolder.getName().startsWith(IoTDBConstant.PATH_ROOT) || sgFolder.getName()
-          .equals(TsFileConstant.TMP_SUFFIX)) {
+      if (!sgFolder.getName().startsWith(IoTDBConstant.PATH_ROOT)
+          || sgFolder.getName().equals(TsFileConstant.TMP_SUFFIX)) {
         continue;
       }
       allSGs.putIfAbsent(sgFolder.getName(), new HashSet<>());
@@ -110,8 +107,12 @@ public class SyncFileManager implements ISyncFileManager {
           currentAllLocalFiles.get(sgFolder.getName()).putIfAbsent(timeRangeId, new HashSet<>());
           File[] files = timeRangeFolder.listFiles();
           Arrays.stream(files)
-              .forEach(file -> currentAllLocalFiles.get(sgFolder.getName()).get(timeRangeId)
-                  .add(new File(timeRangeFolder.getAbsolutePath(), file.getName())));
+              .forEach(
+                  file ->
+                      currentAllLocalFiles
+                          .get(sgFolder.getName())
+                          .get(timeRangeId)
+                          .add(new File(timeRangeFolder.getAbsolutePath(), file.getName())));
         } catch (Exception e) {
           LOGGER.error("Invalid time range folder: {}", timeRangeFolder.getAbsolutePath(), e);
         }
@@ -139,14 +140,14 @@ public class SyncFileManager implements ISyncFileManager {
 
   private boolean checkFileValidity(File file) {
     return new File(file.getAbsolutePath() + TsFileResource.RESOURCE_SUFFIX).exists()
-        && !new File(
-        file.getAbsolutePath() + ModificationFile.FILE_SUFFIX).exists() && !new File(
-        file.getAbsolutePath() + MergeTask.MERGE_SUFFIX).exists();
+        && !new File(file.getAbsolutePath() + ModificationFile.FILE_SUFFIX).exists()
+        && !new File(file.getAbsolutePath() + MergeTask.MERGE_SUFFIX).exists();
   }
 
   @Override
   public void getLastLocalFiles(File lastLocalFileInfo) throws IOException {
-    LOGGER.info("Start to get last local files from last local file info {}",
+    LOGGER.info(
+        "Start to get last local files from last local file info {}",
         lastLocalFileInfo.getAbsoluteFile());
     lastLocalFilesMap = new HashMap<>();
     if (!lastLocalFileInfo.exists()) {
@@ -159,8 +160,10 @@ public class SyncFileManager implements ISyncFileManager {
         Long timeRangeId = Long.parseLong(file.getParentFile().getName());
         String sgName = file.getParentFile().getParentFile().getName();
         allSGs.putIfAbsent(sgName, new HashSet<>());
-        lastLocalFilesMap.computeIfAbsent(sgName, k -> new HashMap<>())
-            .computeIfAbsent(timeRangeId, k -> new HashSet<>()).add(file);
+        lastLocalFilesMap
+            .computeIfAbsent(sgName, k -> new HashMap<>())
+            .computeIfAbsent(timeRangeId, k -> new HashSet<>())
+            .add(file);
       }
     }
   }
@@ -177,27 +180,31 @@ public class SyncFileManager implements ISyncFileManager {
     for (String sgName : allSGs.keySet()) {
       toBeSyncedFilesMap.putIfAbsent(sgName, new HashMap<>());
       deletedFilesMap.putIfAbsent(sgName, new HashMap<>());
-      for (Entry<Long, Set<File>> entry : currentSealedLocalFilesMap
-          .getOrDefault(sgName, Collections.emptyMap()).entrySet()) {
+      for (Entry<Long, Set<File>> entry :
+          currentSealedLocalFilesMap.getOrDefault(sgName, Collections.emptyMap()).entrySet()) {
         Long timeRangeId = entry.getKey();
         toBeSyncedFilesMap.get(sgName).putIfAbsent(timeRangeId, new HashSet<>());
         allSGs.get(sgName).add(timeRangeId);
         for (File newFile : entry.getValue()) {
-          if (!lastLocalFilesMap.getOrDefault(sgName, Collections.emptyMap())
-              .getOrDefault(timeRangeId, Collections.emptySet()).contains(newFile)) {
+          if (!lastLocalFilesMap
+              .getOrDefault(sgName, Collections.emptyMap())
+              .getOrDefault(timeRangeId, Collections.emptySet())
+              .contains(newFile)) {
             toBeSyncedFilesMap.get(sgName).get(timeRangeId).add(newFile);
           }
         }
       }
 
-      for (Entry<Long, Set<File>> entry : lastLocalFilesMap
-          .getOrDefault(sgName, Collections.emptyMap()).entrySet()) {
+      for (Entry<Long, Set<File>> entry :
+          lastLocalFilesMap.getOrDefault(sgName, Collections.emptyMap()).entrySet()) {
         Long timeRangeId = entry.getKey();
         deletedFilesMap.get(sgName).putIfAbsent(timeRangeId, new HashSet<>());
         allSGs.get(sgName).add(timeRangeId);
         for (File oldFile : entry.getValue()) {
-          if (!currentSealedLocalFilesMap.getOrDefault(sgName, Collections.emptyMap())
-              .getOrDefault(timeRangeId, Collections.emptySet()).contains(oldFile)) {
+          if (!currentSealedLocalFilesMap
+              .getOrDefault(sgName, Collections.emptyMap())
+              .getOrDefault(timeRangeId, Collections.emptySet())
+              .contains(oldFile)) {
             deletedFilesMap.get(sgName).get(timeRangeId).add(oldFile);
           }
         }
@@ -234,8 +241,6 @@ public class SyncFileManager implements ISyncFileManager {
 
     private static final SyncFileManager INSTANCE = new SyncFileManager();
 
-    private SyncFileManagerHolder() {
-
-    }
+    private SyncFileManagerHolder() {}
   }
 }

@@ -56,8 +56,9 @@ public class IoTDBSinkInsertTest {
     tuple.put("values", "36.5");
 
     ioTDBSink.invoke(tuple, null);
-    verify(pool).insertRecord(any(String.class), any(Long.class), any(List.class), any(List.class),
-        any(List.class));
+    verify(pool)
+        .insertRecord(
+            any(String.class), any(Long.class), any(List.class), any(List.class), any(List.class));
   }
 
   @Test

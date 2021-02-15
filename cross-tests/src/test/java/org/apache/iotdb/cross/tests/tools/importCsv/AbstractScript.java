@@ -48,7 +48,6 @@ public abstract class AbstractScript {
     r.close();
     p.destroy();
 
-
     System.out.println("should contains:");
     for (String s : output) {
       System.out.println(s);
@@ -66,24 +65,32 @@ public abstract class AbstractScript {
     // This is usually always set by the JVM
 
     File userDir = new File(System.getProperty("user.dir"));
-    if(!userDir.exists()) {
+    if (!userDir.exists()) {
       throw new RuntimeException("user.dir " + userDir.getAbsolutePath() + " doesn't exist.");
     }
-    File target = new File(userDir.getParent() + File.separator + "cli",
-        "target" + File.separator + "maven"
-            + "-archiver"
-            + File.separator + "pom"
-            + ".properties");
+    File target =
+        new File(
+            userDir.getParent() + File.separator + "cli",
+            "target"
+                + File.separator
+                + "maven"
+                + "-archiver"
+                + File.separator
+                + "pom"
+                + ".properties");
     Properties properties = new Properties();
     try {
       properties.load(new FileReader(target));
     } catch (IOException e) {
       return "target" + File.separator + "iotdb-cli-";
     }
-    return new File(userDir.getParent() + File.separator + "cli",
-        String.format("target" + File.separator +
-                "%s-%s",
-            properties.getProperty("artifactId"), properties.getProperty("version"))).getAbsolutePath();
+    return new File(
+            userDir.getParent() + File.separator + "cli",
+            String.format(
+                "target" + File.separator + "%s-%s",
+                properties.getProperty("artifactId"),
+                properties.getProperty("version")))
+        .getAbsolutePath();
   }
 
   protected abstract void testOnWindows() throws IOException;

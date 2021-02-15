@@ -30,9 +30,7 @@ public class LoadDataPlan extends PhysicalPlan {
   private final String inputFilePath;
   private final String measureType;
 
-  /**
-   * Constructor of LoadDataPlan.
-   */
+  /** Constructor of LoadDataPlan. */
   public LoadDataPlan(String inputFilePath, String measureType) {
     super(false, Operator.OperatorType.LOADDATA);
     this.inputFilePath = inputFilePath;
@@ -41,8 +39,8 @@ public class LoadDataPlan extends PhysicalPlan {
 
   @Override
   public List<PartialPath> getPaths() {
-    return measureType != null ?
-        Collections.singletonList(new PartialPath(new String[]{measureType}))
+    return measureType != null
+        ? Collections.singletonList(new PartialPath(new String[] {measureType}))
         : Collections.emptyList();
   }
 
@@ -63,8 +61,8 @@ public class LoadDataPlan extends PhysicalPlan {
       return false;
     }
     LoadDataPlan that = (LoadDataPlan) o;
-    return Objects.equals(getInputFilePath(), that.getInputFilePath()) &&
-        Objects.equals(getMeasureType(), that.getMeasureType());
+    return Objects.equals(getInputFilePath(), that.getInputFilePath())
+        && Objects.equals(getMeasureType(), that.getMeasureType());
   }
 
   @Override

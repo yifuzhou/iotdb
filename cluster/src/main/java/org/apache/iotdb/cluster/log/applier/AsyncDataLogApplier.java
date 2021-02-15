@@ -65,8 +65,13 @@ public class AsyncDataLogApplier implements LogApplier {
   public AsyncDataLogApplier(LogApplier embeddedApplier, String name) {
     this.embeddedApplier = embeddedApplier;
     consumerMap = new HashMap<>();
-    consumerPool = new ThreadPoolExecutor(CONCURRENT_CONSUMER_NUM,
-        Integer.MAX_VALUE, 0, TimeUnit.SECONDS, new SynchronousQueue<>());
+    consumerPool =
+        new ThreadPoolExecutor(
+            CONCURRENT_CONSUMER_NUM,
+            Integer.MAX_VALUE,
+            0,
+            TimeUnit.SECONDS,
+            new SynchronousQueue<>());
     this.name = name;
   }
 
@@ -131,8 +136,9 @@ public class AsyncDataLogApplier implements LogApplier {
   }
 
   /**
-   * We can sure that the storage group of all InsertTabletPlans in InsertMultiTabletPlan are the same. this is
-   * done in {@link org.apache.iotdb.cluster.query.ClusterPlanRouter#splitAndRoutePlan(InsertMultiTabletPlan)}
+   * We can sure that the storage group of all InsertTabletPlans in InsertMultiTabletPlan are the
+   * same. this is done in {@link
+   * org.apache.iotdb.cluster.query.ClusterPlanRouter#splitAndRoutePlan(InsertMultiTabletPlan)}
    *
    * @return the sg that the plan belongs to
    * @throws StorageGroupNotSetException if no sg found
@@ -270,12 +276,17 @@ public class AsyncDataLogApplier implements LogApplier {
 
     @Override
     public String toString() {
-      return "DataLogConsumer{" +
-          "logQueue=" + logQueue.size() +
-          ", lastLogIndex=" + lastLogIndex +
-          ", lastAppliedLogIndex=" + lastAppliedLogIndex +
-          ", name='" + name + '\'' +
-          '}';
+      return "DataLogConsumer{"
+          + "logQueue="
+          + logQueue.size()
+          + ", lastLogIndex="
+          + lastLogIndex
+          + ", lastAppliedLogIndex="
+          + lastAppliedLogIndex
+          + ", name='"
+          + name
+          + '\''
+          + '}';
     }
   }
 }

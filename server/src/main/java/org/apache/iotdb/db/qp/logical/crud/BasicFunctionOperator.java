@@ -34,9 +34,7 @@ import org.apache.iotdb.tsfile.utils.StringContainer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * basic operator includes < > >= <= !=.
- */
+/** basic operator includes < > >= <= !=. */
 public class BasicFunctionOperator extends FunctionOperator {
 
   protected String value;
@@ -101,10 +99,13 @@ public class BasicFunctionOperator extends FunctionOperator {
         ret = funcToken.getUnaryExpression(singlePath, Double.valueOf(value));
         break;
       case TEXT:
-        ret = funcToken.getUnaryExpression(singlePath,
-            (value.startsWith("'") && value.endsWith("'")) || (value.startsWith("\"") && value
-                .endsWith("\""))
-                ? new Binary(value.substring(1, value.length() - 1)) : new Binary(value));
+        ret =
+            funcToken.getUnaryExpression(
+                singlePath,
+                (value.startsWith("'") && value.endsWith("'"))
+                        || (value.startsWith("\"") && value.endsWith("\""))
+                    ? new Binary(value.substring(1, value.length() - 1))
+                    : new Binary(value));
         break;
       default:
         throw new LogicalOperatorException(type.toString(), "");
@@ -127,7 +128,9 @@ public class BasicFunctionOperator extends FunctionOperator {
   public BasicFunctionOperator copy() {
     BasicFunctionOperator ret;
     try {
-      ret = new BasicFunctionOperator(this.tokenIntType, new PartialPath(singlePath.getNodes().clone()), value);
+      ret =
+          new BasicFunctionOperator(
+              this.tokenIntType, new PartialPath(singlePath.getNodes().clone()), value);
     } catch (SQLParserException e) {
       logger.error("error copy:", e);
       return null;
@@ -153,9 +156,9 @@ public class BasicFunctionOperator extends FunctionOperator {
       return false;
     }
     BasicFunctionOperator that = (BasicFunctionOperator) o;
-    return Objects.equals(singlePath, that.singlePath) &&
-        Objects.equals(value, that.value) &&
-        funcToken == that.funcToken;
+    return Objects.equals(singlePath, that.singlePath)
+        && Objects.equals(value, that.value)
+        && funcToken == that.funcToken;
   }
 
   @Override

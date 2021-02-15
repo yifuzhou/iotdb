@@ -36,8 +36,14 @@ import org.junit.Test;
 
 public class SerializableRowRecordListTest extends SerializableListTest {
 
-  private static final TSDataType[] DATA_TYPES = {TSDataType.INT32, TSDataType.INT64,
-      TSDataType.FLOAT, TSDataType.DOUBLE, TSDataType.BOOLEAN, TSDataType.TEXT};
+  private static final TSDataType[] DATA_TYPES = {
+    TSDataType.INT32,
+    TSDataType.INT64,
+    TSDataType.FLOAT,
+    TSDataType.DOUBLE,
+    TSDataType.BOOLEAN,
+    TSDataType.TEXT
+  };
 
   private List<RowRecord> originalList;
   private SerializableRowRecordList testList;
@@ -47,8 +53,9 @@ public class SerializableRowRecordListTest extends SerializableListTest {
   public void setUp() throws Exception {
     super.setUp();
     originalList = new ArrayList<>();
-    testList = SerializableRowRecordList
-        .newSerializableRowRecordList(QUERY_ID, DATA_TYPES, INTERNAL_ROW_RECORD_LIST_CAPACITY);
+    testList =
+        SerializableRowRecordList.newSerializableRowRecordList(
+            QUERY_ID, DATA_TYPES, INTERNAL_ROW_RECORD_LIST_CAPACITY);
   }
 
   @Override

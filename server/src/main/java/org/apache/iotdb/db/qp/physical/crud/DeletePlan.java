@@ -115,8 +115,9 @@ public class DeletePlan extends PhysicalPlan {
       return false;
     }
     DeletePlan that = (DeletePlan) o;
-    return deleteStartTime == that.deleteStartTime && deleteEndTime == that.deleteEndTime && Objects
-        .equals(paths, that.paths);
+    return deleteStartTime == that.deleteStartTime
+        && deleteEndTime == that.deleteEndTime
+        && Objects.equals(paths, that.paths);
   }
 
   @Override

@@ -26,9 +26,7 @@ import org.apache.iotdb.db.engine.fileSystem.SystemFileFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * SimpleFileVersionController uses a local file and its file name to store the version.
- */
+/** SimpleFileVersionController uses a local file and its file name to store the version. */
 public class SimpleFileVersionController implements VersionController {
 
   private static final Logger logger = LoggerFactory.getLogger(SimpleFileVersionController.class);
@@ -40,13 +38,13 @@ public class SimpleFileVersionController implements VersionController {
    * by saveInterval to avoid conflicts.
    */
   private static long saveInterval = 100;
-  /**
-   * time partition id to dividing time series into different storage group
-   */
+  /** time partition id to dividing time series into different storage group */
   private long timePartitionId;
+
   private long prevVersion;
   private long currVersion;
   private String directoryPath;
+
   public SimpleFileVersionController(String directoryPath, long timePartitionId)
       throws IOException {
     this.directoryPath = directoryPath + File.separator + timePartitionId;
@@ -54,9 +52,7 @@ public class SimpleFileVersionController implements VersionController {
     restore();
   }
 
-  /**
-   * only used for upgrading
-   */
+  /** only used for upgrading */
   public SimpleFileVersionController(String directoryPath) throws IOException {
     this.directoryPath = directoryPath + File.separator + UPGRADE_DIR;
     restore();
@@ -112,15 +108,17 @@ public class SimpleFileVersionController implements VersionController {
     if (oldFile.exists()) {
       FileUtils.moveFile(oldFile, newFile);
     }
-    logger.info("Version file updated, previous: {}, current: {}",
-        oldFile.getAbsolutePath(), newFile.getAbsolutePath());
+    logger.info(
+        "Version file updated, previous: {}, current: {}",
+        oldFile.getAbsolutePath(),
+        newFile.getAbsolutePath());
     prevVersion = currVersion;
   }
 
   @SuppressWarnings("squid:S3776") // Suppress high Cognitive Complexity warning
   private void restore() throws IOException {
     File directory = SystemFileFactory.INSTANCE.getFile(directoryPath);
-    if(!directory.exists()){
+    if (!directory.exists()) {
       directory.mkdirs();
     }
     File[] versionFiles = directory.listFiles((dir, name) -> name.startsWith(FILE_PREFIX));

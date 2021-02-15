@@ -38,7 +38,9 @@ public class PullTimeseriesSchemaHandler implements AsyncMethodCallback<PullSche
   private List<String> prefixPaths;
   private AtomicReference<List<TimeseriesSchema>> timeseriesSchemas;
 
-  public PullTimeseriesSchemaHandler(Node owner, List<String> prefixPaths,
+  public PullTimeseriesSchemaHandler(
+      Node owner,
+      List<String> prefixPaths,
       AtomicReference<List<TimeseriesSchema>> timeseriesSchemas) {
     this.owner = owner;
     this.prefixPaths = prefixPaths;

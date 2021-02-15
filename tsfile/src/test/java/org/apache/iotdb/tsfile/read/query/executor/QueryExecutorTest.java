@@ -74,12 +74,18 @@ public class QueryExecutorTest {
     Filter filter = TimeFilter.lt(1480562618100L);
     Filter filter2 = ValueFilter.gt(new Binary("dog"));
 
-    IExpression IExpression = BinaryExpression.and(new SingleSeriesExpression(new Path("d1", "s1"), filter),
-        new SingleSeriesExpression(new Path("d1", "s4"), filter2));
+    IExpression IExpression =
+        BinaryExpression.and(
+            new SingleSeriesExpression(new Path("d1", "s1"), filter),
+            new SingleSeriesExpression(new Path("d1", "s4"), filter2));
 
-    QueryExpression queryExpression = QueryExpression.create().addSelectedPath(new Path("d1", "s1"))
-        .addSelectedPath(new Path("d1", "s2")).addSelectedPath(new Path("d1", "s4")).addSelectedPath(new Path("d1", "s5"))
-        .setExpression(IExpression);
+    QueryExpression queryExpression =
+        QueryExpression.create()
+            .addSelectedPath(new Path("d1", "s1"))
+            .addSelectedPath(new Path("d1", "s2"))
+            .addSelectedPath(new Path("d1", "s4"))
+            .addSelectedPath(new Path("d1", "s5"))
+            .setExpression(IExpression);
     long startTimestamp = System.currentTimeMillis();
     QueryDataSet queryDataSet = queryExecutorWithQueryFilter.execute(queryExpression);
     long aimedTimestamp = 1480562618000L;
@@ -95,9 +101,13 @@ public class QueryExecutorTest {
   public void queryWithoutFilter() throws IOException {
     QueryExecutor queryExecutor = new TsFileExecutor(metadataQuerierByFile, chunkLoader);
 
-    QueryExpression queryExpression = QueryExpression.create().addSelectedPath(new Path("d1", "s1"))
-        .addSelectedPath(new Path("d1", "s2")).addSelectedPath(new Path("d1", "s3")).addSelectedPath(new Path("d1", "s4"))
-        .addSelectedPath(new Path("d1", "s5"));
+    QueryExpression queryExpression =
+        QueryExpression.create()
+            .addSelectedPath(new Path("d1", "s1"))
+            .addSelectedPath(new Path("d1", "s2"))
+            .addSelectedPath(new Path("d1", "s3"))
+            .addSelectedPath(new Path("d1", "s4"))
+            .addSelectedPath(new Path("d1", "s5"));
 
     long aimedTimestamp = 1480562618000L;
     int count = 0;
@@ -117,11 +127,17 @@ public class QueryExecutorTest {
   public void queryWithGlobalTimeFilter() throws IOException {
     QueryExecutor queryExecutor = new TsFileExecutor(metadataQuerierByFile, chunkLoader);
 
-    IExpression IExpression = new GlobalTimeExpression(
-        FilterFactory.and(TimeFilter.gtEq(1480562618100L), TimeFilter.lt(1480562618200L)));
-    QueryExpression queryExpression = QueryExpression.create().addSelectedPath(new Path("d1", "s1"))
-        .addSelectedPath(new Path("d1", "s2")).addSelectedPath(new Path("d1", "s3")).addSelectedPath(new Path("d1", "s4"))
-        .addSelectedPath(new Path("d1", "s5")).setExpression(IExpression);
+    IExpression IExpression =
+        new GlobalTimeExpression(
+            FilterFactory.and(TimeFilter.gtEq(1480562618100L), TimeFilter.lt(1480562618200L)));
+    QueryExpression queryExpression =
+        QueryExpression.create()
+            .addSelectedPath(new Path("d1", "s1"))
+            .addSelectedPath(new Path("d1", "s2"))
+            .addSelectedPath(new Path("d1", "s3"))
+            .addSelectedPath(new Path("d1", "s4"))
+            .addSelectedPath(new Path("d1", "s5"))
+            .setExpression(IExpression);
 
     long aimedTimestamp = 1480562618100L;
     int count = 0;

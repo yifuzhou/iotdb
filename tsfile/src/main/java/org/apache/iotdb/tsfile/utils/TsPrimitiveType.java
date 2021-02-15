@@ -117,12 +117,12 @@ public abstract class TsPrimitiveType implements Serializable {
 
   @Override
   public boolean equals(Object object) {
-    return (object instanceof TsPrimitiveType) && (((TsPrimitiveType) object).getValue()
-        .equals(getValue()));
+    return (object instanceof TsPrimitiveType)
+        && (((TsPrimitiveType) object).getValue().equals(getValue()));
   }
 
   @Override
-  public int hashCode(){
+  public int hashCode() {
     return getValue().hashCode();
   }
 
@@ -461,5 +461,4 @@ public abstract class TsPrimitiveType implements Serializable {
       return false;
     }
   }
-
 }

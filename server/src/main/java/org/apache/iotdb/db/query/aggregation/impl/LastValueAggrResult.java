@@ -32,7 +32,7 @@ import org.apache.iotdb.tsfile.utils.ReadWriteIOUtils;
 
 public class LastValueAggrResult extends AggregateResult {
 
-  //timestamp of current value
+  // timestamp of current value
   protected long timestamp = Long.MIN_VALUE;
 
   public LastValueAggrResult(TSDataType dataType) {
@@ -82,8 +82,8 @@ public class LastValueAggrResult extends AggregateResult {
   }
 
   @Override
-  public void updateResultUsingTimestamps(long[] timestamps, int length,
-      IReaderByTimestamp dataReader) throws IOException {
+  public void updateResultUsingTimestamps(
+      long[] timestamps, int length, IReaderByTimestamp dataReader) throws IOException {
     long time = Long.MIN_VALUE;
     Object lastVal = null;
     for (int i = 0; i < length; i++) {

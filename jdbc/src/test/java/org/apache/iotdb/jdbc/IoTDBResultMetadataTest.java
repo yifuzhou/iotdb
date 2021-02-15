@@ -37,12 +37,10 @@ public class IoTDBResultMetadataTest {
   private IoTDBResultMetadata metadata;
 
   @Before
-  public void setUp() throws Exception {
-  }
+  public void setUp() throws Exception {}
 
   @After
-  public void tearDown() throws Exception {
-  }
+  public void tearDown() throws Exception {}
 
   @Test
   public void testGetColumnCount() {
@@ -112,7 +110,6 @@ public class IoTDBResultMetadataTest {
     for (int i = 1; i <= colums.length; i++) {
       assertEquals(metadata.getColumnLabel(i), colums[i - 1]);
     }
-
   }
 
   @Test
@@ -136,12 +133,19 @@ public class IoTDBResultMetadataTest {
     }
     assertTrue(flag);
 
-    String[] columns = {"timestamp", "root.a.b.boolean", "root.a.b.int32", "root.a.b.int64",
-        "root.a.b.float",
-        "root.a.b.double", "root.a.b.text"};
+    String[] columns = {
+      "timestamp",
+      "root.a.b.boolean",
+      "root.a.b.int32",
+      "root.a.b.int64",
+      "root.a.b.float",
+      "root.a.b.double",
+      "root.a.b.text"
+    };
     String[] typesString = {"BOOLEAN", "INT32", "INT64", "FLOAT", "DOUBLE", "TEXT"};
-    int[] types = {Types.BOOLEAN, Types.INTEGER, Types.BIGINT, Types.FLOAT, Types.DOUBLE,
-        Types.VARCHAR};
+    int[] types = {
+      Types.BOOLEAN, Types.INTEGER, Types.BIGINT, Types.FLOAT, Types.DOUBLE, Types.VARCHAR
+    };
     metadata = new IoTDBResultMetadata(Arrays.asList(columns), Arrays.asList(typesString), false);
     flag = false;
     try {

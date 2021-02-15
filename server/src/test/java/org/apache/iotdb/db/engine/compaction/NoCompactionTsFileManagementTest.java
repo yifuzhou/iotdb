@@ -58,13 +58,11 @@ public class NoCompactionTsFileManagementTest extends LevelCompactionTest {
     FileUtils.deleteDirectory(tempSGDir);
   }
 
-  /**
-   * just compaction once
-   */
+  /** just compaction once */
   @Test
   public void testAddRemoveAndIterator() {
-    NoCompactionTsFileManagement noCompactionTsFileManagement = new NoCompactionTsFileManagement(
-        COMPACTION_TEST_SG, tempSGDir.getPath());
+    NoCompactionTsFileManagement noCompactionTsFileManagement =
+        new NoCompactionTsFileManagement(COMPACTION_TEST_SG, tempSGDir.getPath());
     for (TsFileResource tsFileResource : seqResources) {
       noCompactionTsFileManagement.add(tsFileResource, true);
     }
@@ -74,24 +72,40 @@ public class NoCompactionTsFileManagementTest extends LevelCompactionTest {
     assertEquals(6, noCompactionTsFileManagement.size(true));
     assertEquals(6, noCompactionTsFileManagement.size(false));
     assertTrue(noCompactionTsFileManagement.contains(seqResources.get(0), true));
-    assertFalse(noCompactionTsFileManagement.contains(new TsFileResource(new File(
-        TestConstant.BASE_OUTPUT_PATH.concat(
-            10 + IoTDBConstant.FILE_NAME_SEPARATOR + 10 + IoTDBConstant.FILE_NAME_SEPARATOR + 0
-                + ".tsfile"))), false));
+    assertFalse(
+        noCompactionTsFileManagement.contains(
+            new TsFileResource(
+                new File(
+                    TestConstant.BASE_OUTPUT_PATH.concat(
+                        10
+                            + IoTDBConstant.FILE_NAME_SEPARATOR
+                            + 10
+                            + IoTDBConstant.FILE_NAME_SEPARATOR
+                            + 0
+                            + ".tsfile"))),
+            false));
     assertTrue(noCompactionTsFileManagement.contains(seqResources.get(0), false));
-    assertFalse(noCompactionTsFileManagement.contains(new TsFileResource(new File(
-        TestConstant.BASE_OUTPUT_PATH.concat(
-            10 + IoTDBConstant.FILE_NAME_SEPARATOR + 10 + IoTDBConstant.FILE_NAME_SEPARATOR + 0
-                + ".tsfile"))), false));
+    assertFalse(
+        noCompactionTsFileManagement.contains(
+            new TsFileResource(
+                new File(
+                    TestConstant.BASE_OUTPUT_PATH.concat(
+                        10
+                            + IoTDBConstant.FILE_NAME_SEPARATOR
+                            + 10
+                            + IoTDBConstant.FILE_NAME_SEPARATOR
+                            + 0
+                            + ".tsfile"))),
+            false));
     assertFalse(noCompactionTsFileManagement.isEmpty(true));
     assertFalse(noCompactionTsFileManagement.isEmpty(false));
-    noCompactionTsFileManagement
-        .remove(noCompactionTsFileManagement.getTsFileList(true).get(0), true);
-    noCompactionTsFileManagement
-        .remove(noCompactionTsFileManagement.getTsFileList(false).get(0), false);
+    noCompactionTsFileManagement.remove(
+        noCompactionTsFileManagement.getTsFileList(true).get(0), true);
+    noCompactionTsFileManagement.remove(
+        noCompactionTsFileManagement.getTsFileList(false).get(0), false);
     assertEquals(5, noCompactionTsFileManagement.getTsFileList(true).size());
-    noCompactionTsFileManagement
-        .removeAll(noCompactionTsFileManagement.getTsFileList(false), false);
+    noCompactionTsFileManagement.removeAll(
+        noCompactionTsFileManagement.getTsFileList(false), false);
     assertEquals(0, noCompactionTsFileManagement.getTsFileList(false).size());
     long count = 0;
     Iterator<TsFileResource> iterator = noCompactionTsFileManagement.getIterator(true);
@@ -100,24 +114,36 @@ public class NoCompactionTsFileManagementTest extends LevelCompactionTest {
       count++;
     }
     assertEquals(5, count);
-    noCompactionTsFileManagement
-        .removeAll(noCompactionTsFileManagement.getTsFileList(true), true);
+    noCompactionTsFileManagement.removeAll(noCompactionTsFileManagement.getTsFileList(true), true);
     assertEquals(0, noCompactionTsFileManagement.getTsFileList(true).size());
     assertTrue(noCompactionTsFileManagement.isEmpty(true));
     assertTrue(noCompactionTsFileManagement.isEmpty(false));
-    noCompactionTsFileManagement.add(new TsFileResource(new File(
-        TestConstant.BASE_OUTPUT_PATH.concat(
-            10 + IoTDBConstant.FILE_NAME_SEPARATOR + 10 + IoTDBConstant.FILE_NAME_SEPARATOR + 10
-                + ".tsfile"))), true);
-    noCompactionTsFileManagement.add(new TsFileResource(new File(
-        TestConstant.BASE_OUTPUT_PATH.concat(
-            10 + IoTDBConstant.FILE_NAME_SEPARATOR + 10 + IoTDBConstant.FILE_NAME_SEPARATOR + 10
-                + ".tsfile"))), false);
+    noCompactionTsFileManagement.add(
+        new TsFileResource(
+            new File(
+                TestConstant.BASE_OUTPUT_PATH.concat(
+                    10
+                        + IoTDBConstant.FILE_NAME_SEPARATOR
+                        + 10
+                        + IoTDBConstant.FILE_NAME_SEPARATOR
+                        + 10
+                        + ".tsfile"))),
+        true);
+    noCompactionTsFileManagement.add(
+        new TsFileResource(
+            new File(
+                TestConstant.BASE_OUTPUT_PATH.concat(
+                    10
+                        + IoTDBConstant.FILE_NAME_SEPARATOR
+                        + 10
+                        + IoTDBConstant.FILE_NAME_SEPARATOR
+                        + 10
+                        + ".tsfile"))),
+        false);
     noCompactionTsFileManagement.forkCurrentFileList(0);
     noCompactionTsFileManagement.recover();
-    CompactionMergeTask compactionMergeTask = noCompactionTsFileManagement.new CompactionMergeTask(
-        () -> {
-        }, 0);
+    CompactionMergeTask compactionMergeTask =
+        noCompactionTsFileManagement.new CompactionMergeTask(() -> {}, 0);
     compactionMergeTask.run();
     assertEquals(1, noCompactionTsFileManagement.size(true));
     assertEquals(1, noCompactionTsFileManagement.size(false));

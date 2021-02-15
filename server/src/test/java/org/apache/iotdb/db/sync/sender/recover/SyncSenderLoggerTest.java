@@ -49,8 +49,10 @@ public class SyncSenderLoggerTest {
   public void setUp()
       throws IOException, InterruptedException, StartupException, DiskSpaceInsufficientException {
     EnvironmentUtils.envSetUp();
-    dataDir = new File(DirectoryManager.getInstance().getNextFolderForSequenceFile())
-        .getParentFile().getAbsolutePath();
+    dataDir =
+        new File(DirectoryManager.getInstance().getNextFolderForSequenceFile())
+            .getParentFile()
+            .getAbsolutePath();
     config.update(dataDir);
   }
 
@@ -61,31 +63,28 @@ public class SyncSenderLoggerTest {
 
   @Test
   public void testSyncSenderLogger() throws IOException {
-    senderLogger = new SyncSenderLogger(
-        new File(config.getSenderFolderPath(), SyncConstant.SYNC_LOG_NAME));
+    senderLogger =
+        new SyncSenderLogger(new File(config.getSenderFolderPath(), SyncConstant.SYNC_LOG_NAME));
     Set<String> deletedFileNames = new HashSet<>();
     Set<String> deletedFileNamesTest = new HashSet<>();
     senderLogger.startSyncDeletedFilesName();
     for (int i = 0; i < 100; i++) {
-      senderLogger
-          .finishSyncDeletedFileName(new File(config.getSenderFolderPath(), "deleted" + i));
-      deletedFileNames
-          .add(new File(config.getSenderFolderPath(), "deleted" + i).getAbsolutePath());
+      senderLogger.finishSyncDeletedFileName(new File(config.getSenderFolderPath(), "deleted" + i));
+      deletedFileNames.add(new File(config.getSenderFolderPath(), "deleted" + i).getAbsolutePath());
     }
     Set<String> toBeSyncedFiles = new HashSet<>();
     Set<String> toBeSyncedFilesTest = new HashSet<>();
     senderLogger.startSyncTsFiles();
     for (int i = 0; i < 100; i++) {
-      senderLogger
-          .finishSyncTsfile(new File(config.getSenderFolderPath(), "new" + i));
-      toBeSyncedFiles
-          .add(new File(config.getSenderFolderPath(), "new" + i).getAbsolutePath());
+      senderLogger.finishSyncTsfile(new File(config.getSenderFolderPath(), "new" + i));
+      toBeSyncedFiles.add(new File(config.getSenderFolderPath(), "new" + i).getAbsolutePath());
     }
     senderLogger.close();
     int count = 0;
     int mode = 0;
-    try (BufferedReader br = new BufferedReader(
-        new FileReader(new File(config.getSenderFolderPath(), SyncConstant.SYNC_LOG_NAME)))) {
+    try (BufferedReader br =
+        new BufferedReader(
+            new FileReader(new File(config.getSenderFolderPath(), SyncConstant.SYNC_LOG_NAME)))) {
       String line;
       while ((line = br.readLine()) != null) {
         count++;

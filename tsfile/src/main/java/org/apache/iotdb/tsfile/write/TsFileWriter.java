@@ -18,6 +18,10 @@
  */
 package org.apache.iotdb.tsfile.write;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import org.apache.iotdb.tsfile.common.conf.TSFileConfig;
 import org.apache.iotdb.tsfile.common.conf.TSFileDescriptor;
 import org.apache.iotdb.tsfile.exception.write.NoMeasurementException;
@@ -25,20 +29,16 @@ import org.apache.iotdb.tsfile.exception.write.WriteProcessException;
 import org.apache.iotdb.tsfile.read.common.Path;
 import org.apache.iotdb.tsfile.write.chunk.ChunkGroupWriterImpl;
 import org.apache.iotdb.tsfile.write.chunk.IChunkGroupWriter;
-import org.apache.iotdb.tsfile.write.record.Tablet;
 import org.apache.iotdb.tsfile.write.record.TSRecord;
+import org.apache.iotdb.tsfile.write.record.Tablet;
 import org.apache.iotdb.tsfile.write.record.datapoint.DataPoint;
-import org.apache.iotdb.tsfile.write.schema.Schema;
 import org.apache.iotdb.tsfile.write.schema.MeasurementSchema;
+import org.apache.iotdb.tsfile.write.schema.Schema;
 import org.apache.iotdb.tsfile.write.writer.RestorableTsFileIOWriter;
 import org.apache.iotdb.tsfile.write.writer.TsFileIOWriter;
 import org.apache.iotdb.tsfile.write.writer.TsFileOutput;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import java.io.File;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * TsFileWriter is the entrance for writing processing. It receives a record and send it to
@@ -51,23 +51,19 @@ public class TsFileWriter implements AutoCloseable {
 
   protected static final TSFileConfig config = TSFileDescriptor.getInstance().getConfig();
   private static final Logger LOG = LoggerFactory.getLogger(TsFileWriter.class);
-  /**
-   * schema of this TsFile.
-   **/
+  /** schema of this TsFile. */
   protected final Schema schema;
-  /**
-   * IO writer of this TsFile.
-   **/
+  /** IO writer of this TsFile. */
   private final TsFileIOWriter fileWriter;
+
   private final int pageSize;
   private long recordCount = 0;
 
   private Map<String, IChunkGroupWriter> groupWriters = new HashMap<>();
 
-  /**
-   * min value of threshold of data points num check.
-   **/
+  /** min value of threshold of data points num check. */
   private long recordCountForNextMemCheck = 100;
+
   private long chunkGroupSizeThreshold;
 
   /**
@@ -91,7 +87,7 @@ public class TsFileWriter implements AutoCloseable {
   /**
    * init this TsFileWriter.
    *
-   * @param file   the File to be written by this TsFileWriter
+   * @param file the File to be written by this TsFileWriter
    * @param schema the schema of this TsFile
    */
   public TsFileWriter(File file, Schema schema) throws IOException {
@@ -112,9 +108,9 @@ public class TsFileWriter implements AutoCloseable {
   /**
    * init this TsFileWriter.
    *
-   * @param file   the File to be written by this TsFileWriter
+   * @param file the File to be written by this TsFileWriter
    * @param schema the schema of this TsFile
-   * @param conf   the configuration of this TsFile
+   * @param conf the configuration of this TsFile
    */
   public TsFileWriter(File file, Schema schema, TSFileConfig conf) throws IOException {
     this(new TsFileIOWriter(file), schema, conf);
@@ -124,8 +120,8 @@ public class TsFileWriter implements AutoCloseable {
    * init this TsFileWriter.
    *
    * @param fileWriter the io writer of this TsFile
-   * @param schema     the schema of this TsFile
-   * @param conf       the configuration of this TsFile
+   * @param schema the schema of this TsFile
+   * @param conf the configuration of this TsFile
    */
   protected TsFileWriter(TsFileIOWriter fileWriter, Schema schema, TSFileConfig conf)
       throws IOException {
@@ -134,11 +130,10 @@ public class TsFileWriter implements AutoCloseable {
           "the given file Writer does not support writing any more. Maybe it is an complete TsFile");
     }
     this.fileWriter = fileWriter;
-    
+
     if (fileWriter instanceof RestorableTsFileIOWriter) {
       this.schema = new Schema(((RestorableTsFileIOWriter) fileWriter).getKnownSchema());
-    }
-    else {
+    } else {
       this.schema = schema;
     }
     this.pageSize = conf.getPageSizeInByte();
@@ -147,10 +142,11 @@ public class TsFileWriter implements AutoCloseable {
     if (this.pageSize >= chunkGroupSizeThreshold) {
       LOG.warn(
           "TsFile's page size {} is greater than chunk group size {}, please enlarge the chunk group"
-              + " size or decrease page size. ", pageSize, chunkGroupSizeThreshold);
+              + " size or decrease page size. ",
+          pageSize,
+          chunkGroupSizeThreshold);
     }
   }
-
 
   public void registerDeviceTemplate(String templateName, Map<String, MeasurementSchema> template) {
     schema.registerDeviceTemplate(templateName, template);
@@ -192,8 +188,8 @@ public class TsFileWriter implements AutoCloseable {
         groupWriter.tryToAddSeriesWriter(schema.getSeriesSchema(path), pageSize);
       } else if (schema.getDeviceTemplates() != null && schema.getDeviceTemplates().size() == 1) {
         // use the default template without needing to register device
-        Map<String, MeasurementSchema> template = schema.getDeviceTemplates()
-            .entrySet().iterator().next().getValue();
+        Map<String, MeasurementSchema> template =
+            schema.getDeviceTemplates().entrySet().iterator().next().getValue();
         if (template.containsKey(path.getMeasurement())) {
           groupWriter.tryToAddSeriesWriter(template.get(path.getMeasurement()), pageSize);
         }
@@ -202,7 +198,6 @@ public class TsFileWriter implements AutoCloseable {
       }
     }
     return true;
-
   }
 
   /**
@@ -230,8 +225,8 @@ public class TsFileWriter implements AutoCloseable {
         groupWriter.tryToAddSeriesWriter(schema.getSeriesSchema(path), pageSize);
       } else if (schema.getDeviceTemplates() != null && schema.getDeviceTemplates().size() == 1) {
         // use the default template without needing to register device
-        Map<String, MeasurementSchema> template = schema.getDeviceTemplates()
-            .entrySet().iterator().next().getValue();
+        Map<String, MeasurementSchema> template =
+            schema.getDeviceTemplates().entrySet().iterator().next().getValue();
         if (template.containsKey(path.getMeasurement())) {
           groupWriter.tryToAddSeriesWriter(template.get(path.getMeasurement()), pageSize);
         }
@@ -246,7 +241,7 @@ public class TsFileWriter implements AutoCloseable {
    *
    * @param record - record responding a data line
    * @return true -size of tsfile or metadata reaches the threshold. false - otherwise
-   * @throws IOException           exception in IO
+   * @throws IOException exception in IO
    * @throws WriteProcessException exception in write process
    */
   public boolean write(TSRecord record) throws IOException, WriteProcessException {
@@ -262,7 +257,7 @@ public class TsFileWriter implements AutoCloseable {
    * write a tablet
    *
    * @param tablet - multiple time series of one device that share a time column
-   * @throws IOException           exception in IO
+   * @throws IOException exception in IO
    * @throws WriteProcessException exception in write process
    */
   public boolean write(Tablet tablet) throws IOException, WriteProcessException {
@@ -315,7 +310,7 @@ public class TsFileWriter implements AutoCloseable {
    * outputStream.
    *
    * @return true - size of tsfile or metadata reaches the threshold. false - otherwise. But this
-   * function just return false, the Override of IoTDB may return true.
+   *     function just return false, the Override of IoTDB may return true.
    * @throws IOException exception in IO
    */
   public boolean flushAllChunkGroups() throws IOException {

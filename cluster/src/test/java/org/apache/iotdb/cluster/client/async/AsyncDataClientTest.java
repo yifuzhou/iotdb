@@ -28,26 +28,33 @@ public class AsyncDataClientTest {
     AsyncClientPool asyncClientPool = new AsyncClientPool(new SingleManagerFactory(new Factory()));
     AsyncDataClient client;
     Node node = TestUtils.getNode(0);
-    client = new AsyncDataClient(new Factory(), new TAsyncClientManager(),
-        new TNonblockingSocket(node.getIp(), node.getDataPort()
-            , RaftServer.getConnectionTimeoutInMS()));
+    client =
+        new AsyncDataClient(
+            new Factory(),
+            new TAsyncClientManager(),
+            new TNonblockingSocket(
+                node.getIp(), node.getDataPort(), RaftServer.getConnectionTimeoutInMS()));
     assertTrue(client.isReady());
 
     client = (AsyncDataClient) asyncClientPool.getClient(TestUtils.getNode(0));
 
     assertEquals(TestUtils.getNode(0), client.getNode());
 
-    client.matchTerm(0, 0, TestUtils.getNode(0), new AsyncMethodCallback<Boolean>() {
-      @Override
-      public void onComplete(Boolean aBoolean) {
-        // do nothing
-      }
+    client.matchTerm(
+        0,
+        0,
+        TestUtils.getNode(0),
+        new AsyncMethodCallback<Boolean>() {
+          @Override
+          public void onComplete(Boolean aBoolean) {
+            // do nothing
+          }
 
-      @Override
-      public void onError(Exception e) {
-        // do nothing
-      }
-    });
+          @Override
+          public void onError(Exception e) {
+            // do nothing
+          }
+        });
     assertFalse(client.isReady());
 
     client.onError(new Exception());

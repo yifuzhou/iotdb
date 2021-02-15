@@ -62,8 +62,13 @@ public class AppendGroupEntryHandler implements AsyncMethodCallback<Long> {
 
   private AtomicInteger erroredNodeNum = new AtomicInteger(0);
 
-  public AppendGroupEntryHandler(int[] groupReceivedCounter, int receiverNodeIndex,
-      Node receiverNode, AtomicBoolean leaderShipStale, Log log, AtomicLong newLeaderTerm,
+  public AppendGroupEntryHandler(
+      int[] groupReceivedCounter,
+      int receiverNodeIndex,
+      Node receiverNode,
+      AtomicBoolean leaderShipStale,
+      Log log,
+      AtomicLong newLeaderTerm,
       RaftMember member) {
     this.groupReceivedCounter = groupReceivedCounter;
     this.receiverNodeIndex = receiverNodeIndex;
@@ -134,12 +139,15 @@ public class AppendGroupEntryHandler implements AsyncMethodCallback<Long> {
 
   @Override
   public void onError(Exception exception) {
-    logger.error("{}: Cannot send the add node request to node {}", member.getName(), receiverNode,
+    logger.error(
+        "{}: Cannot send the add node request to node {}",
+        member.getName(),
+        receiverNode,
         exception);
     if (erroredNodeNum.incrementAndGet() >= replicationNum / 2) {
       synchronized (groupReceivedCounter) {
-        logger
-            .error("{}: Over half of the nodes failed, the request is rejected", member.getName());
+        logger.error(
+            "{}: Over half of the nodes failed, the request is rejected", member.getName());
         groupReceivedCounter.notifyAll();
       }
     }

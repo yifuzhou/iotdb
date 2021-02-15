@@ -24,8 +24,7 @@ import org.mockito.Mock;
 
 public class SyncClientPoolTest {
 
-  @Mock
-  private SyncClientFactory testSyncClientFactory;
+  @Mock private SyncClientFactory testSyncClientFactory;
 
   @Test
   public void testTestClient() {
@@ -93,8 +92,8 @@ public class SyncClientPoolTest {
 
   @Test
   public void testWaitClient() {
-    int maxClientPerNodePerMember = ClusterDescriptor.getInstance().getConfig()
-        .getMaxClientPerNodePerMember();
+    int maxClientPerNodePerMember =
+        ClusterDescriptor.getInstance().getConfig().getMaxClientPerNodePerMember();
     try {
       ClusterDescriptor.getInstance().getConfig().setMaxClientPerNodePerMember(10);
       testSyncClientFactory = new TestSyncClientFactory();
@@ -107,16 +106,18 @@ public class SyncClientPoolTest {
       }
 
       AtomicBoolean waitStart = new AtomicBoolean(false);
-      new Thread(() -> {
-        while (!waitStart.get()) {
-         // wait until we start to for wait for a client
-        }
-        synchronized (syncClientPool) {
-          for (Client client : clients) {
-            syncClientPool.putClient(node, client);
-          }
-        }
-      }).start();
+      new Thread(
+              () -> {
+                while (!waitStart.get()) {
+                  // wait until we start to for wait for a client
+                }
+                synchronized (syncClientPool) {
+                  for (Client client : clients) {
+                    syncClientPool.putClient(node, client);
+                  }
+                }
+              })
+          .start();
 
       Client client;
       synchronized (syncClientPool) {
@@ -126,14 +127,16 @@ public class SyncClientPoolTest {
       }
       assertNotNull(client);
     } finally {
-      ClusterDescriptor.getInstance().getConfig().setMaxClientPerNodePerMember(maxClientPerNodePerMember);
+      ClusterDescriptor.getInstance()
+          .getConfig()
+          .setMaxClientPerNodePerMember(maxClientPerNodePerMember);
     }
   }
 
   @Test
   public void testWaitClientTimeOut() {
-    int maxClientPerNodePerMember = ClusterDescriptor.getInstance().getConfig()
-        .getMaxClientPerNodePerMember();
+    int maxClientPerNodePerMember =
+        ClusterDescriptor.getInstance().getConfig().getMaxClientPerNodePerMember();
     try {
       ClusterDescriptor.getInstance().getConfig().setMaxClientPerNodePerMember(1);
       testSyncClientFactory = new TestSyncClientFactory();
@@ -147,7 +150,9 @@ public class SyncClientPoolTest {
 
       assertNotEquals(clients.get(0), clients.get(1));
     } finally {
-      ClusterDescriptor.getInstance().getConfig().setMaxClientPerNodePerMember(maxClientPerNodePerMember);
+      ClusterDescriptor.getInstance()
+          .getConfig()
+          .setMaxClientPerNodePerMember(maxClientPerNodePerMember);
     }
   }
 }

@@ -17,7 +17,6 @@
  * under the License.
  */
 
-
 package org.apache.iotdb.cluster.server.handlers.caller;
 
 import java.util.List;

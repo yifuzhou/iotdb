@@ -36,11 +36,11 @@ public class ClusterQueryUtils {
 
   /**
    * Check if the given path exists locally or can be pulled from a remote node.
+   *
    * @param path
    * @throws QueryProcessException
    */
-  public static void checkPathExistence(String path)
-      throws QueryProcessException {
+  public static void checkPathExistence(String path) throws QueryProcessException {
     try {
       checkPathExistence(new PartialPath(path));
     } catch (IllegalPathException e) {
@@ -48,19 +48,18 @@ public class ClusterQueryUtils {
     }
   }
 
-  public static void checkPathExistence(PartialPath path)
-      throws QueryProcessException {
+  public static void checkPathExistence(PartialPath path) throws QueryProcessException {
     if (!IoTDB.metaManager.isPathExist(path)) {
       try {
-        ((CMManager) IoTDB.metaManager).pullTimeSeriesSchemas(Collections.singletonList(path), null);
+        ((CMManager) IoTDB.metaManager)
+            .pullTimeSeriesSchemas(Collections.singletonList(path), null);
       } catch (MetadataException e) {
         throw new QueryProcessException(e);
       }
     }
   }
 
-  public static void checkPathExistence(List<PartialPath> paths)
-      throws QueryProcessException {
+  public static void checkPathExistence(List<PartialPath> paths) throws QueryProcessException {
     for (PartialPath path : paths) {
       checkPathExistence(path);
     }

@@ -35,10 +35,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * LocalTextModificationAccessor uses a file on local file system to store the modifications
- * in text format, and writes modifications by appending to the tail of the file.
+ * LocalTextModificationAccessor uses a file on local file system to store the modifications in text
+ * format, and writes modifications by appending to the tail of the file.
  */
-public class LocalTextModificationAccessor implements ModificationReader, ModificationWriter, AutoCloseable {
+public class LocalTextModificationAccessor
+    implements ModificationReader, ModificationWriter, AutoCloseable {
 
   private static final Logger logger = LoggerFactory.getLogger(LocalTextModificationAccessor.class);
   private static final String SEPARATOR = ",";
@@ -65,7 +66,7 @@ public class LocalTextModificationAccessor implements ModificationReader, Modifi
 
     String line;
     List<Modification> modificationList = new ArrayList<>();
-    try(BufferedReader reader = FSFactoryProducer.getFSFactory().getBufferedReader(filePath)) {
+    try (BufferedReader reader = FSFactoryProducer.getFSFactory().getBufferedReader(filePath)) {
       while ((line = reader.readLine()) != null) {
         if (line.equals(ABORT_MARK) && !modificationList.isEmpty()) {
           modificationList.remove(modificationList.size() - 1);
@@ -74,8 +75,10 @@ public class LocalTextModificationAccessor implements ModificationReader, Modifi
         }
       }
     } catch (IOException e) {
-      logger.error("An error occurred when reading modifications, and the remaining modifications "
-          + "were ignored.", e);
+      logger.error(
+          "An error occurred when reading modifications, and the remaining modifications "
+              + "were ignored.",
+          e);
     }
     return modificationList;
   }
@@ -109,8 +112,7 @@ public class LocalTextModificationAccessor implements ModificationReader, Modifi
   }
 
   private static String encodeModification(Modification mod) {
-    if (mod instanceof Deletion)
-      return encodeDeletion((Deletion) mod);
+    if (mod instanceof Deletion) return encodeDeletion((Deletion) mod);
     return null;
   }
 
@@ -123,16 +125,22 @@ public class LocalTextModificationAccessor implements ModificationReader, Modifi
   }
 
   private static String encodeDeletion(Deletion del) {
-    return del.getType().toString() + SEPARATOR + del.getPathString()
-        + SEPARATOR + del.getFileOffset() + SEPARATOR
-        + del.getStartTime() + SEPARATOR + del.getEndTime();
+    return del.getType().toString()
+        + SEPARATOR
+        + del.getPathString()
+        + SEPARATOR
+        + del.getFileOffset()
+        + SEPARATOR
+        + del.getStartTime()
+        + SEPARATOR
+        + del.getEndTime();
   }
 
   /**
-   * Decode a range deletion record. E.g. "DELETION,root.ln.wf01.wt01.temperature,111,100,300"
-   * the index of field endTimestamp is length - 1, startTimestamp is length - 2,
-   * TsFile offset is length - 3. Fields in index range [1, length -3) all belong
-   * to a timeseries path in case when the path contains comma.
+   * Decode a range deletion record. E.g. "DELETION,root.ln.wf01.wt01.temperature,111,100,300" the
+   * index of field endTimestamp is length - 1, startTimestamp is length - 2, TsFile offset is
+   * length - 3. Fields in index range [1, length -3) all belong to a timeseries path in case when
+   * the path contains comma.
    */
   private static Deletion decodeDeletion(String[] fields) throws IOException {
     if (fields.length < 4) {
@@ -165,9 +173,9 @@ public class LocalTextModificationAccessor implements ModificationReader, Modifi
   }
 
   /**
-   * Decode a point deletion record. E.g. "DELETION,root.ln.wf01.wt01.temperature,111,300"
-   * the index of field endTimestamp is length - 1, versionNum is length - 2.
-   * Fields in index range [1, length - 2) compose timeseries path.
+   * Decode a point deletion record. E.g. "DELETION,root.ln.wf01.wt01.temperature,111,300" the index
+   * of field endTimestamp is length - 1, versionNum is length - 2. Fields in index range [1, length
+   * - 2) compose timeseries path.
    */
   private static Deletion decodePointDeletion(String[] fields) throws IOException {
     String path = "";

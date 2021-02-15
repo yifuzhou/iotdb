@@ -35,8 +35,8 @@ import org.junit.Test;
 
 public class TimeSeriesMetadataReadTest {
 
-  private static final String FILE_PATH = TestConstant.BASE_OUTPUT_PATH
-      .concat("TimeSeriesMetadataReadTest.tsfile");
+  private static final String FILE_PATH =
+      TestConstant.BASE_OUTPUT_PATH.concat("TimeSeriesMetadataReadTest.tsfile");
   private final TSFileConfig conf = TSFileDescriptor.getInstance().getConfig();
   private int maxDegreeOfIndexNode;
 

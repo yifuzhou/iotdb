@@ -69,7 +69,6 @@ public class TestManagedSeriesReader implements ManagedSeriesReader, IReaderByTi
     return null;
   }
 
-
   @Override
   public boolean hasNextBatch() {
     return !batchUsed;

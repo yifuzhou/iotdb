@@ -46,15 +46,11 @@ public class PathPrivilege {
    */
   private AtomicInteger referenceCnt = new AtomicInteger(0);
 
-  /**
-   * Sort PathPrivilege by referenceCnt in descent order.
-   */
-  public static final Comparator<PathPrivilege> REFERENCE_DESCENT_SORTER = (o1, o2) -> -Integer.
-      compare(o1.referenceCnt.get(), o2.referenceCnt.get());
+  /** Sort PathPrivilege by referenceCnt in descent order. */
+  public static final Comparator<PathPrivilege> REFERENCE_DESCENT_SORTER =
+      (o1, o2) -> -Integer.compare(o1.referenceCnt.get(), o2.referenceCnt.get());
 
-  public PathPrivilege() {
-
-  }
+  public PathPrivilege() {}
 
   public PathPrivilege(String path) {
     this.path = path;

@@ -41,25 +41,24 @@ import org.slf4j.LoggerFactory;
 public class IoTDBFlushQueryMergeIT {
 
   private static final Logger logger = LoggerFactory.getLogger(IoTDBFlushQueryMergeIT.class);
-  private static String[] sqls = new String[]{
-      "SET STORAGE GROUP TO root.vehicle.d0",
-      "CREATE TIMESERIES root.vehicle.d0.s0 WITH DATATYPE=INT32, ENCODING=RLE",
-
-      "insert into root.vehicle.d0(timestamp,s0) values(1,101)",
-      "insert into root.vehicle.d0(timestamp,s0) values(2,198)",
-      "insert into root.vehicle.d0(timestamp,s0) values(100,99)",
-      "insert into root.vehicle.d0(timestamp,s0) values(101,99)",
-      "insert into root.vehicle.d0(timestamp,s0) values(102,80)",
-      "insert into root.vehicle.d0(timestamp,s0) values(103,99)",
-      "insert into root.vehicle.d0(timestamp,s0) values(104,90)",
-      "insert into root.vehicle.d0(timestamp,s0) values(105,99)",
-      "insert into root.vehicle.d0(timestamp,s0) values(106,99)",
-      "flush",
-      "insert into root.vehicle.d0(timestamp,s0) values(2,10000)",
-      "insert into root.vehicle.d0(timestamp,s0) values(50,10000)",
-      "insert into root.vehicle.d0(timestamp,s0) values(1000,22222)",
-
-  };
+  private static String[] sqls =
+      new String[] {
+        "SET STORAGE GROUP TO root.vehicle.d0",
+        "CREATE TIMESERIES root.vehicle.d0.s0 WITH DATATYPE=INT32, ENCODING=RLE",
+        "insert into root.vehicle.d0(timestamp,s0) values(1,101)",
+        "insert into root.vehicle.d0(timestamp,s0) values(2,198)",
+        "insert into root.vehicle.d0(timestamp,s0) values(100,99)",
+        "insert into root.vehicle.d0(timestamp,s0) values(101,99)",
+        "insert into root.vehicle.d0(timestamp,s0) values(102,80)",
+        "insert into root.vehicle.d0(timestamp,s0) values(103,99)",
+        "insert into root.vehicle.d0(timestamp,s0) values(104,90)",
+        "insert into root.vehicle.d0(timestamp,s0) values(105,99)",
+        "insert into root.vehicle.d0(timestamp,s0) values(106,99)",
+        "flush",
+        "insert into root.vehicle.d0(timestamp,s0) values(2,10000)",
+        "insert into root.vehicle.d0(timestamp,s0) values(50,10000)",
+        "insert into root.vehicle.d0(timestamp,s0) values(1000,22222)",
+      };
 
   @BeforeClass
   public static void setUp() throws Exception {
@@ -76,8 +75,9 @@ public class IoTDBFlushQueryMergeIT {
 
   private static void insertData() throws ClassNotFoundException {
     Class.forName(Config.JDBC_DRIVER_NAME);
-    try (Connection connection = DriverManager
-        .getConnection(Config.IOTDB_URL_PREFIX + "127.0.0.1:6667/", "root", "root");
+    try (Connection connection =
+            DriverManager.getConnection(
+                Config.IOTDB_URL_PREFIX + "127.0.0.1:6667/", "root", "root");
         Statement statement = connection.createStatement()) {
 
       for (String sql : sqls) {
@@ -92,8 +92,9 @@ public class IoTDBFlushQueryMergeIT {
   public void selectAllSQLTest() throws ClassNotFoundException {
 
     Class.forName(Config.JDBC_DRIVER_NAME);
-    try (Connection connection = DriverManager
-        .getConnection(Config.IOTDB_URL_PREFIX + "127.0.0.1:6667/", "root", "root");
+    try (Connection connection =
+            DriverManager.getConnection(
+                Config.IOTDB_URL_PREFIX + "127.0.0.1:6667/", "root", "root");
         Statement statement = connection.createStatement()) {
       boolean hasResultSet = statement.execute("SELECT * FROM root");
       Assert.assertTrue(hasResultSet);
@@ -116,8 +117,9 @@ public class IoTDBFlushQueryMergeIT {
     Class.forName(Config.JDBC_DRIVER_NAME);
     String insertTemplate =
         "INSERT INTO root.group%d(timestamp, s1, s2, s3) VALUES (%d, %d, %f, %s)";
-    try (Connection connection = DriverManager
-        .getConnection(Config.IOTDB_URL_PREFIX + "127.0.0.1:6667/", "root", "root");
+    try (Connection connection =
+            DriverManager.getConnection(
+                Config.IOTDB_URL_PREFIX + "127.0.0.1:6667/", "root", "root");
         Statement statement = connection.createStatement()) {
       statement.execute("SET STORAGE GROUP TO root.group1");
       statement.execute("SET STORAGE GROUP TO root.group2");
@@ -147,8 +149,8 @@ public class IoTDBFlushQueryMergeIT {
       statement.execute("FLUSH root.group2,root.group3 FALSE");
 
       int i = 0;
-      try (ResultSet resultSet = statement
-          .executeQuery("SELECT * FROM root.group1,root.group2,root" + ".group3")) {
+      try (ResultSet resultSet =
+          statement.executeQuery("SELECT * FROM root.group1,root.group2,root" + ".group3")) {
         while (resultSet.next()) {
           i++;
         }
@@ -165,8 +167,9 @@ public class IoTDBFlushQueryMergeIT {
   @Test
   public void testFlushGivenGroupNoData() throws ClassNotFoundException {
     Class.forName(Config.JDBC_DRIVER_NAME);
-    try (Connection connection = DriverManager
-        .getConnection(Config.IOTDB_URL_PREFIX + "127.0.0.1:6667/", "root", "root");
+    try (Connection connection =
+            DriverManager.getConnection(
+                Config.IOTDB_URL_PREFIX + "127.0.0.1:6667/", "root", "root");
         Statement statement = connection.createStatement()) {
       statement.execute("SET STORAGE GROUP TO root.nodatagroup1");
       statement.execute("SET STORAGE GROUP TO root.nodatagroup2");
@@ -185,19 +188,20 @@ public class IoTDBFlushQueryMergeIT {
   @Test
   public void testFlushNotExistGroupNoData() throws ClassNotFoundException {
     Class.forName(Config.JDBC_DRIVER_NAME);
-    try (Connection connection = DriverManager
-        .getConnection(Config.IOTDB_URL_PREFIX + "127.0.0.1:6667/", "root", "root");
+    try (Connection connection =
+            DriverManager.getConnection(
+                Config.IOTDB_URL_PREFIX + "127.0.0.1:6667/", "root", "root");
         Statement statement = connection.createStatement()) {
       statement.execute("SET STORAGE GROUP TO root.noexist.nodatagroup1");
       try {
-        statement
-            .execute("FLUSH root.noexist.nodatagroup1,root.notExistGroup1,root.notExistGroup2");
+        statement.execute(
+            "FLUSH root.noexist.nodatagroup1,root.notExistGroup1,root.notExistGroup2");
       } catch (SQLException sqe) {
-        StorageGroupNotSetException tmpsgnse = new StorageGroupNotSetException(
-            "root.notExistGroup1,root.notExistGroup2");
-        SQLException sqlException = new SQLException(
-            TSStatusCode.METADATA_ERROR.getStatusCode() + ": " +
-                tmpsgnse.getMessage());
+        StorageGroupNotSetException tmpsgnse =
+            new StorageGroupNotSetException("root.notExistGroup1,root.notExistGroup2");
+        SQLException sqlException =
+            new SQLException(
+                TSStatusCode.METADATA_ERROR.getStatusCode() + ": " + tmpsgnse.getMessage());
         assertEquals(sqlException.getMessage(), sqe.getMessage());
       }
     } catch (Exception e) {

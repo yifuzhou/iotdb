@@ -66,11 +66,16 @@ public class LogManagerMeta {
   @Override
   public String toString() {
     return "LogManagerMeta{"
-        + " commitLogTerm=" + commitLogTerm
-        + ", commitLogIndex=" + commitLogIndex
-        + ", lastLogIndex=" + lastLogIndex
-        + ", lastLogTerm=" + lastLogTerm
-        + ", maxHaveAppliedCommitIndex=" + maxHaveAppliedCommitIndex
+        + " commitLogTerm="
+        + commitLogTerm
+        + ", commitLogIndex="
+        + commitLogIndex
+        + ", lastLogIndex="
+        + lastLogIndex
+        + ", lastLogTerm="
+        + lastLogTerm
+        + ", maxHaveAppliedCommitIndex="
+        + maxHaveAppliedCommitIndex
         + "}";
   }
 

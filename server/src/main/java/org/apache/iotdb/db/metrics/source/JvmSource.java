@@ -34,9 +34,11 @@ public class JvmSource implements Source {
   }
 
   public void registerInfo() {
-    metricRegistry.register(MetricRegistry.name(SOURCE_NAME, "gc"), new GarbageCollectorMetricSet());
+    metricRegistry.register(
+        MetricRegistry.name(SOURCE_NAME, "gc"), new GarbageCollectorMetricSet());
     metricRegistry.register(MetricRegistry.name(SOURCE_NAME, "memory"), new MemoryUsageGaugeSet());
-    metricRegistry.register(MetricRegistry.name(SOURCE_NAME, "buffer-pool"),
+    metricRegistry.register(
+        MetricRegistry.name(SOURCE_NAME, "buffer-pool"),
         new BufferPoolMetricSet(ManagementFactory.getPlatformMBeanServer()));
   }
 
@@ -44,7 +46,4 @@ public class JvmSource implements Source {
   public String sourceName() {
     return JvmSource.SOURCE_NAME;
   }
-
-
-
 }

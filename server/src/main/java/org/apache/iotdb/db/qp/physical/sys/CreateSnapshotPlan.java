@@ -35,5 +35,4 @@ public class CreateSnapshotPlan extends PhysicalPlan {
   public List<PartialPath> getPaths() {
     return Collections.emptyList();
   }
-
 }

@@ -66,7 +66,8 @@ public class PreviousFillHandler implements AsyncMethodCallback<ByteBuffer> {
   public TimeValuePair getResult() {
     try {
       if (!latch.await(MAX_WAIT_MIN, TimeUnit.MINUTES)) {
-        logger.warn("Not all nodes returned previous fill result when timed out, remaining {}",
+        logger.warn(
+            "Not all nodes returned previous fill result when timed out, remaining {}",
             latch.getCount());
       }
     } catch (InterruptedException e) {

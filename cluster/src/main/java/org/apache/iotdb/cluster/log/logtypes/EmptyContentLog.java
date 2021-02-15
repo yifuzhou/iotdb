@@ -29,8 +29,7 @@ import org.apache.iotdb.cluster.log.Log;
 
 public class EmptyContentLog extends Log {
 
-  public EmptyContentLog() {
-  }
+  public EmptyContentLog() {}
 
   public EmptyContentLog(long index, long term) {
     this.setCurrLogIndex(index);

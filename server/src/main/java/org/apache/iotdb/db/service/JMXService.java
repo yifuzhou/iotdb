@@ -35,16 +35,13 @@ public class JMXService implements IService {
 
   private static final Logger logger = LoggerFactory.getLogger(JMXService.class);
 
-  private JMXService() {
-  }
+  private JMXService() {}
 
   public static JMXService getInstance() {
     return JMXServerHolder.INSTANCE;
   }
 
-  /**
-   * function for registering MBean.
-   */
+  /** function for registering MBean. */
   public static void registerMBean(Object mbean, String name) {
     try {
       MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
@@ -52,16 +49,15 @@ public class JMXService implements IService {
       if (!mbs.isRegistered(objectName)) {
         mbs.registerMBean(mbean, objectName);
       }
-    } catch (MalformedObjectNameException | InstanceAlreadyExistsException
+    } catch (MalformedObjectNameException
+        | InstanceAlreadyExistsException
         | MBeanRegistrationException
         | NotCompliantMBeanException e) {
       logger.error("Failed to registerMBean {}", name, e);
     }
   }
 
-  /**
-   * function for deregistering MBean.
-   */
+  /** function for deregistering MBean. */
   public static void deregisterMBean(String name) {
     try {
       MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
@@ -69,12 +65,12 @@ public class JMXService implements IService {
       if (mbs.isRegistered(objectName)) {
         mbs.unregisterMBean(objectName);
       }
-    } catch (MalformedObjectNameException | MBeanRegistrationException
+    } catch (MalformedObjectNameException
+        | MBeanRegistrationException
         | InstanceNotFoundException e) {
       logger.error("Failed to unregisterMBean {}", name, e);
     }
   }
-
 
   @Override
   public ServiceType getID() {
@@ -98,7 +94,6 @@ public class JMXService implements IService {
 
     private static final JMXService INSTANCE = new JMXService();
 
-    private JMXServerHolder() {
-    }
+    private JMXServerHolder() {}
   }
 }

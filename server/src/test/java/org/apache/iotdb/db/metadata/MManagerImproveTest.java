@@ -58,13 +58,15 @@ public class MManagerImproveTest {
     for (int j = 0; j < DEVICE_NUM; j++) {
       for (int i = 0; i < TIMESERIES_NUM; i++) {
         String p = "root.t1.v2.d" + j + ".s" + i;
-        mManager.createTimeseries(new PartialPath(p), TSDataType.TEXT, TSEncoding.PLAIN,
-            TSFileDescriptor.getInstance().getConfig().getCompressor(), Collections.emptyMap());
+        mManager.createTimeseries(
+            new PartialPath(p),
+            TSDataType.TEXT,
+            TSEncoding.PLAIN,
+            TSFileDescriptor.getInstance().getConfig().getCompressor(),
+            Collections.emptyMap());
       }
     }
-
   }
-
 
   @Test
   public void checkSetUp() throws IllegalPathException {
@@ -180,5 +182,4 @@ public class MManagerImproveTest {
   public void tearDown() throws Exception {
     EnvironmentUtils.cleanEnv();
   }
-
 }

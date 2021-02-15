@@ -35,23 +35,25 @@ public class KafkaConsumerThread implements Runnable {
   private static boolean setStorageGroup = true;
   private static boolean createTimeSeries = true;
   private String createStorageGroupSqlTemplate = "SET STORAGE GROUP TO %s";
-  private String createTimeseriesSqlTemplate = "CREATE TIMESERIES %s WITH DATATYPE=TEXT, ENCODING=PLAIN";
-  private String insertDataSqlTemplate = "INSERT INTO root.vehicle.deviceid(timestamp,%s) VALUES (%s,'%s')";
+  private String createTimeseriesSqlTemplate =
+      "CREATE TIMESERIES %s WITH DATATYPE=TEXT, ENCODING=PLAIN";
+  private String insertDataSqlTemplate =
+      "INSERT INTO root.vehicle.deviceid(timestamp,%s) VALUES (%s,'%s')";
   private static final Logger logger = LoggerFactory.getLogger(KafkaConsumerThread.class);
 
   public KafkaConsumerThread(KafkaStream<String, String> stream) {
     this.stream = stream;
-    /**
-     * Establish JDBC connection of IoTDB
-     */
+    /** Establish JDBC connection of IoTDB */
     initIoTDB();
   }
 
   private void initIoTDB() {
     try {
       Class.forName("org.apache.iotdb.jdbc.IoTDBDriver");
-      connection = DriverManager
-          .getConnection(Constant.IOTDB_CONNECTION_URL, Constant.IOTDB_CONNECTION_USER,
+      connection =
+          DriverManager.getConnection(
+              Constant.IOTDB_CONNECTION_URL,
+              Constant.IOTDB_CONNECTION_USER,
               Constant.IOTDB_CONNECTION_PASSWORD);
       statement = connection.createStatement();
       if (setStorageGroup) {
@@ -74,9 +76,7 @@ public class KafkaConsumerThread implements Runnable {
     }
   }
 
-  /**
-   * Write data to IoTDB
-   */
+  /** Write data to IoTDB */
   private void writeData(String message) {
 
     String[] items = message.split(",");
@@ -93,8 +93,10 @@ public class KafkaConsumerThread implements Runnable {
   public void run() {
     for (MessageAndMetadata<String, String> consumerIterator : stream) {
       String uploadMessage = consumerIterator.message();
-      logger.info(String.format("%s from partiton[%d]: %s", Thread.currentThread().getName(),
-          consumerIterator.partition(), uploadMessage));
+      logger.info(
+          String.format(
+              "%s from partiton[%d]: %s",
+              Thread.currentThread().getName(), consumerIterator.partition(), uploadMessage));
       writeData(uploadMessage);
     }
   }

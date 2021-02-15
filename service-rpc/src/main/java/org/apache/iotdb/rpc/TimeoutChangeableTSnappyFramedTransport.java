@@ -24,7 +24,8 @@ import org.apache.thrift.transport.TSocket;
 import org.apache.thrift.transport.TTransport;
 import org.apache.thrift.transport.TTransportFactory;
 
-public class TimeoutChangeableTSnappyFramedTransport extends TSnappyElasticFramedTransport implements TimeoutChangeableTransport {
+public class TimeoutChangeableTSnappyFramedTransport extends TSnappyElasticFramedTransport
+    implements TimeoutChangeableTransport {
 
   private TSocket underlyingSocket;
 

@@ -43,8 +43,8 @@ public class LogCatchUpInBatchHandler implements AsyncMethodCallback<Long> {
 
   @Override
   public void onComplete(Long response) {
-    logger.debug("{}: Received a catch-up result size of {} from {}", memberName, logs.size(),
-        follower);
+    logger.debug(
+        "{}: Received a catch-up result size of {} from {}", memberName, logs.size(), follower);
 
     long resp = response;
     if (resp == RESPONSE_AGREE) {
@@ -56,22 +56,25 @@ public class LogCatchUpInBatchHandler implements AsyncMethodCallback<Long> {
 
     } else if (resp == RESPONSE_LOG_MISMATCH) {
       // this is not probably possible
-      logger.error("{}: Log mismatch occurred when sending logs, whose size is {}", memberName,
-          logs.size());
+      logger.error(
+          "{}: Log mismatch occurred when sending logs, whose size is {}", memberName, logs.size());
       synchronized (appendSucceed) {
         appendSucceed.notifyAll();
       }
     } else {
       // the follower's term has updated, which means a new leader is elected
-      logger.debug("{}: Received a rejection because term is updated to {} when sending {} logs",
-          memberName, resp, logs.size());
+      logger.debug(
+          "{}: Received a rejection because term is updated to {} when sending {} logs",
+          memberName,
+          resp,
+          logs.size());
       raftMember.stepDown(resp, false);
 
       synchronized (appendSucceed) {
         appendSucceed.notifyAll();
       }
-      logger.warn("{}: Catch-up with {} logs aborted because leadership is lost",
-          logs.size(), memberName);
+      logger.warn(
+          "{}: Catch-up with {} logs aborted because leadership is lost", logs.size(), memberName);
     }
   }
 
@@ -80,10 +83,12 @@ public class LogCatchUpInBatchHandler implements AsyncMethodCallback<Long> {
     synchronized (appendSucceed) {
       appendSucceed.notifyAll();
     }
-    logger.warn("{}: Catch-up fails when sending log, whose size is {}", memberName, logs.size(),
+    logger.warn(
+        "{}: Catch-up fails when sending log, whose size is {}",
+        memberName,
+        logs.size(),
         exception);
   }
-
 
   public void setAppendSucceed(AtomicBoolean appendSucceed) {
     this.appendSucceed = appendSucceed;

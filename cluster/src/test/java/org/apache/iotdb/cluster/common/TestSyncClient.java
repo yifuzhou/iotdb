@@ -43,5 +43,4 @@ public class TestSyncClient extends Client {
   public int getSerialNum() {
     return serialNum;
   }
-
 }

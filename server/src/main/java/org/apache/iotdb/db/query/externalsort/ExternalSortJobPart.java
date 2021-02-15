@@ -21,7 +21,6 @@ package org.apache.iotdb.db.query.externalsort;
 import java.io.IOException;
 import org.apache.iotdb.tsfile.read.reader.IPointReader;
 
-
 public abstract class ExternalSortJobPart {
 
   private ExternalSortJobPartType type;
@@ -37,7 +36,7 @@ public abstract class ExternalSortJobPart {
   }
 
   public enum ExternalSortJobPartType {
-    SINGLE_SOURCE, MULTIPLE_SOURCE
+    SINGLE_SOURCE,
+    MULTIPLE_SOURCE
   }
-
 }

@@ -75,8 +75,8 @@ public class GroupedLSBWatermarkEncoder implements WatermarkEncoder {
       throw new RuntimeException("Error: minBitPosition is bigger than maxBitPosition");
     }
     int range = maxBitPosition - minBitPosition;
-    return minBitPosition + hashMod(String.format("%s%d%s", secretKey, timestamp, secretKey),
-        range);
+    return minBitPosition
+        + hashMod(String.format("%s%d%s", secretKey, timestamp, secretKey), range);
   }
 
   private boolean getBitValue(long timestamp) {

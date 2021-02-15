@@ -39,14 +39,10 @@ public class KafkaConsumer {
   private ConsumerConnector consumer;
 
   private KafkaConsumer() {
-    /**
-     * Consumer configuration
-     */
+    /** Consumer configuration */
     Properties props = new Properties();
 
-    /**
-     * Zookeeper configuration
-     */
+    /** Zookeeper configuration */
     props.put("zookeeper.connect", "127.0.0.1:2181");
     props.put("group.id", "consumeGroup");
     props.put("zookeeper.session.timeout.ms", "400");
@@ -61,9 +57,7 @@ public class KafkaConsumer {
      */
     props.put("auto.offset.reset", "smallest");
 
-    /**
-     * serializer class
-     */
+    /** serializer class */
     props.put("serializer.class", "kafka.serializer.StringEncoder");
 
     ConsumerConfig config = new ConsumerConfig(props);
@@ -75,21 +69,16 @@ public class KafkaConsumer {
   }
 
   private void consume() {
-    /**
-     * Specify the number of consumer thread
-     */
+    /** Specify the number of consumer thread */
     Map<String, Integer> topicCountMap = new HashMap<>();
     topicCountMap.put(Constant.TOPIC, Constant.CONSUMER_THREAD_NUM);
 
-    /**
-     * Specify data decoder
-     */
+    /** Specify data decoder */
     StringDecoder keyDecoder = new StringDecoder(new VerifiableProperties());
     StringDecoder valueDecoder = new StringDecoder(new VerifiableProperties());
 
-    Map<String, List<KafkaStream<String, String>>> consumerMap = consumer
-        .createMessageStreams(topicCountMap, keyDecoder,
-            valueDecoder);
+    Map<String, List<KafkaStream<String, String>>> consumerMap =
+        consumer.createMessageStreams(topicCountMap, keyDecoder, valueDecoder);
 
     List<KafkaStream<String, String>> streams = consumerMap.get(Constant.TOPIC);
     ExecutorService executor = Executors.newFixedThreadPool(Constant.CONSUMER_THREAD_NUM);

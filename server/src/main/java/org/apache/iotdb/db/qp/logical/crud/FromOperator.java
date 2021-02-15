@@ -23,9 +23,7 @@ import java.util.List;
 import org.apache.iotdb.db.metadata.PartialPath;
 import org.apache.iotdb.db.qp.logical.Operator;
 
-/**
- * this class maintains information of {@code FROM} clause.
- */
+/** this class maintains information of {@code FROM} clause. */
 public class FromOperator extends Operator {
 
   private List<PartialPath> prefixList;
@@ -43,5 +41,4 @@ public class FromOperator extends Operator {
   public List<PartialPath> getPrefixPaths() {
     return prefixList;
   }
-
 }

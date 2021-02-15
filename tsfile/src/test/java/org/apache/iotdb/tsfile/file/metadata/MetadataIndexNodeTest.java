@@ -36,8 +36,8 @@ public class MetadataIndexNodeTest {
     list.add(new MetadataIndexEntry("s15", -1L));
     list.add(new MetadataIndexEntry("s20", -1L));
 
-    MetadataIndexNode metadataIndexNode = new MetadataIndexNode(list, -1L,
-        MetadataIndexNodeType.LEAF_MEASUREMENT);
+    MetadataIndexNode metadataIndexNode =
+        new MetadataIndexNode(list, -1L, MetadataIndexNodeType.LEAF_MEASUREMENT);
     Assert.assertEquals(0, metadataIndexNode.binarySearchInChildren("s0", false));
     Assert.assertEquals(2, metadataIndexNode.binarySearchInChildren("s10", false));
     Assert.assertEquals(2, metadataIndexNode.binarySearchInChildren("s13", false));

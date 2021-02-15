@@ -31,9 +31,7 @@ import org.apache.iotdb.tsfile.read.filter.TimeFilter;
 import org.apache.iotdb.tsfile.read.filter.ValueFilter;
 import org.apache.iotdb.tsfile.read.filter.basic.Filter;
 
-/**
- * all basic operator in filter.
- */
+/** all basic operator in filter. */
 public enum BasicOperatorType {
   EQ {
     @Override
@@ -163,8 +161,7 @@ public enum BasicOperatorType {
    * @return basic operator type
    * @throws LogicalOperatorException Logical Operator Exception
    */
-  public static BasicOperatorType getBasicOpBySymbol(int tokenIntType)
-      throws SQLParserException {
+  public static BasicOperatorType getBasicOpBySymbol(int tokenIntType) throws SQLParserException {
     switch (tokenIntType) {
       case SQLConstant.EQUAL:
         return EQ;

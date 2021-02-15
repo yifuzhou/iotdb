@@ -29,8 +29,11 @@ public class ConsoleSink implements Sink {
 
   public ConsoleSink(MetricRegistry registry) {
     this.registry = registry;
-    this.reporter = ConsoleReporter.forRegistry(registry).convertDurationsTo(TimeUnit.MILLISECONDS)
-        .convertRatesTo(TimeUnit.SECONDS).build();
+    this.reporter =
+        ConsoleReporter.forRegistry(registry)
+            .convertDurationsTo(TimeUnit.MILLISECONDS)
+            .convertRatesTo(TimeUnit.SECONDS)
+            .build();
   }
 
   @Override

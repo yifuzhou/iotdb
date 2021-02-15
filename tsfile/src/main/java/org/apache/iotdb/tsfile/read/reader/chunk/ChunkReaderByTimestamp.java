@@ -18,10 +18,9 @@
  */
 package org.apache.iotdb.tsfile.read.reader.chunk;
 
+import java.io.IOException;
 import org.apache.iotdb.tsfile.file.header.PageHeader;
 import org.apache.iotdb.tsfile.read.common.Chunk;
-
-import java.io.IOException;
 
 public class ChunkReaderByTimestamp extends ChunkReader {
 
@@ -41,5 +40,4 @@ public class ChunkReaderByTimestamp extends ChunkReader {
   public void setCurrentTimestamp(long currentTimestamp) {
     this.currentTimestamp = currentTimestamp;
   }
-
 }

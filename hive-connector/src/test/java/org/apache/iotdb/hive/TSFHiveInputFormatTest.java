@@ -18,6 +18,9 @@
  */
 package org.apache.iotdb.hive;
 
+import static org.junit.Assert.*;
+
+import java.io.IOException;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.MapWritable;
 import org.apache.hadoop.io.NullWritable;
@@ -31,11 +34,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.io.IOException;
-
-import static org.junit.Assert.*;
-
-
 public class TSFHiveInputFormatTest {
 
   private TSFInputSplit inputSplit;
@@ -47,14 +45,13 @@ public class TSFHiveInputFormatTest {
   public void setUp() {
     TsFileTestHelper.writeTsFile(filePath);
     inputFormat = new TSFHiveInputFormat();
-    //in windows
-    String jobPath = filePath.replaceAll("\\\\","/");
+    // in windows
+    String jobPath = filePath.replaceAll("\\\\", "/");
     job = new JobConf();
     job.set(FileInputFormat.INPUT_DIR, jobPath);
     Path path = new Path(jobPath);
     String[] hosts = {"127.0.0.1"};
     inputSplit = new TSFInputSplit(path, hosts, 0, 3727688L);
-
   }
 
   @After
@@ -65,7 +62,8 @@ public class TSFHiveInputFormatTest {
   @Test
   public void testGetRecordReader() {
     try {
-      RecordReader<NullWritable, MapWritable> recordReader = inputFormat.getRecordReader(inputSplit, job, null);
+      RecordReader<NullWritable, MapWritable> recordReader =
+          inputFormat.getRecordReader(inputSplit, job, null);
       assertTrue(recordReader instanceof TSFHiveRecordReader);
     } catch (IOException e) {
       e.printStackTrace();

@@ -33,10 +33,8 @@ import org.apache.iotdb.service.sync.thrift.SyncService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * sync receiver server.
- */
-public class SyncServerManager  extends ThriftService implements SyncServerManagerMBean {
+/** sync receiver server. */
+public class SyncServerManager extends ThriftService implements SyncServerManagerMBean {
   private static Logger logger = LoggerFactory.getLogger(SyncServerManager.class);
   private SyncServiceImpl serviceImpl;
 
@@ -69,13 +67,17 @@ public class SyncServerManager  extends ThriftService implements SyncServerManag
   public void initThriftServiceThread()
       throws IllegalAccessException, InstantiationException, ClassNotFoundException {
     IoTDBConfig config = IoTDBDescriptor.getInstance().getConfig();
-    thriftServiceThread = new ThriftServiceThread(processor,
-        getID().getName(), ThreadName.SYNC_CLIENT.getName(),
-        config.getRpcAddress(), config.getSyncServerPort(),
-        Integer.MAX_VALUE, config.getThriftServerAwaitTimeForStopService(),
-        new SyncServerThriftHandler(serviceImpl),
-        config.isRpcThriftCompressionEnable()
-        );
+    thriftServiceThread =
+        new ThriftServiceThread(
+            processor,
+            getID().getName(),
+            ThreadName.SYNC_CLIENT.getName(),
+            config.getRpcAddress(),
+            config.getSyncServerPort(),
+            Integer.MAX_VALUE,
+            config.getThriftServerAwaitTimeForStopService(),
+            new SyncServerThriftHandler(serviceImpl),
+            config.isRpcThriftCompressionEnable());
     thriftServiceThread.setName(ThreadName.SYNC_SERVER.getName());
   }
 
@@ -116,6 +118,5 @@ public class SyncServerManager  extends ThriftService implements SyncServerManag
       FileLoaderManager.getInstance().stop();
       super.stopService();
     }
-
   }
 }

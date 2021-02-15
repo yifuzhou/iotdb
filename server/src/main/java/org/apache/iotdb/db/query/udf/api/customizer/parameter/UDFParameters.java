@@ -30,14 +30,15 @@ import org.apache.iotdb.tsfile.file.metadata.enums.TSDataType;
 
 /**
  * Used in {@link UDTF#beforeStart(UDFParameters, UDTFConfigurations)}.
- * <p>
- * This class is used to parse the parameters in the UDF entered by the user.
- * <p>
- * The input parameters of UDF have two parts. The first part is the paths (measurements) of the
+ *
+ * <p>This class is used to parse the parameters in the UDF entered by the user.
+ *
+ * <p>The input parameters of UDF have two parts. The first part is the paths (measurements) of the
  * time series that the UDF needs to process, and the second part is the key-value pair attributes
  * for customization. Only the second part can be empty.
- * <p>
- * Note that the user must enter the paths (measurements) part before entering the attributes part.
+ *
+ * <p>Note that the user must enter the paths (measurements) part before entering the attributes
+ * part.
  */
 public class UDFParameters {
 

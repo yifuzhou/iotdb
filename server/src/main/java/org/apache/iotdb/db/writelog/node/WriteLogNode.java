@@ -23,33 +23,27 @@ import java.nio.ByteBuffer;
 import org.apache.iotdb.db.qp.physical.PhysicalPlan;
 import org.apache.iotdb.db.writelog.io.ILogReader;
 
-/**
- * WriteLogNode is the minimum unit of managing WALs.
- */
+/** WriteLogNode is the minimum unit of managing WALs. */
 public interface WriteLogNode {
 
   /**
-   * Write a wal for a PhysicalPlan. First, the PhysicalPlan will be conveyed to byte[].
-   * Then the byte[] will be put into a cache. When the cache is full, the logs in the cache will be
-   * synced to disk.
+   * Write a wal for a PhysicalPlan. First, the PhysicalPlan will be conveyed to byte[]. Then the
+   * byte[] will be put into a cache. When the cache is full, the logs in the cache will be synced
+   * to disk.
    *
    * @param plan - a PhysicalPlan
    */
   void write(PhysicalPlan plan) throws IOException;
 
-  /**
-   * Sync and close streams.
-   */
+  /** Sync and close streams. */
   void close() throws IOException;
 
-  /**
-   * Write what in cache to disk.
-   */
+  /** Write what in cache to disk. */
   void forceSync() throws IOException;
 
   /**
-   * When data that have WALs in this node start to be flushed, this method must be called to
-   * change the working WAL file.
+   * When data that have WALs in this node start to be flushed, this method must be called to change
+   * the working WAL file.
    */
   void notifyStartFlush() throws IOException;
 
@@ -74,20 +68,18 @@ public interface WriteLogNode {
   String getLogDirectory();
 
   /**
-   * Abandon all logs in this node and delete the log directory. Calling insert() after calling
-   * this method is undefined.
+   * Abandon all logs in this node and delete the log directory. Calling insert() after calling this
+   * method is undefined.
    */
   ByteBuffer[] delete() throws IOException;
 
   /**
    * return an ILogReader which can iterate each log in this log node.
+   *
    * @return an ILogReader which can iterate each log in this log node.
    */
   ILogReader getLogReader();
 
-  /**
-   * init the buffers, this should be called after this node being created.
-   */
+  /** init the buffers, this should be called after this node being created. */
   void initBuffer(ByteBuffer[] byteBuffers);
-
 }

@@ -20,6 +20,9 @@ package org.apache.iotdb.hadoop.tsfile;
 
 import static org.apache.iotdb.tsfile.common.constant.TsFileConstant.TSFILE_SUFFIX;
 
+import java.io.IOException;
+import java.util.*;
+import java.util.stream.Collectors;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.BlockLocation;
 import org.apache.hadoop.fs.FileStatus;
@@ -32,50 +35,30 @@ import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.util.*;
-import java.util.stream.Collectors;
+public class TSFInputFormat extends FileInputFormat<NullWritable, MapWritable> {
 
-public class
-TSFInputFormat extends FileInputFormat<NullWritable, MapWritable> {
-
-  /**
-   * key to configure whether reading time enable
-   */
+  /** key to configure whether reading time enable */
   public static final String READ_TIME_ENABLE = "tsfile.read.time.enable";
-  /**
-   * key to configure whether reading deltaObjectId enable
-   */
+  /** key to configure whether reading deltaObjectId enable */
   public static final String READ_DELTAOBJECT_ENABLE = "tsfile.read.deltaObjectId.enable";
-  /**
-   * key to configure the type of filter
-   */
-  @Deprecated
-  public static final String FILTER_TYPE = "tsfile.filter.type";
-  /**
-   * key to configure the filter
-   */
-  @Deprecated
-  public static final String FILTER_EXPRESSION = "tsfile.filter.expression";
-  /**
-   * key to configure whether filtering is enable
-   */
+  /** key to configure the type of filter */
+  @Deprecated public static final String FILTER_TYPE = "tsfile.filter.type";
+  /** key to configure the filter */
+  @Deprecated public static final String FILTER_EXPRESSION = "tsfile.filter.expression";
+  /** key to configure whether filtering is enable */
   public static final String FILTER_EXIST = "tsfile.filter.exist";
-  /**
-   * key to configure the reading deltaObjectIds
-   */
+  /** key to configure the reading deltaObjectIds */
   public static final String READ_DELTAOBJECTS = "tsfile.read.deltaobject";
-  /**
-   * key to configure the reading measurementIds
-   */
+  /** key to configure the reading measurementIds */
   public static final String READ_MEASUREMENTID = "tsfile.read.measurement";
+
   private static final Logger logger = LoggerFactory.getLogger(TSFInputFormat.class);
   private static final String SEPARATOR = ",";
 
   /**
    * Set the deltaObjectIds which want to be read
    *
-   * @param job   hadoop job
+   * @param job hadoop job
    * @param value the deltaObjectIds will be read
    * @throws TSFHadoopException
    */
@@ -88,8 +71,10 @@ TSFInputFormat extends FileInputFormat<NullWritable, MapWritable> {
         deltaObjectIdsBuilder.append(deltaObjectId).append(SEPARATOR);
       }
       String deltaObjectIds = deltaObjectIdsBuilder.toString();
-      job.getConfiguration().set(READ_DELTAOBJECTS,
-          (String) deltaObjectIds.subSequence(0, deltaObjectIds.length() - 1));
+      job.getConfiguration()
+          .set(
+              READ_DELTAOBJECTS,
+              (String) deltaObjectIds.subSequence(0, deltaObjectIds.length() - 1));
     }
   }
 
@@ -98,7 +83,7 @@ TSFInputFormat extends FileInputFormat<NullWritable, MapWritable> {
    *
    * @param configuration
    * @return List of device, if configuration has been set the deviceIds. null, if configuration has
-   * not been set the deviceIds.
+   *     not been set the deviceIds.
    */
   public static List<String> getReadDeviceIds(Configuration configuration) {
     String deviceIds = configuration.get(READ_DELTAOBJECTS);
@@ -113,7 +98,7 @@ TSFInputFormat extends FileInputFormat<NullWritable, MapWritable> {
   /**
    * Set the measurementIds which want to be read
    *
-   * @param job   hadoop job
+   * @param job hadoop job
    * @param value the measurementIds will be read
    * @throws TSFHadoopException
    */
@@ -127,8 +112,10 @@ TSFInputFormat extends FileInputFormat<NullWritable, MapWritable> {
       }
       String measurementIds = measurementIdsBuilder.toString();
       // Get conf type
-      job.getConfiguration().set(READ_MEASUREMENTID,
-          (String) measurementIds.subSequence(0, measurementIds.length() - 1));
+      job.getConfiguration()
+          .set(
+              READ_MEASUREMENTID,
+              (String) measurementIds.subSequence(0, measurementIds.length() - 1));
     }
   }
 
@@ -231,8 +218,8 @@ TSFInputFormat extends FileInputFormat<NullWritable, MapWritable> {
   }
 
   @Override
-  public RecordReader<NullWritable, MapWritable> createRecordReader(InputSplit split,
-      TaskAttemptContext context) {
+  public RecordReader<NullWritable, MapWritable> createRecordReader(
+      InputSplit split, TaskAttemptContext context) {
     return new TSFRecordReader();
   }
 
@@ -243,8 +230,9 @@ TSFInputFormat extends FileInputFormat<NullWritable, MapWritable> {
     return new ArrayList<>(getTSFInputSplit(job.getConfiguration(), listFileStatus, logger));
   }
 
-  public static List<TSFInputSplit> getTSFInputSplit(Configuration configuration,
-      List<FileStatus> listFileStatus, Logger logger) throws IOException {
+  public static List<TSFInputSplit> getTSFInputSplit(
+      Configuration configuration, List<FileStatus> listFileStatus, Logger logger)
+      throws IOException {
     BlockLocation[] blockLocations;
     List<TSFInputSplit> splits = new ArrayList<>();
     // get the all file in the directory
@@ -288,10 +276,13 @@ TSFInputFormat extends FileInputFormat<NullWritable, MapWritable> {
       throws IOException {
     List<TSFInputSplit> splits = new ArrayList<>();
     for (BlockLocation blockLocation : blockLocations) {
-      splits.add(new TSFInputSplit(path, blockLocation.getHosts(), blockLocation.getOffset(),
-          blockLocation.getLength()));
+      splits.add(
+          new TSFInputSplit(
+              path,
+              blockLocation.getHosts(),
+              blockLocation.getOffset(),
+              blockLocation.getLength()));
     }
     return splits;
   }
-
 }

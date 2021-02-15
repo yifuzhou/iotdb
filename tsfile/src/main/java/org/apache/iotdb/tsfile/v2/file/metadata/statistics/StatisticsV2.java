@@ -21,7 +21,6 @@ package org.apache.iotdb.tsfile.v2.file.metadata.statistics;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
-
 import org.apache.iotdb.tsfile.exception.write.UnknownColumnTypeException;
 import org.apache.iotdb.tsfile.file.metadata.enums.TSDataType;
 import org.apache.iotdb.tsfile.file.metadata.statistics.BooleanStatistics;
@@ -31,8 +30,7 @@ import org.apache.iotdb.tsfile.utils.ReadWriteIOUtils;
 
 public class StatisticsV2 {
 
-  private StatisticsV2() {
-  }
+  private StatisticsV2() {}
 
   @SuppressWarnings("rawtypes")
   public static Statistics deserialize(InputStream inputStream, TSDataType dataType)
@@ -53,7 +51,8 @@ public class StatisticsV2 {
         int firstValue = ReadWriteIOUtils.readInt(inputStream);
         int lastValue = ReadWriteIOUtils.readInt(inputStream);
         long sumValue = (long) ReadWriteIOUtils.readDouble(inputStream);
-        ((IntegerStatistics) statistics).initializeStats(minValue, maxValue, firstValue, lastValue, sumValue);
+        ((IntegerStatistics) statistics)
+            .initializeStats(minValue, maxValue, firstValue, lastValue, sumValue);
         break;
       case INT64:
       case TEXT:
@@ -86,7 +85,8 @@ public class StatisticsV2 {
         int firstValue = ReadWriteIOUtils.readInt(buffer);
         int lastValue = ReadWriteIOUtils.readInt(buffer);
         long sumValue = (long) ReadWriteIOUtils.readDouble(buffer);
-        ((IntegerStatistics) statistics).initializeStats(minValue, maxValue, firstValue, lastValue, sumValue);
+        ((IntegerStatistics) statistics)
+            .initializeStats(minValue, maxValue, firstValue, lastValue, sumValue);
         break;
       case INT64:
       case TEXT:
@@ -100,5 +100,4 @@ public class StatisticsV2 {
     statistics.setEmpty(false);
     return statistics;
   }
-
 }

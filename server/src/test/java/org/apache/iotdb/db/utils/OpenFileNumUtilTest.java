@@ -127,7 +127,8 @@ public class OpenFileNumUtilTest {
         assertEquals(UNSUPPORTED_OS_ERROR_CODE, totalOpenFileNumAfter);
       }
     } else {
-      assertEquals(UNSUPPORTED_OS_ERROR_CODE,
+      assertEquals(
+          UNSUPPORTED_OS_ERROR_CODE,
           openFileNumUtil.get(OpenFileNumStatistics.DIGEST_OPEN_FILE_NUM));
     }
   }
@@ -170,7 +171,8 @@ public class OpenFileNumUtilTest {
         assertEquals(UNSUPPORTED_OS_ERROR_CODE, totalOpenFileNumAfter);
       }
     } else {
-      assertEquals(UNSUPPORTED_OS_ERROR_CODE,
+      assertEquals(
+          UNSUPPORTED_OS_ERROR_CODE,
           openFileNumUtil.get(OpenFileNumStatistics.DIGEST_OPEN_FILE_NUM));
     }
   }
@@ -222,7 +224,8 @@ public class OpenFileNumUtilTest {
         assertEquals(UNSUPPORTED_OS_ERROR_CODE, totalOpenFileNumAfter);
       }
     } else {
-      assertEquals(UNSUPPORTED_OS_ERROR_CODE,
+      assertEquals(
+          UNSUPPORTED_OS_ERROR_CODE,
           openFileNumUtil.get(OpenFileNumStatistics.SEQUENCE_FILE_OPEN_NUM));
     }
   }
@@ -281,7 +284,8 @@ public class OpenFileNumUtilTest {
         assertEquals(UNSUPPORTED_OS_ERROR_CODE, totalOpenFileNumAfter);
       }
     } else {
-      assertEquals(UNSUPPORTED_OS_ERROR_CODE,
+      assertEquals(
+          UNSUPPORTED_OS_ERROR_CODE,
           openFileNumUtil.get(OpenFileNumStatistics.DIGEST_OPEN_FILE_NUM));
     }
   }

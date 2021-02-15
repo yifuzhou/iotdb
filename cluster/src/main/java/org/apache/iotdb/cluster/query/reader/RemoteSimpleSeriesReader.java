@@ -71,8 +71,10 @@ public class RemoteSimpleSeriesReader implements IPointReader {
       throw new NoSuchElementException();
     }
     this.lastTimestamp = cachedBatch.currentTime();
-    TimeValuePair timeValuePair = new TimeValuePair(cachedBatch.currentTime(),
-        TsPrimitiveType.getByType(sourceInfo.getDataType(), cachedBatch.currentValue()));
+    TimeValuePair timeValuePair =
+        new TimeValuePair(
+            cachedBatch.currentTime(),
+            TsPrimitiveType.getByType(sourceInfo.getDataType(), cachedBatch.currentValue()));
     cachedBatch.next();
     return timeValuePair;
   }
@@ -82,7 +84,8 @@ public class RemoteSimpleSeriesReader implements IPointReader {
     if (!hasNextTimeValuePair()) {
       throw new NoSuchElementException();
     }
-    return new TimeValuePair(cachedBatch.currentTime(),
+    return new TimeValuePair(
+        cachedBatch.currentTime(),
         TsPrimitiveType.getByType(sourceInfo.getDataType(), cachedBatch.currentValue()));
   }
 
@@ -106,7 +109,9 @@ public class RemoteSimpleSeriesReader implements IPointReader {
 
     cachedBatch = SerializeUtils.deserializeBatchData(result);
     if (logger.isDebugEnabled()) {
-      logger.debug("Fetched a batch from {}, size:{}", sourceInfo.getCurrentNode(),
+      logger.debug(
+          "Fetched a batch from {}, size:{}",
+          sourceInfo.getCurrentNode(),
           cachedBatch == null ? 0 : cachedBatch.length());
     }
   }
@@ -116,12 +121,12 @@ public class RemoteSimpleSeriesReader implements IPointReader {
     synchronized (fetchResult) {
       fetchResult.set(null);
       try {
-        sourceInfo.getCurAsyncClient(RaftServer.getReadOperationTimeoutMS())
-            .fetchSingleSeries(sourceInfo.getHeader(),
-                sourceInfo.getReaderId(), handler);
+        sourceInfo
+            .getCurAsyncClient(RaftServer.getReadOperationTimeoutMS())
+            .fetchSingleSeries(sourceInfo.getHeader(), sourceInfo.getReaderId(), handler);
         fetchResult.wait(RaftServer.getReadOperationTimeoutMS());
       } catch (TException e) {
-        //try other node
+        // try other node
         if (!sourceInfo.switchNode(false, lastTimestamp)) {
           return null;
         }
@@ -137,15 +142,14 @@ public class RemoteSimpleSeriesReader implements IPointReader {
 
   private ByteBuffer fetchResultSync() throws IOException {
     try {
-      SyncDataClient curSyncClient = sourceInfo
-          .getCurSyncClient(RaftServer.getReadOperationTimeoutMS());
-      ByteBuffer buffer = curSyncClient
-          .fetchSingleSeries(sourceInfo.getHeader(),
-              sourceInfo.getReaderId());
+      SyncDataClient curSyncClient =
+          sourceInfo.getCurSyncClient(RaftServer.getReadOperationTimeoutMS());
+      ByteBuffer buffer =
+          curSyncClient.fetchSingleSeries(sourceInfo.getHeader(), sourceInfo.getReaderId());
       curSyncClient.putBack();
       return buffer;
     } catch (TException e) {
-      //try other node
+      // try other node
       if (!sourceInfo.switchNode(false, lastTimestamp)) {
         return null;
       }

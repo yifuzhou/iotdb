@@ -27,8 +27,7 @@ public class MergedReaderByTime implements IReaderByTimestamp {
 
   private List<IReaderByTimestamp> innerReaders;
 
-  public MergedReaderByTime(
-      List<IReaderByTimestamp> innerReaders) {
+  public MergedReaderByTime(List<IReaderByTimestamp> innerReaders) {
     this.innerReaders = innerReaders;
   }
 

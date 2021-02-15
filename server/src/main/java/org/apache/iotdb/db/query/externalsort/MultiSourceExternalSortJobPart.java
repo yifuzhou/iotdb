@@ -29,14 +29,13 @@ public class MultiSourceExternalSortJobPart extends ExternalSortJobPart {
   private List<ExternalSortJobPart> source;
   private long queryId;
 
-  public MultiSourceExternalSortJobPart(long queryId, String tmpFilePath,
-      List<ExternalSortJobPart> source) {
+  public MultiSourceExternalSortJobPart(
+      long queryId, String tmpFilePath, List<ExternalSortJobPart> source) {
     super(ExternalSortJobPartType.MULTIPLE_SOURCE);
     this.source = source;
     this.tmpFilePath = tmpFilePath;
     this.queryId = queryId;
   }
-
 
   @Override
   public IPointReader executeForIPointReader() throws IOException {

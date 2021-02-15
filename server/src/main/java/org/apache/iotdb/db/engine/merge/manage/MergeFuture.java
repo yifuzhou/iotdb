@@ -30,8 +30,7 @@ import org.apache.iotdb.db.engine.merge.task.MergeTask;
 
 public abstract class MergeFuture extends FutureTask<Void> implements Comparable<MergeFuture> {
 
-  private final DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss"
-      + ".SSS'Z'");
+  private final DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss" + ".SSS'Z'");
   private Date createdTime;
 
   public MergeFuture(Callable callable) {
@@ -149,5 +148,3 @@ public abstract class MergeFuture extends FutureTask<Void> implements Comparable
     }
   }
 }
-
-

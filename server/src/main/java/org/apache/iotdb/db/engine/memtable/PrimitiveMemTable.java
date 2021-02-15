@@ -26,12 +26,12 @@ import org.apache.iotdb.tsfile.write.schema.MeasurementSchema;
 
 public class PrimitiveMemTable extends AbstractMemTable {
 
-  public PrimitiveMemTable() {
-  }
+  public PrimitiveMemTable() {}
 
   public PrimitiveMemTable(boolean enableMemControl) {
     this.disableMemControl = !enableMemControl;
   }
+
   public PrimitiveMemTable(Map<String, Map<String, IWritableMemChunk>> memTableMap) {
     super(memTableMap);
   }
@@ -55,6 +55,6 @@ public class PrimitiveMemTable extends AbstractMemTable {
 
   @Override
   public String toString() {
-    return "PrimitiveMemTable{planIndex=[" + getMinPlanIndex() +"," + getMaxPlanIndex() + "]}";
+    return "PrimitiveMemTable{planIndex=[" + getMinPlanIndex() + "," + getMaxPlanIndex() + "]}";
   }
 }

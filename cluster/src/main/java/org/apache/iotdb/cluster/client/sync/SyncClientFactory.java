@@ -28,6 +28,7 @@ public interface SyncClientFactory {
 
   /**
    * Get a client which will connect the given node and be cached in the given pool.
+   *
    * @param node the cluster node the client will connect.
    * @param pool the pool that will cache the client for reusing.
    * @return

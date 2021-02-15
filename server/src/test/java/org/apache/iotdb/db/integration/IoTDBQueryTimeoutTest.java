@@ -34,7 +34,6 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-
 public class IoTDBQueryTimeoutTest {
 
   @BeforeClass
@@ -50,15 +49,13 @@ public class IoTDBQueryTimeoutTest {
     EnvironmentUtils.cleanEnv();
   }
 
-  /**
-   * Test show query processlist, there is supposed to no result.
-   */
+  /** Test show query processlist, there is supposed to no result. */
   @Test
   public void queryProcessListTest() {
     String headerResult = "Time, queryId, statement, ";
 
-    try (Connection connection = DriverManager.
-        getConnection("jdbc:iotdb://127.0.0.1:6667/", "root", "root");
+    try (Connection connection =
+            DriverManager.getConnection("jdbc:iotdb://127.0.0.1:6667/", "root", "root");
         Statement statement = connection.createStatement()) {
 
       boolean hasResultSet = statement.execute("show query processlist");
@@ -84,13 +81,13 @@ public class IoTDBQueryTimeoutTest {
   }
 
   /**
-   * Test query with timeout, which is supposed to throw an QueryTimeoutRuntimeException.
-   * Note: This test is not guaranteed to time out.
+   * Test query with timeout, which is supposed to throw an QueryTimeoutRuntimeException. Note: This
+   * test is not guaranteed to time out.
    */
   @Test
   public void queryWithTimeoutTest() {
-    try (Connection connection = DriverManager.
-        getConnection("jdbc:iotdb://127.0.0.1:6667/", "root", "root");
+    try (Connection connection =
+            DriverManager.getConnection("jdbc:iotdb://127.0.0.1:6667/", "root", "root");
         Statement statement = connection.createStatement()) {
 
       statement.setFetchSize(40000);
@@ -107,13 +104,11 @@ public class IoTDBQueryTimeoutTest {
     }
   }
 
-  /**
-   * Test executing query after a timeout query, it's supposed to execute correctly.
-   */
+  /** Test executing query after a timeout query, it's supposed to execute correctly. */
   @Test
   public void queryAfterTimeoutQueryTest() {
-    try (Connection connection = DriverManager.
-        getConnection("jdbc:iotdb://127.0.0.1:6667/", "root", "root");
+    try (Connection connection =
+            DriverManager.getConnection("jdbc:iotdb://127.0.0.1:6667/", "root", "root");
         Statement statement = connection.createStatement()) {
 
       statement.setFetchSize(40000);
@@ -138,8 +133,9 @@ public class IoTDBQueryTimeoutTest {
   }
 
   private static void prepareData() {
-    try (Connection connection = DriverManager
-        .getConnection(Config.IOTDB_URL_PREFIX + "127.0.0.1:6667/", "root", "root");
+    try (Connection connection =
+            DriverManager.getConnection(
+                Config.IOTDB_URL_PREFIX + "127.0.0.1:6667/", "root", "root");
         Statement statement = connection.createStatement()) {
 
       for (int i = 0; i <= 80000; i++) {

@@ -33,22 +33,20 @@ public class AuthorityChecker {
   private static final String SUPER_USER = IoTDBConstant.ADMIN_NAME;
   private static final Logger logger = LoggerFactory.getLogger(AuthorityChecker.class);
 
-  private AuthorityChecker() {
-
-  }
+  private AuthorityChecker() {}
 
   /**
    * check permission.
    *
-   * @param username   username
-   * @param paths      paths in List structure
-   * @param type       Operator type
+   * @param username username
+   * @param paths paths in List structure
+   * @param type Operator type
    * @param targetUser target user
    * @return if permission-check is passed
    * @throws AuthException Authentication Exception
    */
-  public static boolean check(String username, List<PartialPath> paths, Operator.OperatorType type,
-      String targetUser)
+  public static boolean check(
+      String username, List<PartialPath> paths, Operator.OperatorType type, String targetUser)
       throws AuthException {
     if (SUPER_USER.equals(username)) {
       return true;
@@ -57,8 +55,8 @@ public class AuthorityChecker {
     if (permission == -1) {
       logger.error("OperateType not found. {}", type);
       return false;
-    } else if (permission == PrivilegeType.MODIFY_PASSWORD.ordinal() && username
-        .equals(targetUser)) {
+    } else if (permission == PrivilegeType.MODIFY_PASSWORD.ordinal()
+        && username.equals(targetUser)) {
       // a user can modify his own password
       return true;
     }

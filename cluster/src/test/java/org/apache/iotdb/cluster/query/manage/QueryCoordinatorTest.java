@@ -68,34 +68,37 @@ public class QueryCoordinatorTest {
       nodeLatencyMap.put(node, i * 200L);
     }
 
-    MetaGroupMember metaGroupMember = new MetaGroupMember() {
-      @Override
-      public AsyncClient getAsyncClient(Node node, boolean activatedOnly) {
-        return getAsyncClient(node);
-      }
+    MetaGroupMember metaGroupMember =
+        new MetaGroupMember() {
+          @Override
+          public AsyncClient getAsyncClient(Node node, boolean activatedOnly) {
+            return getAsyncClient(node);
+          }
 
-      @Override
-      public AsyncClient getAsyncClient(Node node) {
-        try {
-          return new TestAsyncMetaClient(new Factory(),  null, node, null) {
-            @Override
-            public void queryNodeStatus(AsyncMethodCallback<TNodeStatus> resultHandler) {
-              new Thread(() -> {
-                try {
-                  Thread.sleep(nodeLatencyMap.get(getNode()));
-                } catch (InterruptedException e) {
-                  // ignored
+          @Override
+          public AsyncClient getAsyncClient(Node node) {
+            try {
+              return new TestAsyncMetaClient(new Factory(), null, node, null) {
+                @Override
+                public void queryNodeStatus(AsyncMethodCallback<TNodeStatus> resultHandler) {
+                  new Thread(
+                          () -> {
+                            try {
+                              Thread.sleep(nodeLatencyMap.get(getNode()));
+                            } catch (InterruptedException e) {
+                              // ignored
+                            }
+                            resultHandler.onComplete(nodeStatusMap.get(getNode()).getStatus());
+                          })
+                      .start();
                 }
-                resultHandler.onComplete(nodeStatusMap.get(getNode()).getStatus());
-              }).start();
+              };
+            } catch (IOException e) {
+              fail(e.getMessage());
+              return null;
             }
-          };
-        } catch (IOException e) {
-          fail(e.getMessage());
-          return null;
-        }
-      }
-    };
+          }
+        };
     NodeStatusManager.getINSTANCE().setMetaGroupMember(metaGroupMember);
     NodeStatusManager.getINSTANCE().clear();
   }

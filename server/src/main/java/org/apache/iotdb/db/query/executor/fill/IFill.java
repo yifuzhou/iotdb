@@ -38,13 +38,16 @@ public abstract class IFill {
     this.queryTime = queryTime;
   }
 
-  public IFill() {
-  }
+  public IFill() {}
 
   public abstract IFill copy();
 
-  public abstract void configureFill(PartialPath path, TSDataType dataType, long queryTime,
-      Set<String> deviceMeasurements, QueryContext context);
+  public abstract void configureFill(
+      PartialPath path,
+      TSDataType dataType,
+      long queryTime,
+      Set<String> deviceMeasurements,
+      QueryContext context);
 
   public abstract TimeValuePair getFillResult()
       throws IOException, QueryProcessException, StorageEngineException;

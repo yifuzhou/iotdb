@@ -23,11 +23,11 @@ import org.apache.iotdb.cluster.common.TestUtils;
 import org.apache.iotdb.cluster.exception.SnapshotInstallationException;
 import org.apache.iotdb.cluster.partition.slot.SlotManager.SlotStatus;
 import org.apache.iotdb.db.engine.StorageEngine;
-import org.apache.iotdb.db.engine.storagegroup.StorageGroupProcessor;
 import org.apache.iotdb.db.engine.storagegroup.TsFileResource;
+import org.apache.iotdb.db.engine.storagegroup.VirtualStorageGroupProcessor;
 import org.apache.iotdb.db.exception.StorageEngineException;
 import org.apache.iotdb.db.exception.metadata.IllegalPathException;
-import org.apache.iotdb.db.metadata.PartialPath;
+import org.apache.iotdb.db.metadata.path.PartialPath;
 import org.apache.iotdb.db.service.IoTDB;
 import org.apache.iotdb.tsfile.exception.write.WriteProcessException;
 import org.apache.iotdb.tsfile.write.schema.TimeseriesSchema;
@@ -96,7 +96,7 @@ public class PartitionedSnapshotTest extends DataSnapshotTest {
     for (int i = 0; i < 10; i++) {
       dataGroupMember.getSlotManager().setToPulling(i, TestUtils.getNode(0));
     }
-    defaultInstaller.install(snapshot, -1);
+    defaultInstaller.install(snapshot, -1, false);
     // after installation, the slot should be available again
     for (int i = 0; i < 10; i++) {
       assertEquals(SlotStatus.NULL, dataGroupMember.getSlotManager().getStatus(i));
@@ -105,7 +105,7 @@ public class PartitionedSnapshotTest extends DataSnapshotTest {
     for (TimeseriesSchema timeseriesSchema : timeseriesSchemas) {
       assertTrue(IoTDB.metaManager.isPathExist(new PartialPath(timeseriesSchema.getFullPath())));
     }
-    StorageGroupProcessor processor =
+    VirtualStorageGroupProcessor processor =
         StorageEngine.getInstance().getProcessor(new PartialPath(TestUtils.getTestSg(0)));
     assertEquals(9, processor.getPartitionMaxFileVersions(0));
     List<TsFileResource> loadedFiles = processor.getSequenceFileTreeSet();

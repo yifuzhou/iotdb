@@ -19,19 +19,60 @@
 
 package org.apache.iotdb.db.qp.physical.crud;
 
+import org.apache.iotdb.db.exception.metadata.MetadataException;
 import org.apache.iotdb.db.exception.query.QueryProcessException;
 import org.apache.iotdb.db.qp.logical.Operator;
+import org.apache.iotdb.db.qp.strategy.PhysicalGenerator;
+import org.apache.iotdb.db.query.expression.ResultColumn;
+import org.apache.iotdb.db.service.StaticResps;
+import org.apache.iotdb.service.rpc.thrift.TSExecuteStatementResp;
+import org.apache.iotdb.tsfile.file.metadata.enums.TSDataType;
 import org.apache.iotdb.tsfile.read.expression.IExpression;
 import org.apache.iotdb.tsfile.read.expression.impl.GlobalTimeExpression;
 import org.apache.iotdb.tsfile.read.filter.TimeFilter.TimeGt;
 import org.apache.iotdb.tsfile.read.filter.TimeFilter.TimeGtEq;
 import org.apache.iotdb.tsfile.read.filter.basic.Filter;
 
+import org.apache.thrift.TException;
+
+import java.util.ArrayList;
+import java.util.BitSet;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 public class LastQueryPlan extends RawDataQueryPlan {
 
   public LastQueryPlan() {
     super();
     setOperatorType(Operator.OperatorType.LAST);
+  }
+
+  @Override
+  public void deduplicate(PhysicalGenerator physicalGenerator) throws MetadataException {
+    List<ResultColumn> deduplicatedResultColumns = new ArrayList<>();
+    Set<String> columnForReaderSet = new HashSet<>();
+    for (int i = 0; i < resultColumns.size(); i++) {
+      String column = resultColumns.get(i).getResultColumnName();
+      if (!columnForReaderSet.contains(column)) {
+        addDeduplicatedPaths(paths.get(i));
+        deduplicatedResultColumns.add(resultColumns.get(i));
+        columnForReaderSet.add(column);
+      }
+    }
+    setResultColumns(deduplicatedResultColumns);
+  }
+
+  @Override
+  public TSExecuteStatementResp getTSExecuteStatementResp(boolean isJdbcQuery) {
+    return StaticResps.LAST_RESP.deepCopy();
+  }
+
+  @Override
+  public List<TSDataType> getWideQueryHeaders(
+      List<String> respColumns, List<String> respSgColumns, boolean isJdbcQuery, BitSet aliasList)
+      throws TException {
+    throw new TException("unsupported query type: " + getOperatorType());
   }
 
   @Override
@@ -47,15 +88,8 @@ public class LastQueryPlan extends RawDataQueryPlan {
   private boolean isValidExpression(IExpression expression) {
     if (expression instanceof GlobalTimeExpression) {
       Filter filter = ((GlobalTimeExpression) expression).getFilter();
-      if (filter instanceof TimeGtEq || filter instanceof TimeGt) {
-        return true;
-      }
+      return filter instanceof TimeGtEq || filter instanceof TimeGt;
     }
-    return false;
-  }
-
-  @Override
-  public boolean isRawQuery() {
     return false;
   }
 }

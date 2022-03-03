@@ -110,7 +110,7 @@ public class Path implements Serializable, Comparable<Path> {
     }
     this.device = device;
     this.measurement = measurement;
-    if (!device.equals("")) {
+    if (!"".equals(device)) {
       this.fullPath = device + TsFileConstant.PATH_SEPARATOR + measurement;
     } else {
       fullPath = measurement;
@@ -131,6 +131,10 @@ public class Path implements Serializable, Comparable<Path> {
 
   public String getFullPathWithAlias() {
     throw new IllegalArgumentException("doesn't alias in TSFile Path");
+  }
+
+  public void setMeasurement(String measurement) {
+    this.measurement = measurement;
   }
 
   @Override
@@ -160,5 +164,10 @@ public class Path implements Serializable, Comparable<Path> {
   @Override
   public Path clone() {
     return new Path(fullPath);
+  }
+
+  /** return the column contained by this path */
+  public int getColumnNum() {
+    return 1;
   }
 }

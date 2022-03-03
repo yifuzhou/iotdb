@@ -20,7 +20,7 @@
 package org.apache.iotdb.db.qp.physical.sys;
 
 import org.apache.iotdb.db.exception.metadata.IllegalPathException;
-import org.apache.iotdb.db.metadata.PartialPath;
+import org.apache.iotdb.db.metadata.path.PartialPath;
 import org.apache.iotdb.db.qp.logical.Operator;
 import org.apache.iotdb.db.qp.physical.PhysicalPlan;
 import org.apache.iotdb.tsfile.file.metadata.enums.CompressionType;
@@ -42,41 +42,41 @@ public class CreateAlignedTimeSeriesPlan extends PhysicalPlan {
 
   private static final Logger logger = LoggerFactory.getLogger(CreateAlignedTimeSeriesPlan.class);
 
-  private PartialPath devicePath;
+  private PartialPath prefixPath;
   private List<String> measurements;
   private List<TSDataType> dataTypes;
   private List<TSEncoding> encodings;
-  private CompressionType compressor;
+  private List<CompressionType> compressors;
   private List<String> aliasList;
 
   public CreateAlignedTimeSeriesPlan() {
-    super(false, Operator.OperatorType.CREATE_ALIGNED_TIMESERIES);
+    super(Operator.OperatorType.CREATE_ALIGNED_TIMESERIES);
     canBeSplit = false;
   }
 
   public CreateAlignedTimeSeriesPlan(
-      PartialPath devicePath,
+      PartialPath prefixPath,
       List<String> measurements,
       List<TSDataType> dataTypes,
       List<TSEncoding> encodings,
-      CompressionType compressor,
+      List<CompressionType> compressors,
       List<String> aliasList) {
-    super(false, Operator.OperatorType.CREATE_ALIGNED_TIMESERIES);
-    this.devicePath = devicePath;
+    super(Operator.OperatorType.CREATE_ALIGNED_TIMESERIES);
+    this.prefixPath = prefixPath;
     this.measurements = measurements;
     this.dataTypes = dataTypes;
     this.encodings = encodings;
-    this.compressor = compressor;
+    this.compressors = compressors;
     this.aliasList = aliasList;
     this.canBeSplit = false;
   }
 
-  public PartialPath getDevicePath() {
-    return devicePath;
+  public PartialPath getPrefixPath() {
+    return prefixPath;
   }
 
-  public void setDevicePath(PartialPath devicePath) {
-    this.devicePath = devicePath;
+  public void setPrefixPath(PartialPath prefixPath) {
+    this.prefixPath = prefixPath;
   }
 
   public List<String> getMeasurements() {
@@ -103,12 +103,12 @@ public class CreateAlignedTimeSeriesPlan extends PhysicalPlan {
     this.encodings = encodings;
   }
 
-  public CompressionType getCompressor() {
-    return compressor;
+  public List<CompressionType> getCompressors() {
+    return compressors;
   }
 
-  public void setCompressor(CompressionType compressor) {
-    this.compressor = compressor;
+  public void setCompressors(List<CompressionType> compressor) {
+    this.compressors = compressors;
   }
 
   public List<String> getAliasList() {
@@ -122,8 +122,8 @@ public class CreateAlignedTimeSeriesPlan extends PhysicalPlan {
   @Override
   public String toString() {
     return String.format(
-        "devicePath: %s, measurements: %s, dataTypes: %s, encodings: %s, compression: %s",
-        devicePath, measurements, dataTypes, encodings, compressor);
+        "devicePath: %s, measurements: %s, dataTypes: %s, encodings: %s, compressions: %s",
+        prefixPath, measurements, dataTypes, encodings, compressors);
   }
 
   @Override
@@ -131,7 +131,7 @@ public class CreateAlignedTimeSeriesPlan extends PhysicalPlan {
     List<PartialPath> paths = new ArrayList<>();
     for (String measurement : measurements) {
       try {
-        paths.add(new PartialPath(devicePath.getFullPath(), measurement));
+        paths.add(new PartialPath(prefixPath.getFullPath(), measurement));
       } catch (IllegalPathException e) {
         logger.error("Failed to get paths of CreateAlignedTimeSeriesPlan. ", e);
       }
@@ -142,7 +142,7 @@ public class CreateAlignedTimeSeriesPlan extends PhysicalPlan {
   @Override
   public void serialize(DataOutputStream stream) throws IOException {
     stream.writeByte((byte) PhysicalPlanType.CREATE_ALIGNED_TIMESERIES.ordinal());
-    byte[] bytes = devicePath.getFullPath().getBytes();
+    byte[] bytes = prefixPath.getFullPath().getBytes();
     stream.writeInt(bytes.length);
     stream.write(bytes);
 
@@ -156,7 +156,9 @@ public class CreateAlignedTimeSeriesPlan extends PhysicalPlan {
     for (TSEncoding encoding : encodings) {
       stream.write(encoding.ordinal());
     }
-    stream.write(compressor.ordinal());
+    for (CompressionType compressor : compressors) {
+      stream.write(compressor.ordinal());
+    }
 
     // alias
     if (aliasList != null) {
@@ -171,9 +173,9 @@ public class CreateAlignedTimeSeriesPlan extends PhysicalPlan {
   }
 
   @Override
-  public void serialize(ByteBuffer buffer) {
+  public void serializeImpl(ByteBuffer buffer) {
     buffer.put((byte) PhysicalPlanType.CREATE_ALIGNED_TIMESERIES.ordinal());
-    byte[] bytes = devicePath.getFullPath().getBytes();
+    byte[] bytes = prefixPath.getFullPath().getBytes();
     buffer.putInt(bytes.length);
     buffer.put(bytes);
 
@@ -187,7 +189,9 @@ public class CreateAlignedTimeSeriesPlan extends PhysicalPlan {
     for (TSEncoding encoding : encodings) {
       buffer.put((byte) encoding.ordinal());
     }
-    buffer.put((byte) compressor.ordinal());
+    for (CompressionType compressor : compressors) {
+      buffer.put((byte) compressor.ordinal());
+    }
 
     // alias
     if (aliasList != null) {
@@ -208,7 +212,7 @@ public class CreateAlignedTimeSeriesPlan extends PhysicalPlan {
     byte[] bytes = new byte[length];
     buffer.get(bytes);
 
-    devicePath = new PartialPath(new String(bytes));
+    prefixPath = new PartialPath(new String(bytes));
     int size = ReadWriteIOUtils.readInt(buffer);
     measurements = new ArrayList<>();
     for (int i = 0; i < size; i++) {
@@ -222,7 +226,10 @@ public class CreateAlignedTimeSeriesPlan extends PhysicalPlan {
     for (int i = 0; i < size; i++) {
       encodings.add(TSEncoding.values()[buffer.get()]);
     }
-    compressor = CompressionType.values()[buffer.get()];
+    compressors = new ArrayList<>();
+    for (int i = 0; i < size; i++) {
+      compressors.add(CompressionType.values()[buffer.get()]);
+    }
 
     // alias
     if (buffer.get() == 1) {
@@ -245,15 +252,15 @@ public class CreateAlignedTimeSeriesPlan extends PhysicalPlan {
     }
     CreateAlignedTimeSeriesPlan that = (CreateAlignedTimeSeriesPlan) o;
 
-    return Objects.equals(devicePath, that.devicePath)
+    return Objects.equals(prefixPath, that.prefixPath)
         && Objects.equals(measurements, that.measurements)
         && Objects.equals(dataTypes, that.dataTypes)
         && Objects.equals(encodings, that.encodings)
-        && compressor == that.compressor;
+        && Objects.equals(compressors, that.compressors);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(devicePath, measurements, dataTypes, encodings, compressor);
+    return Objects.hash(prefixPath, measurements, dataTypes, encodings, compressors);
   }
 }

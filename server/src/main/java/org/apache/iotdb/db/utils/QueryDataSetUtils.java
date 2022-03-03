@@ -43,24 +43,11 @@ public class QueryDataSetUtils {
 
   private QueryDataSetUtils() {}
 
-  /**
-   * convert query data set by fetch size.
-   *
-   * @param queryDataSet -query dataset
-   * @param fetchSize -fetch size
-   * @return -convert query dataset
-   */
-  public static TSQueryDataSet convertQueryDataSetByFetchSize(
-      QueryDataSet queryDataSet, int fetchSize) throws IOException {
-    return convertQueryDataSetByFetchSize(queryDataSet, fetchSize, null);
-  }
-
   @SuppressWarnings("squid:S3776") // Suppress high Cognitive Complexity warning
   public static TSQueryDataSet convertQueryDataSetByFetchSize(
       QueryDataSet queryDataSet, int fetchSize, WatermarkEncoder watermarkEncoder)
       throws IOException {
-    List<TSDataType> dataTypes = queryDataSet.getDataTypes();
-    int columnNum = dataTypes.size();
+    int columnNum = queryDataSet.getColumnNum();
     TSQueryDataSet tsQueryDataSet = new TSQueryDataSet();
     // one time column and each value column has a actual value buffer and a bitmap value to
     // indicate whether it is a null
@@ -79,6 +66,14 @@ public class QueryDataSetUtils {
     for (int i = 0; i < fetchSize; i++) {
       if (queryDataSet.hasNext()) {
         RowRecord rowRecord = queryDataSet.next();
+        // filter rows whose columns are null according to the rule
+        if ((queryDataSet.isWithoutAllNull() && rowRecord.isAllNull())
+            || (queryDataSet.isWithoutAnyNull() && rowRecord.hasNullField())) {
+          // if the current RowRecord doesn't satisfy, we should also decrease AlreadyReturnedRowNum
+          queryDataSet.decreaseAlreadyReturnedRowNum();
+          i--;
+          continue;
+        }
         if (watermarkEncoder != null) {
           rowRecord = watermarkEncoder.encodeRecord(rowRecord);
         }

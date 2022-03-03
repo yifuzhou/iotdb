@@ -19,9 +19,7 @@
 
 package org.apache.iotdb.db.service.thrift;
 
-import org.apache.iotdb.db.conf.IoTDBConfig;
 import org.apache.iotdb.db.conf.IoTDBConstant;
-import org.apache.iotdb.db.conf.IoTDBDescriptor;
 import org.apache.iotdb.db.exception.StartupException;
 import org.apache.iotdb.db.service.IService;
 import org.apache.iotdb.db.service.JMXService;
@@ -35,8 +33,10 @@ import java.util.concurrent.CountDownLatch;
 public abstract class ThriftService implements IService {
 
   private static final Logger logger = LoggerFactory.getLogger(ThriftService.class);
-  private static final String STATUS_UP = "UP";
-  private static final String STATUS_DOWN = "DOWN";
+
+  public static final String STATUS_UP = "UP";
+  public static final String STATUS_DOWN = "DOWN";
+
   protected final String mbeanName =
       String.format(
           "%s:%s=%s", IoTDBConstant.IOTDB_PACKAGE, IoTDBConstant.JMX_TYPE, getID().getJmxName());
@@ -64,11 +64,6 @@ public abstract class ThriftService implements IService {
     }
   }
 
-  public int getRPCPort() {
-    IoTDBConfig config = IoTDBDescriptor.getInstance().getConfig();
-    return config.getRpcPort();
-  }
-
   public abstract ThriftService getImplementation();
 
   @Override
@@ -81,6 +76,17 @@ public abstract class ThriftService implements IService {
   public void stop() {
     stopService();
     JMXService.deregisterMBean(mbeanName);
+  }
+
+  boolean setSyncedImpl = false;
+  boolean setAsyncedImpl = false;
+
+  public void initSyncedServiceImpl(Object serviceImpl) {
+    setSyncedImpl = true;
+  }
+
+  public void initAsyncedServiceImpl(Object serviceImpl) {
+    setAsyncedImpl = true;
   }
 
   public abstract void initTProcessor()
@@ -106,6 +112,10 @@ public abstract class ThriftService implements IService {
     try {
       reset();
       initTProcessor();
+      if (!setSyncedImpl && !setAsyncedImpl) {
+        throw new StartupException(
+            getID().getName(), "At least one service implementataion should be set.");
+      }
       initThriftServiceThread();
       thriftServiceThread.setThreadStopLatch(stopLatch);
       thriftServiceThread.start();

@@ -6,15 +6,11 @@ name: E2E Tests
 on:
   push:
     branches: 
-      - master
-      - 'rel/*'
       - test/e2e
     paths-ignore:
       - 'docs/**'
   pull_request:
     branches: 
-      - master
-      - 'rel/*'
       - cluster_new
     paths-ignore:
       - 'docs/**'
@@ -58,4 +54,4 @@ jobs:
 
       - name: TestContainer
         run: |
-          mvn -B integration-test -pl testcontainer
+          mvn -B -T 4 integration-test -pl testcontainer

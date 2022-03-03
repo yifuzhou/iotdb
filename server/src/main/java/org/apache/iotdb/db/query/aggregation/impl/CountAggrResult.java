@@ -22,9 +22,10 @@ package org.apache.iotdb.db.query.aggregation.impl;
 import org.apache.iotdb.db.query.aggregation.AggregateResult;
 import org.apache.iotdb.db.query.aggregation.AggregationType;
 import org.apache.iotdb.db.query.reader.series.IReaderByTimestamp;
+import org.apache.iotdb.db.utils.ValueIterator;
 import org.apache.iotdb.tsfile.file.metadata.enums.TSDataType;
 import org.apache.iotdb.tsfile.file.metadata.statistics.Statistics;
-import org.apache.iotdb.tsfile.read.common.BatchData;
+import org.apache.iotdb.tsfile.read.common.IBatchDataIterator;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -45,29 +46,26 @@ public class CountAggrResult extends AggregateResult {
 
   @Override
   public void updateResultFromStatistics(Statistics statistics) {
-    long preValue = getLongValue();
-    preValue += statistics.getCount();
-    setLongValue(preValue);
+    setLongValue(getLongValue() + statistics.getCount());
   }
 
   @Override
-  public void updateResultFromPageData(BatchData dataInThisPage) {
-    int cnt = dataInThisPage.length();
-    long preValue = getLongValue();
-    preValue += cnt;
-    setLongValue(preValue);
+  public void updateResultFromPageData(IBatchDataIterator batchIterator) {
+    setLongValue(getLongValue() + batchIterator.totalLength());
   }
 
   @Override
-  public void updateResultFromPageData(BatchData dataInThisPage, long minBound, long maxBound) {
-    while (dataInThisPage.hasCurrent()) {
-      if (dataInThisPage.currentTime() >= maxBound || dataInThisPage.currentTime() < minBound) {
+  public void updateResultFromPageData(
+      IBatchDataIterator batchIterator, long minBound, long maxBound) {
+    int cnt = 0;
+    while (batchIterator.hasNext(minBound, maxBound)) {
+      if (batchIterator.currentTime() >= maxBound || batchIterator.currentTime() < minBound) {
         break;
       }
-      long preValue = getLongValue();
-      setLongValue(++preValue);
-      dataInThisPage.next();
+      cnt++;
+      batchIterator.next();
     }
+    setLongValue(getLongValue() + cnt);
   }
 
   @Override
@@ -80,24 +78,17 @@ public class CountAggrResult extends AggregateResult {
         cnt++;
       }
     }
-
-    long preValue = getLongValue();
-    preValue += cnt;
-    setLongValue(preValue);
+    setLongValue(getLongValue() + cnt);
   }
 
   @Override
-  public void updateResultUsingValues(long[] timestamps, int length, Object[] values) {
+  public void updateResultUsingValues(long[] timestamps, int length, ValueIterator valueIterator) {
     int cnt = 0;
-    for (int i = 0; i < length; i++) {
-      if (values[i] != null) {
-        cnt++;
-      }
+    while (valueIterator.hasNext()) {
+      valueIterator.next();
+      cnt++;
     }
-
-    long preValue = getLongValue();
-    preValue += cnt;
-    setLongValue(preValue);
+    setLongValue(getLongValue() + cnt);
   }
 
   @Override

@@ -23,7 +23,11 @@ import org.apache.iotdb.db.engine.fileSystem.SystemFileFactory;
 import org.apache.iotdb.db.engine.flush.MemTableFlushTask;
 import org.apache.iotdb.db.engine.memtable.IMemTable;
 import org.apache.iotdb.db.engine.memtable.PrimitiveMemTable;
+import org.apache.iotdb.db.engine.modification.Deletion;
+import org.apache.iotdb.db.engine.modification.Modification;
+import org.apache.iotdb.db.engine.modification.ModificationFile;
 import org.apache.iotdb.db.engine.storagegroup.TsFileResource;
+import org.apache.iotdb.db.engine.storagegroup.VirtualStorageGroupProcessor;
 import org.apache.iotdb.db.exception.StorageGroupProcessorException;
 import org.apache.iotdb.db.utils.FileLoaderUtils;
 import org.apache.iotdb.db.writelog.manager.MultiFileLogNodeManager;
@@ -41,6 +45,8 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -62,17 +68,20 @@ public class TsFileRecoverPerformer {
   private final String logNodePrefix;
   private final TsFileResource tsFileResource;
   private final boolean sequence;
+  private VirtualStorageGroupProcessor virtualStorageGroupProcessor;
 
   /** @param isLastFile whether this TsFile is the last file of its partition */
   public TsFileRecoverPerformer(
       String logNodePrefix,
       TsFileResource currentTsFileResource,
       boolean sequence,
-      boolean isLastFile) {
+      boolean isLastFile,
+      VirtualStorageGroupProcessor storageGroupProcessor) {
     this.filePath = currentTsFileResource.getTsFilePath();
     this.logNodePrefix = logNodePrefix;
     this.tsFileResource = currentTsFileResource;
     this.sequence = sequence;
+    this.virtualStorageGroupProcessor = storageGroupProcessor;
   }
 
   /**
@@ -86,11 +95,18 @@ public class TsFileRecoverPerformer {
   @SuppressWarnings("squid:S3776") // Suppress high Cognitive Complexity warning
   public RestorableTsFileIOWriter recover(
       boolean needRedoWal, Supplier<ByteBuffer[]> supplier, Consumer<ByteBuffer[]> consumer)
-      throws StorageGroupProcessorException {
+      throws StorageGroupProcessorException, IOException {
 
     File file = FSFactoryProducer.getFSFactory().getFile(filePath);
     if (!file.exists()) {
       logger.error("TsFile {} is missing, will skip its recovery.", filePath);
+      return null;
+    }
+
+    if (tsFileResource.resourceFileExists()) {
+      // .resource file exists, deserialize it
+      recoverResourceFromFile();
+      // return null here for skipping check TsFile
       return null;
     }
 
@@ -139,18 +155,13 @@ public class TsFileRecoverPerformer {
   }
 
   private void recoverResource() throws IOException {
-    if (tsFileResource.resourceFileExists()) {
-      // .resource file exists, deserialize it
-      recoverResourceFromFile();
-    } else {
-      // .resource file does not exist, read file metadata and recover tsfile resource
-      try (TsFileSequenceReader reader =
-          new TsFileSequenceReader(tsFileResource.getTsFile().getAbsolutePath())) {
-        FileLoaderUtils.updateTsFileResource(reader, tsFileResource);
-      }
-      // write .resource file
-      tsFileResource.serialize();
+    // .resource file does not exist, read file metadata and recover tsfile resource
+    try (TsFileSequenceReader reader =
+        new TsFileSequenceReader(tsFileResource.getTsFile().getAbsolutePath())) {
+      FileLoaderUtils.updateTsFileResource(reader, tsFileResource);
     }
+    // write .resource file
+    tsFileResource.serialize();
   }
 
   private void recoverResourceFromFile() throws IOException {
@@ -183,22 +194,85 @@ public class TsFileRecoverPerformer {
   }
 
   private void recoverResourceFromWriter(RestorableTsFileIOWriter restorableTsFileIOWriter) {
+    Map<String, Map<String, List<Deletion>>> modificationsForResource =
+        loadModificationsForResource();
     Map<String, List<ChunkMetadata>> deviceChunkMetaDataMap =
         restorableTsFileIOWriter.getDeviceChunkMetadataMap();
     for (Map.Entry<String, List<ChunkMetadata>> entry : deviceChunkMetaDataMap.entrySet()) {
       String deviceId = entry.getKey();
       List<ChunkMetadata> chunkMetadataList = entry.getValue();
-      TSDataType dataType = entry.getValue().get(entry.getValue().size() - 1).getDataType();
-      for (ChunkMetadata chunkMetaData : chunkMetadataList) {
-        if (!chunkMetaData.getDataType().equals(dataType)) {
-          continue;
+
+      // measurement -> ChunkMetadataList
+      Map<String, List<ChunkMetadata>> measurementToChunkMetadatas = new HashMap<>();
+      for (ChunkMetadata chunkMetadata : chunkMetadataList) {
+        List<ChunkMetadata> list =
+            measurementToChunkMetadatas.computeIfAbsent(
+                chunkMetadata.getMeasurementUid(), n -> new ArrayList<>());
+        list.add(chunkMetadata);
+      }
+
+      for (List<ChunkMetadata> metadataList : measurementToChunkMetadatas.values()) {
+        TSDataType dataType = metadataList.get(metadataList.size() - 1).getDataType();
+        for (ChunkMetadata chunkMetaData : chunkMetadataList) {
+          if (!chunkMetaData.getDataType().equals(dataType)) {
+            continue;
+          }
+
+          // calculate startTime and endTime according to chunkMetaData and modifications
+          long startTime = chunkMetaData.getStartTime();
+          long endTime = chunkMetaData.getEndTime();
+          long chunkHeaderOffset = chunkMetaData.getOffsetOfChunkHeader();
+          if (modificationsForResource.containsKey(deviceId)
+              && modificationsForResource
+                  .get(deviceId)
+                  .containsKey(chunkMetaData.getMeasurementUid())) {
+            // exist deletion for current measurement
+            for (Deletion modification :
+                modificationsForResource.get(deviceId).get(chunkMetaData.getMeasurementUid())) {
+              long fileOffset = modification.getFileOffset();
+              if (chunkHeaderOffset < fileOffset) {
+                // deletion is valid for current chunk
+                long modsStartTime = modification.getStartTime();
+                long modsEndTime = modification.getEndTime();
+                if (startTime >= modsStartTime && endTime <= modsEndTime) {
+                  startTime = Long.MAX_VALUE;
+                  endTime = Long.MIN_VALUE;
+                } else if (startTime >= modsStartTime && startTime <= modsEndTime) {
+                  startTime = modsEndTime + 1;
+                } else if (endTime >= modsStartTime && endTime <= modsEndTime) {
+                  endTime = modsStartTime - 1;
+                }
+              }
+            }
+          }
+          tsFileResource.updateStartTime(deviceId, startTime);
+          tsFileResource.updateEndTime(deviceId, endTime);
         }
-        tsFileResource.updateStartTime(deviceId, chunkMetaData.getStartTime());
-        tsFileResource.updateEndTime(deviceId, chunkMetaData.getEndTime());
       }
     }
     tsFileResource.updatePlanIndexes(restorableTsFileIOWriter.getMinPlanIndex());
     tsFileResource.updatePlanIndexes(restorableTsFileIOWriter.getMaxPlanIndex());
+  }
+
+  // load modifications for recovering tsFileResource
+  private Map<String, Map<String, List<Deletion>>> loadModificationsForResource() {
+    Map<String, Map<String, List<Deletion>>> modificationsForResource = new HashMap<>();
+    ModificationFile modificationFile = tsFileResource.getModFile();
+    if (modificationFile.exists()) {
+      List<Modification> modifications = (List<Modification>) modificationFile.getModifications();
+      for (Modification modification : modifications) {
+        if (modification.getType().equals(Modification.Type.DELETION)) {
+          String deviceId = modification.getPath().getDevice();
+          String measurementId = modification.getPath().getMeasurement();
+          Map<String, List<Deletion>> measurementModsMap =
+              modificationsForResource.computeIfAbsent(deviceId, n -> new HashMap<>());
+          List<Deletion> list =
+              measurementModsMap.computeIfAbsent(measurementId, n -> new ArrayList<>());
+          list.add((Deletion) modification);
+        }
+      }
+    }
+    return modificationsForResource;
   }
 
   private void redoLogs(
@@ -213,7 +287,7 @@ public class TsFileRecoverPerformer {
             tsFileResource,
             recoverMemTable,
             sequence);
-    logReplayer.replayLogs(supplier);
+    logReplayer.replayLogs(supplier, virtualStorageGroupProcessor);
     try {
       if (!recoverMemTable.isEmpty()) {
         // flush logs

@@ -21,6 +21,7 @@ package org.apache.iotdb.cluster.server.clusterinfo;
 import org.apache.iotdb.cluster.config.ClusterDescriptor;
 import org.apache.iotdb.cluster.rpc.thrift.ClusterInfoService;
 import org.apache.iotdb.db.conf.IoTDBDescriptor;
+import org.apache.iotdb.db.exception.StorageEngineException;
 import org.apache.iotdb.db.exception.metadata.MetadataException;
 import org.apache.iotdb.rpc.RpcTransportFactory;
 
@@ -33,7 +34,10 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.IOException;
+
 public class ClusterInfoServerTest {
+
   ClusterInfoServiceImplTest test;
   ClusterInfoServer service;
 
@@ -46,18 +50,24 @@ public class ClusterInfoServerTest {
   }
 
   @After
-  public void tearDown() throws MetadataException {
+  public void tearDown() throws MetadataException, IOException, StorageEngineException {
     test.tearDown();
     service.stop();
   }
 
   @Test
   public void testConnect() {
-    TTransport transport =
-        RpcTransportFactory.INSTANCE.getTransport(
-            new TSocket(
-                IoTDBDescriptor.getInstance().getConfig().getRpcAddress(),
-                ClusterDescriptor.getInstance().getConfig().getClusterInfoRpcPort()));
+    TTransport transport = null;
+    try {
+      transport =
+          RpcTransportFactory.INSTANCE.getTransport(
+              new TSocket(
+                  IoTDBDescriptor.getInstance().getConfig().getRpcAddress(),
+                  ClusterDescriptor.getInstance().getConfig().getClusterInfoRpcPort()));
+    } catch (TTransportException e) {
+      Assert.fail(e.getMessage());
+    }
+
     try {
       transport.open();
     } catch (TTransportException e) {
@@ -69,5 +79,21 @@ public class ClusterInfoServerTest {
     Assert.assertNotNull(client);
     // client's methods have been tested on ClusterInfoServiceImplTest
     transport.close();
+    try {
+      transport =
+          RpcTransportFactory.INSTANCE.getTransport(
+              new TSocket(
+                  IoTDBDescriptor.getInstance().getConfig().getRpcAddress(),
+                  ClusterDescriptor.getInstance().getConfig().getClusterInfoRpcPort()));
+      transport.open();
+
+      // connection success means OK.
+      client = new ClusterInfoService.Client(new TBinaryProtocol(transport));
+      Assert.assertNotNull(client);
+      // client's methods have been tested on ClusterInfoServiceImplTest
+      transport.close();
+    } catch (TTransportException e) {
+      Assert.fail(e.getMessage());
+    }
   }
 }

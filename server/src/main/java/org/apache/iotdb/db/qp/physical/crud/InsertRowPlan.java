@@ -23,8 +23,9 @@ import org.apache.iotdb.db.conf.IoTDBDescriptor;
 import org.apache.iotdb.db.exception.metadata.IllegalPathException;
 import org.apache.iotdb.db.exception.metadata.PathNotExistException;
 import org.apache.iotdb.db.exception.query.QueryProcessException;
-import org.apache.iotdb.db.metadata.PartialPath;
+import org.apache.iotdb.db.metadata.mnode.IMeasurementMNode;
 import org.apache.iotdb.db.metadata.mnode.MeasurementMNode;
+import org.apache.iotdb.db.metadata.path.PartialPath;
 import org.apache.iotdb.db.qp.logical.Operator;
 import org.apache.iotdb.db.qp.logical.Operator.OperatorType;
 import org.apache.iotdb.db.utils.CommonUtils;
@@ -63,6 +64,7 @@ public class InsertRowPlan extends InsertPlan {
   private boolean isNeedInferType = false;
 
   private List<Object> failedValues;
+  private List<PartialPath> paths;
 
   public InsertRowPlan() {
     super(OperatorType.INSERT);
@@ -70,7 +72,7 @@ public class InsertRowPlan extends InsertPlan {
 
   public InsertRowPlan(InsertRowPlan another) {
     super(OperatorType.INSERT);
-    this.deviceId = another.deviceId;
+    this.devicePath = another.devicePath;
     this.time = another.time;
     this.measurements = new String[another.measurements.length];
     System.arraycopy(another.measurements, 0, this.measurements, 0, another.measurements.length);
@@ -81,10 +83,10 @@ public class InsertRowPlan extends InsertPlan {
   }
 
   public InsertRowPlan(
-      PartialPath deviceId, long insertTime, String[] measurementList, String[] insertValues) {
+      PartialPath prefixPath, long insertTime, String[] measurementList, String[] insertValues) {
     super(Operator.OperatorType.INSERT);
     this.time = insertTime;
-    this.deviceId = deviceId;
+    this.devicePath = prefixPath;
     this.measurements = measurementList;
     this.dataTypes = new TSDataType[insertValues.length];
     // We need to create an Object[] for the data type casting, because we can not set Float, Long
@@ -95,28 +97,33 @@ public class InsertRowPlan extends InsertPlan {
   }
 
   public InsertRowPlan(
-      PartialPath deviceId, long insertTime, String[] measurementList, ByteBuffer values)
+      PartialPath prefixPath,
+      long insertTime,
+      String[] measurementList,
+      ByteBuffer values,
+      boolean isAligned)
       throws QueryProcessException {
     super(Operator.OperatorType.INSERT);
     this.time = insertTime;
-    this.deviceId = deviceId;
+    this.devicePath = prefixPath;
     this.measurements = measurementList;
     this.dataTypes = new TSDataType[measurementList.length];
     this.values = new Object[measurementList.length];
     this.fillValues(values);
     isNeedInferType = false;
+    this.isAligned = isAligned;
   }
 
   @TestOnly
   public InsertRowPlan(
-      PartialPath deviceId,
+      PartialPath prefixPath,
       long insertTime,
       String[] measurements,
       TSDataType[] dataTypes,
       String[] insertValues) {
     super(OperatorType.INSERT);
     this.time = insertTime;
-    this.deviceId = deviceId;
+    this.devicePath = prefixPath;
     this.measurements = measurements;
     this.dataTypes = dataTypes;
     this.values = new Object[dataTypes.length];
@@ -131,37 +138,61 @@ public class InsertRowPlan extends InsertPlan {
 
   @TestOnly
   public InsertRowPlan(
-      PartialPath deviceId,
+      PartialPath prefixPath,
+      long insertTime,
+      String[] measurements,
+      TSDataType[] dataTypes,
+      String[] insertValues,
+      boolean isAligned) {
+    super(OperatorType.INSERT);
+    this.time = insertTime;
+    this.devicePath = prefixPath;
+    this.measurements = measurements;
+    this.dataTypes = dataTypes;
+    this.values = new Object[dataTypes.length];
+    for (int i = 0; i < dataTypes.length; i++) {
+      try {
+        values[i] = CommonUtils.parseValueForTest(dataTypes[i], insertValues[i]);
+      } catch (QueryProcessException e) {
+        e.printStackTrace();
+      }
+    }
+    this.isAligned = isAligned;
+  }
+
+  @TestOnly
+  public InsertRowPlan(
+      PartialPath prefixPath,
       long insertTime,
       String measurement,
       TSDataType type,
       String insertValue) {
     super(OperatorType.INSERT);
     this.time = insertTime;
-    this.deviceId = deviceId;
+    this.devicePath = prefixPath;
     this.measurements = new String[] {measurement};
     this.dataTypes = new TSDataType[] {type};
     this.values = new Object[1];
     try {
       values[0] = CommonUtils.parseValueForTest(dataTypes[0], insertValue);
     } catch (QueryProcessException e) {
-      e.printStackTrace();
+      logger.error(e.getMessage());
     }
   }
 
   @TestOnly
   public InsertRowPlan(TSRecord tsRecord) throws IllegalPathException {
     super(OperatorType.INSERT);
-    this.deviceId = new PartialPath(tsRecord.deviceId);
+    this.devicePath = new PartialPath(tsRecord.deviceId);
     this.time = tsRecord.time;
     this.measurements = new String[tsRecord.dataPointList.size()];
-    this.measurementMNodes = new MeasurementMNode[tsRecord.dataPointList.size()];
+    this.measurementMNodes = new IMeasurementMNode[tsRecord.dataPointList.size()];
     this.dataTypes = new TSDataType[tsRecord.dataPointList.size()];
     this.values = new Object[tsRecord.dataPointList.size()];
     for (int i = 0; i < tsRecord.dataPointList.size(); i++) {
       measurements[i] = tsRecord.dataPointList.get(i).getMeasurementId();
       measurementMNodes[i] =
-          new MeasurementMNode(
+          MeasurementMNode.getMeasurementMNode(
               null,
               measurements[i],
               new MeasurementSchema(
@@ -195,7 +226,6 @@ public class InsertRowPlan extends InsertPlan {
   @SuppressWarnings("squid:S3776") // Suppress high Cognitive Complexity warning
   public void transferType() throws QueryProcessException {
     if (isNeedInferType) {
-      int columnIndex = 0;
       for (int i = 0; i < measurementMNodes.length; i++) {
         if (measurementMNodes[i] == null) {
           if (IoTDBDescriptor.getInstance().getConfig().isEnablePartialInsert()) {
@@ -203,58 +233,32 @@ public class InsertRowPlan extends InsertPlan {
                 i,
                 new QueryProcessException(
                     new PathNotExistException(
-                        deviceId.getFullPath() + IoTDBConstant.PATH_SEPARATOR + measurements[i])));
+                        devicePath.getFullPath()
+                            + IoTDBConstant.PATH_SEPARATOR
+                            + measurements[i])));
           } else {
             throw new QueryProcessException(
                 new PathNotExistException(
-                    deviceId.getFullPath() + IoTDBConstant.PATH_SEPARATOR + measurements[i]));
+                    devicePath.getFullPath() + IoTDBConstant.PATH_SEPARATOR + measurements[i]));
           }
-          columnIndex++;
           continue;
         }
-        if (measurementMNodes[i].getSchema().getType() != TSDataType.VECTOR) {
-          dataTypes[columnIndex] = measurementMNodes[i].getSchema().getType();
-          try {
-            values[columnIndex] =
-                CommonUtils.parseValue(dataTypes[columnIndex], values[columnIndex].toString());
-          } catch (Exception e) {
-            logger.warn(
-                "{}.{} data type is not consistent, input {}, registered {}",
-                deviceId,
-                measurements[i],
-                values[i],
-                dataTypes[i]);
-            if (IoTDBDescriptor.getInstance().getConfig().isEnablePartialInsert()) {
-              markFailedMeasurementInsertion(i, e);
-              measurementMNodes[i] = null;
-            } else {
-              throw e;
-            }
-          }
-          columnIndex++;
-        }
-        // for aligned timeseries
-        else {
-          for (TSDataType dataType : measurementMNodes[i].getSchema().getValueTSDataTypeList()) {
-            dataTypes[columnIndex] = dataType;
-            try {
-              values[columnIndex] =
-                  CommonUtils.parseValue(dataTypes[columnIndex], values[columnIndex].toString());
-            } catch (Exception e) {
-              logger.warn(
-                  "{}.{} data type is not consistent, input {}, registered {}",
-                  deviceId,
-                  measurements[i],
-                  values[columnIndex],
-                  dataTypes[columnIndex]);
-              if (IoTDBDescriptor.getInstance().getConfig().isEnablePartialInsert()) {
-                markFailedMeasurementInsertion(i, e);
-                measurementMNodes[i] = null;
-              } else {
-                throw e;
-              }
-            }
-            columnIndex++;
+
+        dataTypes[i] = measurementMNodes[i].getSchema().getType();
+        try {
+          values[i] = CommonUtils.parseValue(dataTypes[i], values[i].toString());
+        } catch (Exception e) {
+          logger.warn(
+              "{}.{} data type is not consistent, input {}, registered {}",
+              devicePath,
+              measurements[i],
+              values[i],
+              dataTypes[i]);
+          if (IoTDBDescriptor.getInstance().getConfig().isEnablePartialInsert()) {
+            markFailedMeasurementInsertion(i, e);
+            measurementMNodes[i] = null;
+          } else {
+            throw e;
           }
         }
       }
@@ -277,17 +281,22 @@ public class InsertRowPlan extends InsertPlan {
     }
     failedValues.add(values[index]);
     values[index] = null;
-    dataTypes[index] = null;
+    if (isNeedInferType) {
+      dataTypes[index] = null;
+    }
   }
 
   @Override
   public List<PartialPath> getPaths() {
-    List<PartialPath> ret = new ArrayList<>();
-    for (String m : measurements) {
-      PartialPath fullPath = deviceId.concatNode(m);
-      ret.add(fullPath);
+    if (paths != null) {
+      return paths;
     }
-    return ret;
+    paths = new ArrayList<>(measurements.length);
+    for (String m : measurements) {
+      PartialPath fullPath = devicePath.concatNode(m);
+      paths.add(fullPath);
+    }
+    return paths;
   }
 
   public Object[] getValues() {
@@ -308,14 +317,15 @@ public class InsertRowPlan extends InsertPlan {
     }
     InsertRowPlan that = (InsertRowPlan) o;
     return time == that.time
-        && Objects.equals(deviceId, that.deviceId)
+        && Objects.equals(devicePath, that.devicePath)
         && Arrays.equals(measurements, that.measurements)
-        && Arrays.equals(values, that.values);
+        && Arrays.equals(values, that.values)
+        && Objects.equals(isAligned, that.isAligned);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(deviceId, time);
+    return Objects.hash(devicePath, time);
   }
 
   @Override
@@ -327,7 +337,7 @@ public class InsertRowPlan extends InsertPlan {
 
   public void subSerialize(DataOutputStream stream) throws IOException {
     stream.writeLong(time);
-    putString(stream, deviceId.getFullPath());
+    putString(stream, devicePath.getFullPath());
     serializeMeasurementsAndValues(stream);
   }
 
@@ -352,6 +362,7 @@ public class InsertRowPlan extends InsertPlan {
     stream.write((byte) (isNeedInferType ? 1 : 0));
 
     stream.writeLong(index);
+    stream.write((byte) (isAligned ? 1 : 0));
   }
 
   private void putValues(DataOutputStream outputStream) throws QueryProcessException, IOException {
@@ -364,7 +375,7 @@ public class InsertRowPlan extends InsertPlan {
       // and is forwarded to other nodes
       if (dataTypes == null || dataTypes[i] == null) {
         ReadWriteIOUtils.write(TYPE_RAW_STRING, outputStream);
-        ReadWriteIOUtils.write((String) values[i], outputStream);
+        ReadWriteIOUtils.write(values[i].toString(), outputStream);
       } else {
         ReadWriteIOUtils.write(dataTypes[i], outputStream);
         switch (dataTypes[i]) {
@@ -403,7 +414,7 @@ public class InsertRowPlan extends InsertPlan {
       // and is forwarded to other nodes
       if (dataTypes == null || dataTypes[i] == null) {
         ReadWriteIOUtils.write(TYPE_RAW_STRING, buffer);
-        ReadWriteIOUtils.write((String) values[i], buffer);
+        ReadWriteIOUtils.write(values[i].toString(), buffer);
       } else {
         ReadWriteIOUtils.write(dataTypes[i], buffer);
         switch (dataTypes[i]) {
@@ -469,7 +480,7 @@ public class InsertRowPlan extends InsertPlan {
   }
 
   @Override
-  public void serialize(ByteBuffer buffer) {
+  public void serializeImpl(ByteBuffer buffer) {
     int type = PhysicalPlanType.INSERT.ordinal();
     buffer.put((byte) type);
     subSerialize(buffer);
@@ -477,7 +488,7 @@ public class InsertRowPlan extends InsertPlan {
 
   public void subSerialize(ByteBuffer buffer) {
     buffer.putLong(time);
-    putString(buffer, deviceId.getFullPath());
+    putString(buffer, devicePath.getFullPath());
     serializeMeasurementsAndValues(buffer);
   }
 
@@ -500,12 +511,14 @@ public class InsertRowPlan extends InsertPlan {
     // the types are not inferred before the plan is serialized
     buffer.put((byte) (isNeedInferType ? 1 : 0));
     buffer.putLong(index);
+
+    buffer.put((byte) (isAligned ? 1 : 0));
   }
 
   @Override
   public void deserialize(ByteBuffer buffer) throws IllegalPathException {
     this.time = buffer.getLong();
-    this.deviceId = new PartialPath(readString(buffer));
+    this.devicePath = new PartialPath(readString(buffer));
     deserializeMeasurementsAndValues(buffer);
   }
 
@@ -528,12 +541,13 @@ public class InsertRowPlan extends InsertPlan {
 
     isNeedInferType = buffer.get() == 1;
     this.index = buffer.getLong();
+    isAligned = buffer.get() == 1;
   }
 
   @Override
   public String toString() {
-    return "deviceId: "
-        + deviceId
+    return "prefixPath: "
+        + devicePath
         + ", time: "
         + time
         + ", measurements: "
